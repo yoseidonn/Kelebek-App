@@ -1,0 +1,2 @@
+#deneme
+print("Merhaba dünya")
