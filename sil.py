@@ -1,2 +1,0 @@
-#deneme
-print("Merhaba dünya")
