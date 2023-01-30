@@ -4,10 +4,13 @@ import sqlite3
 db = sqlite3.connect("database.db")
 cur = db.cursor()
 
-def createTables() -> None:
+def createTables():
+    # FIRST INFOS
     """
-    Program ilk defa çalıştırılmışsa gerekli tabloları oluşturmak için,
-    kayıtlı tablolar silinmişse veya bozulmuşsa onarım için kullanılır.
+    cur.execute(""
+        CREATE TABLE IF NOT EXISTS "first_infos" (
+	        "date"	TEXT)
+        "")
     """
     
     # OGRENCILER
@@ -53,12 +56,25 @@ createTables()
 
 ######################### FONKSIYONLAR ############################
 
-#SUBE ISIMLERI
-def get_all_grade_names() -> list:
-    """
-    Kayıtlı tüm öğrencilerin şubelerini tekrarsız bir liste halinde döndürür.
-    """
+"""
+# İLK AÇILIŞ MI ? 
+def get_first_date():
+    QUERY = "SELECT * FROM first_infos"
+    try:
+        date = cur.execute(QUERY).fetchall()[0][0]
+    except Exception as e:
+        print(e)
+        return False
+        
+    return date
 
+def set_first_date(date: str):
+    cur.execute("INSERT OR REPLACE INTO first_infos VALUES(?)", (date,))
+    db.commit()
+"""
+
+#ŞUBE İSİMLERİ
+def get_all_grade_names():
     QUERY = "SELECT sinif FROM ogrenciler"
     tumSiniflar = cur.execute(QUERY)
     siniflar = set()
@@ -68,20 +84,12 @@ def get_all_grade_names() -> list:
     return siniflar
 
 #ÖĞRENCİLER
-def add_one_student(student: list) -> None:
-    """
-    Verilen bilgiler doğrultusunda tek bir öğrenci ekler.
-    """
-
+def add_one_student(student: list):
     if len(student) != 0:
         cur.execute("INSERT OR REPLACE INTO ogrenciler VALUES(? ,?, ?, ?, ?)", student)
         db.commit()
 
-def add_multiple_students(students: list) -> None:
-    """
-    Verilen listede bulunan bilgiler doğrultusunda birden fazla öğrenci ekler.
-    """
-
+def add_multiple_students(students: list):
     if len(students) != 0:
         for student in students:
             cur.execute("INSERT OR REPLACE INTO ogrenciler VALUES(?, ?, ?, ?, ?)", [data for data in student])
@@ -92,11 +100,7 @@ def update_student(student):
     # NUMARAYI BULUP O OGRENCIYI SIL VE YENISINI EKLE YAPABILIRSIN
     # YA DA NUMARAYI BULUP DIGER DEGERLERINI DEGISTIREBILIRSIN
 
-def get_student_counts_per_every_grade() -> list:
-    """
-    İstatistik tablolarında kullanmak için sırasıyla toplam, 9, 10, 11 ve 12. sınıflardaki öğrenci sayılarını döndürür.
-    """
-
+def get_student_counts_per_every_grade():
     QUERY_9 = "SELECT * FROM ogrenciler WHERE sinif LIKE '%9%'"
     QUERY_10 = "SELECT * FROM ogrenciler WHERE sinif LIKE '%10%'"
     QUERY_11 = "SELECT * FROM ogrenciler WHERE sinif LIKE '%11%'"
@@ -109,16 +113,7 @@ def get_student_counts_per_every_grade() -> list:
     count12 = str(len(cur.execute(QUERY_12).fetchall()))
     return [totalCount, count9, count10, count11, count12]
     
-def get_all_students(number = False, fullname = False, grade = False, withGrades = False) -> list or dict:
-    """
-    withGrades = True: Kayıtlı tüm öğrencileri şube isimlerini anahtar olarak tutan bir sözlükte geri döndürür.
-    {
-        "9/A": [ogr1, ogr2, ogr3],
-        "9/B": [ogr4, ogr5, ogr6]
-    }
-    withGrades = False: Tüm öğrencileri tek bir listede geri döndürür.
-    """
-
+def get_all_students(number = False, fullname = False, grade = False, withGrades = False):
     QUERY = "SELECT * FROM ogrenciler ORDER BY sinif, no"
     QUERY_NUM = "SELECT * FROM ogrenciler WHERE no = ? ORDER BY sinif, no"
     QUERY_CLASS = "SELECT * FROM ogrenciler WHERE sinif = ? ORDER BY sinif, no"
@@ -149,20 +144,12 @@ def get_all_students(number = False, fullname = False, grade = False, withGrades
 
     return students
 
-def remove_one_student(number) -> None:
-    """
-    Numarası verilen öğrenci kaydını siler.
-    """
-
+def remove_one_student(number):
     QUERY = "DELETE FROM ogrenciler WHERE no = ?"
     cur.execute(QUERY, (number,))
     db.commit()
 
 def remove_all_students():
-    """
-    Kayıtlı tüm öğrencileri siler.
-    """
-
     QUERY = "DELETE FROM ogrenciler WHERE 1=1"
     cur.execute(QUERY)
     db.commit()
@@ -170,30 +157,11 @@ def remove_all_students():
 ################### CLASSROOMS ##############
 
 def add_new_classroom(*values):
-    """
-    Bilgileri verilen bir derslik ekler.
-    """
-
     QUERY = "INSERT OR REPLACE INTO salonlar VALUES(?, ?, ?, ?)"
     cur.execute(QUERY, values)
     db.commit()
 
-def get_all_classrooms(onlyNames = False) -> list or dict:
-    """
-    onlyNames = True: Kayıtlı tüm salonların adlarını döndürür.
-    onlyNames = False: Kayıtlı tüm salonların özelliklerini, salon adlarını anahtar olarak tutan bir sözlük halinde döndürür.
-    {
-        "Salon-1": {
-            "derslik_adi: "Salon-1",
-            "ogretmen_yonu": "Solda",
-            "kacli": "2'li",
-            "oturma_duzeni": "5,5,4",
-            }
-        },
-        ...        
-    }
-    """
-
+def get_all_classrooms(onlyNames = False):
     QUERY = "SELECT derslik_adi FROM salonlar"
     QUERY_2 = "SELECT derslik_adi, ogretmen_yonu, kacli, oturma_duzeni FROM salonlar"
     
@@ -215,11 +183,7 @@ def get_all_classrooms(onlyNames = False) -> list or dict:
 
     return salonlar
 
-def get_classrooms_counts_per_every_grade() -> list:
-    """
-    İstatistik tablolarında kullanmak için sırasıyla toplam, 9, 10, 11 ve 12. sınıflara ait şube sayılarını döndürür.
-    """
-
+def get_classrooms_counts_per_every_grade():
     QUERY_9 = "SELECT * FROM salonlar WHERE derslik_adi LIKE '%9%'"
     QUERY_10 = "SELECT * FROM salonlar WHERE derslik_adi LIKE '%10%'"
     QUERY_11 = "SELECT * FROM salonlar WHERE derslik_adi LIKE '%11%'"
@@ -234,24 +198,6 @@ def get_classrooms_counts_per_every_grade() -> list:
 
 # THESE TWO FUNCTION WORKS TOGETHER
 def create_arrangement(kacli: str, ogretmen_yonu: str, oturma_duzeni: str):
-    """
-    Verilen derslik özelliklerine göre öğrenci dağıtmak için kullanılacak olan bir düzen oluşturur.
-    [
-        [ 
-            {1: None, 2: None},
-            {3: None, 4: None},
-            {5: None, 6: None},
-            {7: None, 8: None}
-        ],
-        [ 
-            {9: None, 10: None},
-            {11: None, 12: None},
-            {13: None, 14: None},
-        ],
-    ]
-    }
-    """
-
     rowCounts = oturma_duzeni.split(",")
     matrix = []
     # KUTUCUKLARI KOY
@@ -286,11 +232,7 @@ def create_arrangement(kacli: str, ogretmen_yonu: str, oturma_duzeni: str):
                     
     return matrix
     
-def get_name_given_classrooms(names: list) -> dict:
-    """
-    Listedeki isimlerin veritabanındaki özelliklerini salon adını anahtar olarak tutan bir sözlük döndürür. 
-    """
-
+def get_name_given_classrooms(names: list):
     classrooms = dict()
     for name in names:
         QUERY = f"SELECT * FROM salonlar WHERE derslik_adi = ?"
@@ -314,32 +256,22 @@ def get_name_given_classrooms(names: list) -> dict:
 
     return classrooms
     
-def remove_classroom(classroomName) -> None:
-    """
-    Adı verilen salonun kaydını siler.
-    """
+def remove_classroom(classroomName):
     QUERY = "DELETE FROM salonlar WHERE derslik_adi = ?"
     cur.execute(QUERY, (classroomName,))
     db.commit()
+    print(get_all_classrooms(onlyNames=True))
 
 ################### THE SCHOOL ##############
 
-def update_all_infos(*values) -> None:
-    """
-    Okul bilgilerini verilen bilgileri kullanarak günceller.
-    """
-
+def update_all_infos(*values):
     QUERY = "DELETE FROM okul_bilgileri WHERE 1=1"
     QUERY_2 = "INSERT INTO okul_bilgileri VALUES(?, ?, ?)"
     cur.execute(QUERY)
     cur.execute(QUERY_2, values)
     db.commit()
 
-def get_all_infos() -> list:
-    """
-    Tüm okul bilgilerini geri döndürür
-    """
-
+def get_all_infos():
     QUERY = "SELECT * FROM okul_bilgileri"
     try:
         bilgiler = cur.execute(QUERY).fetchall()[0]
@@ -348,11 +280,7 @@ def get_all_infos() -> list:
         
     return bilgiler
 
-def get_table_infos() -> list:
-    """
-    Okulla ilgili istatistiklerin tutulduğu tabloda kullanılmak üzere gerekli bilgileri döndürür.
-    """
-
+def get_table_infos():
     gradeCounts = []
     studentCounts = []
     classroomCounts = []

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <link href="styles.css" rel="stylesheet" type="text/css">
+    <title>kimya Sınıf listeleri</title>
+    <style>
+        *{
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+        }
+        body{
+            font-family: Helvetica;
+            -webkit-font-smoothing: antialiased;
+            background: rgba( 71, 147, 227, 1);
+        }
+        .outer{
+            width: 29.7cm;
+            height: 21cm;
+        }
+        h2{
+            text-align: center;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: white;
+            padding: 30px 0;
+        }
+        
+        .table-wrapper{
+            margin: 10px 70px 70px;
+            box-shadow: 0px 35px 50px rgba( 0, 0, 0, 0.2 );
+        }
+        
+        .fl-table {
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: normal;
+            border: none;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 100%;
+            white-space: nowrap;
+            background-color: white;
+        }
+        
+        .fl-table td, .fl-table th {
+            text-align: center;
+            padding: 8px;
+        }
+        
+        .fl-table td {
+            border-right: 1px solid #f8f8f8;
+            font-size: 12px;
+        }
+        
+        .fl-table thead th {
+            color: #ffffff;
+            background: #4FC3A1;
+        }
+        
+        
+        .fl-table thead th:nth-child(odd) {
+            color: #ffffff;
+            background: #324960;
+        }
+        
+        .fl-table tr:nth-child(even) {
+            background: #F8F8F8;
+        }
+        
+        /* Responsive */
+        
+        @media (max-width: 767px) {
+            .fl-table {
+                display: block;
+                width: 100%;
+            }
+            .table-wrapper:before{
+                content: "Scroll horizontally >";
+                display: block;
+                text-align: right;
+                font-size: 11px;
+                color: white;
+                padding: 0 0 10px;
+            }
+            .fl-table thead, .fl-table tbody, .fl-table thead th {
+                display: block;
+            }
+            .fl-table thead th:last-child{
+                border-bottom: none;
+            }
+            .fl-table thead {
+                float: left;
+            }
+            .fl-table tbody {
+                width: auto;
+                position: relative;
+                overflow-x: auto;
+            }
+            .fl-table td, .fl-table th {
+                padding: 20px .625em .625em .625em;
+                height: 60px;
+                vertical-align: middle;
+                box-sizing: border-box;
+                overflow-x: hidden;
+                overflow-y: auto;
+                width: 120px;
+                font-size: 13px;
+                text-overflow: ellipsis;
+            }
+            .fl-table thead th {
+                text-align: left;
+                border-bottom: 1px solid #f7f7f9;
+            }
+            .fl-table tbody tr {
+                display: table-cell;
+            }
+            .fl-table tbody tr:nth-child(odd) {
+                background: none;
+            }
+            .fl-table tr:nth-child(even) {
+                background: transparent;
+            }
+            .fl-table tr td:nth-child(odd) {
+                background: #F8F8F8;
+                border-right: 1px solid #E6E4E4;
+            }
+            .fl-table tr td:nth-child(even) {
+                border-right: 1px solid #E6E4E4;
+            }
+            .fl-table tbody td {
+                display: block;
+                text-align: center;
+            }
+        }
+    </style>
+</head><body>
+    <div class="outer"> <h2>11/D</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>BATUHAN OKAN</td> <td>10/A 18</td> </tr> <tr> <td>2</td> <td>ESİN GÜL ÖZDEMİR</td> <td>10/B 6</td> </tr> <tr> <td>3</td> <td>ARDA YASİN HIRA</td> <td>10/B 9</td> </tr> <tr> <td>4</td> <td>BURAK ARDA KABASARI</td> <td>10/B 14</td> </tr> <tr> <td>5</td> <td>SENA KORKUT</td> <td>10/B 21</td> </tr> <tr> <td>6</td> <td>ALPER FURKAN YOLCU</td> <td>10/B 26</td> </tr> <tr> <td>7</td> <td>ONUR GÖKÇE</td> <td>10/C 30</td> </tr> <tr> <td>8</td> <td>ELİF ÇİÇEK</td> <td>10/D 22</td> </tr> <tr> <td>9</td> <td>SAFFET ARDA AVCI</td> <td>11/A 15</td> </tr> <tr> <td>10</td> <td>RANA TÜRKMEN</td> <td>11/A 21</td> </tr> <tr> <td>11</td> <td>ALPEREN BOSNA</td> <td>11/A 23</td> </tr> <tr> <td>12</td> <td>YUSUF ENES ÇALIŞKAN</td> <td>11/B 8</td> </tr> <tr> <td>13</td> <td>SEYİTHAN ÇAKIR</td> <td>11/C 25</td> </tr> <tr> <td>14</td> <td>MERT ALİ KAYA</td> <td>11/D 12</td> </tr> <tr> <td>15</td> <td>SILA ERBAĞCI</td> <td>11/D 16</td> </tr> <tr> <td>16</td> <td>FURKAN DAŞGIN</td> <td>11/D 20</td> </tr> <tr> <td>17</td> <td>AYŞENAZ BELGRAT</td> <td>11/D 26</td> </tr> <tr> <td>18</td> <td>MEHMET ALİ BEKTAŞ</td> <td>9/A 6</td> </tr> <tr> <td>19</td> <td>HAVVA NUR ÖZCAN</td> <td>9/A 27</td> </tr> </tbody> </table> </div> <br><br><br> </div> <div class="outer"> <h2>10/B</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>İBRAHİM TUNA KIRŞANLIOĞLU</td> <td>10/A 17</td> </tr> <tr> <td>2</td> <td>TÜRKER EMRE DOĞAN</td> <td>10/A 22</td> </tr> <tr> <td>3</td> <td>BATU TUNA</td> <td>10/A 24</td> </tr> <tr> <td>4</td> <td>ŞERİFE BETÜL BAŞARI</td> <td>10/A 14</td> </tr> <tr> <td>5</td> <td>ELANUR OTURAK</td> <td>10/A 4</td> </tr> <tr> <td>6</td> <td>RABİA KUZU</td> <td>10/B 18</td> </tr> <tr> <td>7</td> <td>MELİSA BAYIRLI</td> <td>10/B 23</td> </tr> <tr> <td>8</td> <td>MEHMET ANIL ÖLÇER</td> <td>10/C 7</td> </tr> <tr> <td>9</td> <td>AHMET UĞUR ÇAVDAR</td> <td>10/C 24</td> </tr> <tr> <td>10</td> <td>BURHAN GER</td> <td>10/C 26</td> </tr> <tr> <td>11</td> <td>AZRA DESTECİ</td> <td>10/D 2</td> </tr> <tr> <td>12</td> <td>ALPEREN ÜNLÜ</td> <td>10/D 16</td> </tr> <tr> <td>13</td> <td>GÜL PEMBE NARCI</td> <td>10/D 23</td> </tr> <tr> <td>14</td> <td>EYLÜL NAZ ACAR</td> <td>11/A 1</td> </tr> <tr> <td>15</td> <td>DAMLA DİRMİLLİ</td> <td>11/A 5</td> </tr> <tr> <td>16</td> <td>AYNUSA ASARLI</td> <td>11/A 9</td> </tr> <tr> <td>17</td> <td>SULTAN YANIK</td> <td>11/A 22</td> </tr> <tr> <td>18</td> <td>SEHER TATLI</td> <td>11/B 21</td> </tr> <tr> <td>19</td> <td>GÜLSÜM NAZ KORMAL</td> <td>11/B 27</td> </tr> <tr> <td>20</td> <td>GÖRKEM SOLAKOĞLU</td> <td>11/B 17</td> </tr> <tr> <td>21</td> <td>TUBA TÜRKMEN</td> <td>11/B 19</td> </tr> <tr> <td>22</td> <td>KADİR KOFTU</td> <td>11/C 14</td> </tr> <tr> <td>23</td> <td>DOĞAN ÜREYEN</td> <td>11/D 24</td> </tr> </tbody> </table> </div> <br><br><br> </div> <div class="outer"> <h2>11/C</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>BURAK BATU KARŞİT</td> <td>10/A 20</td> </tr> <tr> <td>2</td> <td>NEHİR TAŞDEMİR</td> <td>10/A 12</td> </tr> <tr> <td>3</td> <td>HAMİT SONBEY ACER</td> <td>10/A 6</td> </tr> <tr> <td>4</td> <td>AZRA YALÇIN</td> <td>10/B 16</td> </tr> <tr> <td>5</td> <td>SAMED ERDOĞDU</td> <td>10/B 28</td> </tr> <tr> <td>6</td> <td>DERVİŞ YILMAZ</td> <td>10/D 15</td> </tr> <tr> <td>7</td> <td>ZEYNEP SUDE ERSOY</td> <td>10/D 17</td> </tr> <tr> <td>8</td> <td>MİRAY KAYA</td> <td>10/D 19</td> </tr> <tr> <td>9</td> <td>ÇİSEM SEYFİ</td> <td>11/A 10</td> </tr> <tr> <td>10</td> <td>ALEYNA MALGAZ</td> <td>11/A 27</td> </tr> <tr> <td>11</td> <td>AYŞENAZ BAKIR</td> <td>11/B 28</td> </tr> <tr> <td>12</td> <td>ÇINAR ELGİN KAYA</td> <td>11/B 1</td> </tr> <tr> <td>13</td> <td>ZEYNEP ZÜLAL URYAN</td> <td>11/C 4</td> </tr> <tr> <td>14</td> <td>BURCU KARAKAŞ</td> <td>11/D 2</td> </tr> <tr> <td>15</td> <td>RAMAZAN BİLDİRİCİ</td> <td>11/D 28</td> </tr> <tr> <td>16</td> <td>FURKAN KURTULAN</td> <td>9/A 2</td> </tr> <tr> <td>17</td> <td>EMİRHAN ÇINAR</td> <td>9/A 25</td> </tr> <tr> <td>18</td> <td>AYŞEGÜL AYDOĞDU</td> <td>9/B 2</td> </tr> <tr> <td>19</td> <td>EGE YİĞİT KARAYEL</td> <td>9/B 4</td> </tr> <tr> <td>20</td> <td>MUSTAFA ACAR</td> <td>9/B 8</td> </tr> </tbody> </table> </div> <br><br><br> </div> <div class="outer"> <h2>9/B</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>KAAN POLAT UĞUR</td> <td>10/A 19</td> </tr> <tr> <td>2</td> <td>SELİN MANAY</td> <td>10/A 11</td> </tr> <tr> <td>3</td> <td>EBUBEKİR GÜDÜCÜ</td> <td>10/A 15</td> </tr> <tr> <td>4</td> <td>BERRA KILIÇ</td> <td>10/A 1</td> </tr> <tr> <td>5</td> <td>BERİN DOĞAN</td> <td>10/B 7</td> </tr> <tr> <td>6</td> <td>YAĞIZ EFE TIKIR</td> <td>10/B 12</td> </tr> <tr> <td>7</td> <td>BEYZA ONARAN</td> <td>10/B 24</td> </tr> <tr> <td>8</td> <td>ELİF TOSUN</td> <td>10/D 14</td> </tr> <tr> <td>9</td> <td>ELİF ŞİMŞEK</td> <td>10/D 25</td> </tr> <tr> <td>10</td> <td>İSMAİL METE ÇETİN</td> <td>11/A 4</td> </tr> <tr> <td>11</td> <td>EREN MİTTİRİ</td> <td>11/A 24</td> </tr> <tr> <td>12</td> <td>MUHAMMED ARDA DANE</td> <td>11/A 28</td> </tr> <tr> <td>13</td> <td>SILA GENCER</td> <td>11/B 14</td> </tr> <tr> <td>14</td> <td>GAMZE NUR YILDIZ</td> <td>11/B 4</td> </tr> <tr> <td>15</td> <td>FATMA SUDE NASLI</td> <td>11/C 7</td> </tr> <tr> <td>16</td> <td>DAMLA FATMA TAŞCI</td> <td>11/C 9</td> </tr> <tr> <td>17</td> <td>ARDA TAN</td> <td>11/C 11</td> </tr> <tr> <td>18</td> <td>KEREM GÖKSAL</td> <td>11/C 26</td> </tr> <tr> <td>19</td> <td>MUHAMMED ENES ZAHİRİ</td> <td>11/D 1</td> </tr> <tr> <td>20</td> <td>MÜRVET ECE TUNÇ</td> <td>11/D 3</td> </tr> <tr> <td>21</td> <td>ALPEREN KARAGEDİK</td> <td>11/D 5</td> </tr> <tr> <td>22</td> <td>MELDA TOPAKCI</td> <td>11/D 9</td> </tr> <tr> <td>23</td> <td>FERHAT TÜRKMEN</td> <td>11/D 13</td> </tr> <tr> <td>24</td> <td>ASİL REDAR ÇAKAR</td> <td>11/D 27</td> </tr> <tr> <td>25</td> <td>MENEKŞE UĞURLU</td> <td>9/A 1</td> </tr> <tr> <td>26</td> <td>BEDİRHAN DEMİRTAŞ</td> <td>9/A 18</td> </tr> <tr> <td>27</td> <td>AREL KOZAK</td> <td>9/B 7</td> </tr> <tr> <td>28</td> <td>AZRA OVALI</td> <td>9/B 15</td> </tr> <tr> <td>29</td> <td>BURAK AYDOĞDU</td> <td>9/B 17</td> </tr> </tbody> </table> </div> <br><br><br> </div> <div class="outer"> <h2>9/C</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>ELA ÜLKÜ ÜLKÜ</td> <td>10/A 21</td> </tr> <tr> <td>2</td> <td>BELKIS SU KASKA</td> <td>10/B 3</td> </tr> <tr> <td>3</td> <td>ALİ İHSAN HOPAYILMAZ</td> <td>10/B 15</td> </tr> <tr> <td>4</td> <td>TUNAHAN CANSEVER</td> <td>10/B 22</td> </tr> <tr> <td>5</td> <td>REFİK GÜZEY</td> <td>10/B 27</td> </tr> <tr> <td>6</td> <td>MERİÇ ECE BALTACI</td> <td>10/C 2</td> </tr> <tr> <td>7</td> <td>ESMA MÜNEVVER BOSTANCI</td> <td>10/C 20</td> </tr> <tr> <td>8</td> <td>İSMAİL ÇIRAK</td> <td>10/C 25</td> </tr> <tr> <td>9</td> <td>EFE KAAN ÖĞMEN</td> <td>10/D 12</td> </tr> <tr> <td>10</td> <td>DUYGUNUR ŞİMŞEK</td> <td>11/A 12</td> </tr> <tr> <td>11</td> <td>HALİL EFE BAHAR</td> <td>11/A 14</td> </tr> <tr> <td>12</td> <td>ÜMMÜGÜLSÜM KAYAK</td> <td>11/A 16</td> </tr> <tr> <td>13</td> <td>IRMAK ILGAZ</td> <td>11/A 26</td> </tr> <tr> <td>14</td> <td>CEYHUN DORUK KARADAĞ</td> <td>11/B 16</td> </tr> <tr> <td>15</td> <td>ÖZLEM ÖZDEMİR</td> <td>11/B 6</td> </tr> <tr> <td>16</td> <td>UMUT VELİ GENÇ</td> <td>11/B 10</td> </tr> <tr> <td>17</td> <td>TAHA IŞIKTAŞ</td> <td>11/C 13</td> </tr> <tr> <td>18</td> <td>FATMA YILDIZ</td> <td>11/C 15</td> </tr> <tr> <td>19</td> <td>MUSTAFA CAN ÖZKAN</td> <td>11/C 34</td> </tr> <tr> <td>20</td> <td>BİLGE MELİSA KOÇYİĞİT</td> <td>11/D 19</td> </tr> <tr> <td>21</td> <td>KEVSER BASKAK</td> <td>11/D 23</td> </tr> <tr> <td>22</td> <td>YAKUB EMRE AYDIN</td> <td>9/A 3</td> </tr> <tr> <td>23</td> <td>MELİSA DİLİ</td> <td>9/A 12</td> </tr> <tr> <td>24</td> <td>ARDA AKALIN</td> <td>9/A 16</td> </tr> <tr> <td>25</td> <td>HİLAL NAZ ARSLAN</td> <td>9/A 24</td> </tr> <tr> <td>26</td> <td>ELANUR ZENGİN</td> <td>9/A 28</td> </tr> <tr> <td>27</td> <td>HÜSEYİN ÖZKAYA</td> <td>9/A 30</td> </tr> <tr> <td>28</td> <td>BÜŞRA GÖVEN</td> <td>9/B 13</td> </tr> <tr> <td>29</td> <td>SUDENAZ BEKİK</td> <td>9/B 19</td> </tr> <tr> <td>30</td> <td>DENİZHAN KELÇE</td> <td>9/B 29</td> </tr> </tbody> </table> </div> <br><br><br> </div> <div class="outer"> <h2>9/A</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>ECRİN KABAKCI</td> <td>10/A 23</td> </tr> <tr> <td>2</td> <td>EMRE KARATAÇ</td> <td>10/A 3</td> </tr> <tr> <td>3</td> <td>EYLÜL ÜNAL</td> <td>10/A 7</td> </tr> <tr> <td>4</td> <td>GÖKBERK BURAK UÇAN</td> <td>10/B 5</td> </tr> <tr> <td>5</td> <td>AZRA GİREN</td> <td>10/B 20</td> </tr> <tr> <td>6</td> <td>DENİZ RODOPLU</td> <td>10/C 4</td> </tr> <tr> <td>7</td> <td>DENİZ GÖLTAŞ</td> <td>10/C 6</td> </tr> <tr> <td>8</td> <td>ERTUĞRUL ÖZDEMİR</td> <td>10/C 10</td> </tr> <tr> <td>9</td> <td>ADEM ÇAVDAR</td> <td>10/C 21</td> </tr> <tr> <td>10</td> <td>BAYRAM KIBIK</td> <td>10/C 23</td> </tr> <tr> <td>11</td> <td>ALEV ÖRNEK</td> <td>10/C 27</td> </tr> <tr> <td>12</td> <td>EYLÜL ÖĞÜTLÜ</td> <td>10/D 3</td> </tr> <tr> <td>13</td> <td>SALİH CAN</td> <td>10/D 29</td> </tr> <tr> <td>14</td> <td>ZEHRA İNCEARIK</td> <td>11/A 2</td> </tr> <tr> <td>15</td> <td>BÜŞRA HARDIÇ</td> <td>11/A 8</td> </tr> <tr> <td>16</td> <td>SÜLEYMAN GÜLBAĞ</td> <td>11/B 26</td> </tr> <tr> <td>17</td> <td>İSMAİL KAYRA ERDOĞAN</td> <td>11/B 12</td> </tr> <tr> <td>18</td> <td>SÜLEYMAN BENLİ</td> <td>11/C 5</td> </tr> <tr> <td>19</td> <td>ÇAKIL PEHLİVANER</td> <td>11/C 17</td> </tr> <tr> <td>20</td> <td>İREMSU İCLAL TOPLUPATA</td> <td>11/C 19</td> </tr> <tr> <td>21</td> <td>AYŞE HANIM KARAGÖL</td> <td>11/C 24</td> </tr> <tr> <td>22</td> <td>RAMAZAN ERAY KARAKAŞ</td> <td>11/C 28</td> </tr> <tr> <td>23</td> <td>CEMRE İBRİK</td> <td>11/D 7</td> </tr> <tr> <td>24</td> <td>PAKİZE PELEN ÇİMEN</td> <td>11/D 17</td> </tr> <tr> <td>25</td> <td>SÜMEYYE KAPLAN</td> <td>9/A 7</td> </tr> <tr> <td>26</td> <td>AYŞE BERRA ÖZCAN</td> <td>9/A 20</td> </tr> <tr> <td>27</td> <td>BURAK TÜRKKAN</td> <td>9/B 1</td> </tr> <tr> <td>28</td> <td>ASYA SAK</td> <td>9/B 21</td> </tr> <tr> <td>29</td> <td>DURMUŞ ALİ USLU</td> <td>9/B 27</td> </tr> </tbody> </table> </div> <br><br><br> </div> <div class="outer"> <h2>11/A</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>ALPEREN USTA</td> <td>10/A 26</td> </tr> <tr> <td>2</td> <td>RABİA KOCAER</td> <td>10/B 4</td> </tr> <tr> <td>3</td> <td>YUSUF KİRİŞ</td> <td>10/C 1</td> </tr> <tr> <td>4</td> <td>EDA DURUK</td> <td>10/C 12</td> </tr> <tr> <td>5</td> <td>ZAHİD ALPEREN KESKE</td> <td>10/C 14</td> </tr> <tr> <td>6</td> <td>NAZİRE YEŞİLKUŞ</td> <td>10/C 16</td> </tr> <tr> <td>7</td> <td>ZÜLAL KITIL</td> <td>10/C 18</td> </tr> <tr> <td>8</td> <td>KORAY HALİL MUTLU</td> <td>10/C 22</td> </tr> <tr> <td>9</td> <td>GÜLSADE ERVA TOPTAŞ</td> <td>10/D 1</td> </tr> <tr> <td>10</td> <td>İREMGÜL KOCAKAYA</td> <td>11/A 7</td> </tr> <tr> <td>11</td> <td>EGEHAN SARITOSUN</td> <td>11/B 13</td> </tr> <tr> <td>12</td> <td>ORÇUN BERK DÜZGÜN</td> <td>11/C 6</td> </tr> <tr> <td>13</td> <td>AZRA NUR ACAR</td> <td>11/C 8</td> </tr> <tr> <td>14</td> <td>BURAK SAFA BİLGİÇ</td> <td>11/C 10</td> </tr> <tr> <td>15</td> <td>MİNSU YILMAZ</td> <td>11/C 12</td> </tr> <tr> <td>16</td> <td>SUDENAZ ÇİL</td> <td>11/C 20</td> </tr> <tr> <td>17</td> <td>BERKE MERT ERGÜL</td> <td>11/C 22</td> </tr> <tr> <td>18</td> <td>MUSTAFA YİĞİT ÇETİN</td> <td>11/C 27</td> </tr> <tr> <td>19</td> <td>NEHİR KUŞAKSIZ</td> <td>11/C 29</td> </tr> <tr> <td>20</td> <td>FİRDEVS DUMAN</td> <td>11/D 6</td> </tr> <tr> <td>21</td> <td>AZRA ÖZCAN</td> <td>11/D 14</td> </tr> <tr> <td>22</td> <td>TUNA ÇELİK</td> <td>11/D 18</td> </tr> <tr> <td>23</td> <td>BÜNYAMİN GÖKCE</td> <td>9/A 17</td> </tr> </tbody> </table> </div> <br><br><br> </div> <div class="outer"> <h2>9/D</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>CEREN ŞENDUR</td> <td>10/A 25</td> </tr> <tr> <td>2</td> <td>KURTULUŞ ÖZDEMİR</td> <td>10/A 13</td> </tr> <tr> <td>3</td> <td>ENES EGE SUYABATMAZ</td> <td>10/A 5</td> </tr> <tr> <td>4</td> <td>SENA HAMARAT</td> <td>10/B 1</td> </tr> <tr> <td>5</td> <td>TAHA BERK KAYMAKCI</td> <td>10/B 10</td> </tr> <tr> <td>6</td> <td>AZRA KANGA</td> <td>10/B 17</td> </tr> <tr> <td>7</td> <td>SERHAT AKSOY</td> <td>10/C 8</td> </tr> <tr> <td>8</td> <td>ATAKAN MUHAMMED COŞKUN</td> <td>10/D 7</td> </tr> <tr> <td>9</td> <td>İDRİS KAYA</td> <td>10/D 27</td> </tr> <tr> <td>10</td> <td>GÜLDEREN BERRA AYDOĞDU</td> <td>11/A 6</td> </tr> <tr> <td>11</td> <td>HATİCE UĞUR</td> <td>11/A 19</td> </tr> <tr> <td>12</td> <td>İREM ABUKAN</td> <td>11/B 24</td> </tr> <tr> <td>13</td> <td>ALİYE DAŞTAN</td> <td>11/B 20</td> </tr> <tr> <td>14</td> <td>SUDENAZ AYDIN</td> <td>11/B 2</td> </tr> <tr> <td>15</td> <td>İREM SU YILMAZ</td> <td>11/C 1</td> </tr> <tr> <td>16</td> <td>NEVA DEMİR</td> <td>11/C 30</td> </tr> <tr> <td>17</td> <td>SÜLEYMAN EFE UYGUN</td> <td>11/C 32</td> </tr> <tr> <td>18</td> <td>İLAYDA AY</td> <td>11/D 11</td> </tr> <tr> <td>19</td> <td>RAMAZAN EREN MUTLU</td> <td>11/D 21</td> </tr> <tr> <td>20</td> <td>EFE KABAZ</td> <td>11/D 25</td> </tr> <tr> <td>21</td> <td>NİSA YILDIRIM</td> <td>9/A 5</td> </tr> <tr> <td>22</td> <td>FEYZA KOÇBIYIK</td> <td>9/A 9</td> </tr> <tr> <td>23</td> <td>KAZIM DENİZ ÇETİNKAYA</td> <td>9/A 14</td> </tr> <tr> <td>24</td> <td>ŞİFANUR AYDIN</td> <td>9/A 22</td> </tr> <tr> <td>25</td> <td>NİSA DELİGÖZ</td> <td>9/B 3</td> </tr> <tr> <td>26</td> <td>ENVER ÜLPER</td> <td>9/B 11</td> </tr> <tr> <td>27</td> <td>BURCU SERA YÜKSEL</td> <td>9/B 23</td> </tr> <tr> <td>28</td> <td>SELİN TOSUN</td> <td>9/B 25</td> </tr> </tbody> </table> </div> <br><br><br> </div> <div class="outer"> <h2>11/B</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>HARUN SİDAR</td> <td>10/A 10</td> </tr> <tr> <td>2</td> <td>TURAN EMİR YANIK</td> <td>10/A 16</td> </tr> <tr> <td>3</td> <td>SUDE MANAY</td> <td>10/A 2</td> </tr> <tr> <td>4</td> <td>ESMA ERYILMAZ</td> <td>10/C 3</td> </tr> <tr> <td>5</td> <td>SUEDA ERTEMLİ</td> <td>10/C 9</td> </tr> <tr> <td>6</td> <td>ELİF GÜLSU GÖKDAĞ</td> <td>10/C 28</td> </tr> <tr> <td>7</td> <td>OSMAN MEMİCİK</td> <td>10/D 5</td> </tr> <tr> <td>8</td> <td>CİVAN DEMİR</td> <td>10/D 9</td> </tr> <tr> <td>9</td> <td>MURAT CEM YILMAZ</td> <td>10/D 11</td> </tr> <tr> <td>10</td> <td>HASAN FIRAT SARTAN</td> <td>10/D 13</td> </tr> <tr> <td>11</td> <td>BÜŞRA NUR YEĞEN</td> <td>10/D 24</td> </tr> <tr> <td>12</td> <td>ÖNCÜ ERGÜN GÖK</td> <td>10/D 26</td> </tr> <tr> <td>13</td> <td>YİĞİT ÇAKALOĞLU</td> <td>11/A 13</td> </tr> <tr> <td>14</td> <td>BENNUR TURHAN</td> <td>11/A 17</td> </tr> <tr> <td>15</td> <td>HÜSEYİN SAMİ ODUNCU</td> <td>11/B 22</td> </tr> <tr> <td>16</td> <td>MEHMET YENİBAŞ</td> <td>11/B 18</td> </tr> <tr> <td>17</td> <td>ZEYNEP FERDA CAN</td> <td>11/C 2</td> </tr> <tr> <td>18</td> <td>MUHAMMED TAHA GÜZEL</td> <td>9/A 10</td> </tr> <tr> <td>19</td> <td>ARİFE GÜNAYDIN</td> <td>9/A 13</td> </tr> <tr> <td>20</td> <td>MEHMET ZAHİR KARADEMİR</td> <td>9/A 23</td> </tr> <tr> <td>21</td> <td>SADULLAH SOMRU</td> <td>9/B 6</td> </tr> <tr> <td>22</td> <td>İBRAHİM DEMİR</td> <td>9/B 10</td> </tr> </tbody> </table> </div> <br><br><br> </div> <div class="outer"> <h2>10/C</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>ASEL KAŞLI</td> <td>10/A 9</td> </tr> <tr> <td>2</td> <td>EMİRHAN KÖMÜRCÜ</td> <td>10/B 19</td> </tr> <tr> <td>3</td> <td>MERT ALİ SEZGİN</td> <td>10/B 25</td> </tr> <tr> <td>4</td> <td>KEMAL GEDİK</td> <td>10/C 13</td> </tr> <tr> <td>5</td> <td>MESUT EMRE YILMAZ</td> <td>10/C 29</td> </tr> <tr> <td>6</td> <td>KÜBRA KARAKAYA</td> <td>11/A 20</td> </tr> <tr> <td>7</td> <td>AYŞE NAZ KAYA</td> <td>11/B 25</td> </tr> <tr> <td>8</td> <td>MURAT EFEKAN KEÇECİ</td> <td>11/B 11</td> </tr> <tr> <td>9</td> <td>ZEYNEP GÜVEN</td> <td>11/B 7</td> </tr> <tr> <td>10</td> <td>HATİCE NUR DAĞDELEN</td> <td>11/C 18</td> </tr> <tr> <td>11</td> <td>MUHAMMET ALİ OTGÖZ</td> <td>11/C 21</td> </tr> <tr> <td>12</td> <td>ELA ATILGAN</td> <td>11/C 31</td> </tr> <tr> <td>13</td> <td>EYLÜL ÖZEL</td> <td>11/C 33</td> </tr> <tr> <td>14</td> <td>MELİH KARGIN</td> <td>11/D 4</td> </tr> <tr> <td>15</td> <td>MUSTAFA BURAK YAMAN</td> <td>11/D 8</td> </tr> <tr> <td>16</td> <td>RAMAZAN YAHYA KARAGÖZ</td> <td>11/D 10</td> </tr> <tr> <td>17</td> <td>FURKAN KUTLU</td> <td>11/D 22</td> </tr> <tr> <td>18</td> <td>MUHAMMED ŞAHİN</td> <td>9/A 29</td> </tr> <tr> <td>19</td> <td>AZRA VURAL</td> <td>9/B 12</td> </tr> <tr> <td>20</td> <td>KUTAY ÇELİK</td> <td>9/B 16</td> </tr> <tr> <td>21</td> <td>ALİ KARAŞAHİN</td> <td>9/B 20</td> </tr> <tr> <td>22</td> <td>RAMAZAN KAAN YÖRÜK</td> <td>9/B 24</td> </tr> </tbody> </table> </div> <br><br><br> </div> <div class="outer"> <h2>10/D</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>MUHAMMED KORKMAZ</td> <td>10/A 8</td> </tr> <tr> <td>2</td> <td>İSLAM KARALIOĞLU</td> <td>10/B 2</td> </tr> <tr> <td>3</td> <td>YAREN YILDIRIM</td> <td>10/B 11</td> </tr> <tr> <td>4</td> <td>ELİF CEYLAN</td> <td>10/B 13</td> </tr> <tr> <td>5</td> <td>FATİH MERGEN</td> <td>10/C 11</td> </tr> <tr> <td>6</td> <td>HALİSE GÜL KOÇAK</td> <td>10/C 17</td> </tr> <tr> <td>7</td> <td>ATACAN EGE DEMİRKAN</td> <td>10/D 30</td> </tr> <tr> <td>8</td> <td>CAFER EFE DUR</td> <td>11/A 3</td> </tr> <tr> <td>9</td> <td>GÜLŞEN ŞURA SOYBAKIŞ</td> <td>11/A 18</td> </tr> <tr> <td>10</td> <td>BATUHAN DOĞAN</td> <td>11/B 23</td> </tr> <tr> <td>11</td> <td>SU TUNÇEL</td> <td>11/B 15</td> </tr> <tr> <td>12</td> <td>ALİ İMRAN YÜCEYURT</td> <td>11/B 3</td> </tr> <tr> <td>13</td> <td>MUHAMMED ENES AYDIN</td> <td>11/C 3</td> </tr> <tr> <td>14</td> <td>ASYA ÜGÜDÜR</td> <td>11/D 15</td> </tr> <tr> <td>15</td> <td>NARİN ERÇELİK</td> <td>9/A 4</td> </tr> <tr> <td>16</td> <td>DİLEK ÖZDEMİR</td> <td>9/A 15</td> </tr> <tr> <td>17</td> <td>ZEYNEP SUDE SALIK</td> <td>9/A 19</td> </tr> <tr> <td>18</td> <td>ÇİĞDEM KARABAŞ</td> <td>9/A 21</td> </tr> <tr> <td>19</td> <td>FATMA ÖKTEM</td> <td>9/B 9</td> </tr> <tr> <td>20</td> <td>SERVER IRMAK KISA</td> <td>9/B 18</td> </tr> <tr> <td>21</td> <td>SEVGİ ÇETİN</td> <td>9/B 22</td> </tr> </tbody> </table> </div> <br><br><br> </div> <div class="outer"> <h2>10/A</h2> <div class="table-wrapper"> <table class="fl-table"> <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Öğrenci</th> 
+                        <th>Sınav yeri</th> 
+                    </tr>
+                </head> <tbody> <tr> <td>1</td> <td>EFE DOLUNAY</td> <td>10/B 8</td> </tr> <tr> <td>2</td> <td>AZRA NAZ ÇOMAK</td> <td>10/C 5</td> </tr> <tr> <td>3</td> <td>BERRA NUR ACUNGİL</td> <td>10/C 15</td> </tr> <tr> <td>4</td> <td>EMİR ALİ EMİROĞLU</td> <td>10/C 19</td> </tr> <tr> <td>5</td> <td>MİRAÇ KAAN İRBEÇ</td> <td>10/D 4</td> </tr> <tr> <td>6</td> <td>ATAKAN ZEYBEK</td> <td>10/D 6</td> </tr> <tr> <td>7</td> <td>DESTAN GÜLTEKİN</td> <td>10/D 8</td> </tr> <tr> <td>8</td> <td>LALESU ÖZDEMİR</td> <td>10/D 10</td> </tr> <tr> <td>9</td> <td>YAREN TUFAN</td> <td>10/D 18</td> </tr> <tr> <td>10</td> <td>ATAKAN YÜCEL</td> <td>10/D 20</td> </tr> <tr> <td>11</td> <td>ŞEFİKA NUR KURBAN</td> <td>10/D 21</td> </tr> <tr> <td>12</td> <td>MEHMET ALİ GÜŞÜN</td> <td>10/D 28</td> </tr> <tr> <td>13</td> <td>BAYRAM EMRE YARAMIŞ</td> <td>11/A 11</td> </tr> <tr> <td>14</td> <td>BEYZA SU DERMENCİOĞLU</td> <td>11/A 25</td> </tr> <tr> <td>15</td> <td>BUSE BÖLÜK</td> <td>11/B 5</td> </tr> <tr> <td>16</td> <td>EREN KEPÇELİ</td> <td>11/B 9</td> </tr> <tr> <td>17</td> <td>MUSTAFA TURGUT USLU</td> <td>11/C 16</td> </tr> <tr> <td>18</td> <td>SAİT SERT</td> <td>11/C 23</td> </tr> <tr> <td>19</td> <td>EZGİ ZÜLAL ÖNER</td> <td>9/A 8</td> </tr> <tr> <td>20</td> <td>ALİ MERT ARMAĞAN</td> <td>9/A 11</td> </tr> <tr> <td>21</td> <td>MEHMET HÜSEYİN AY</td> <td>9/A 26</td> </tr> <tr> <td>22</td> <td>BURAK ÖZTÜRK</td> <td>9/B 5</td> </tr> <tr> <td>23</td> <td>EREN ONAY</td> <td>9/B 14</td> </tr> </tbody> </table> </div> <br><br><br> </div>
+    </body>
+</html>

@@ -84,6 +84,9 @@
        <layout class="QHBoxLayout" name="buttonsFrame">
         <item>
          <widget class="QPushButton" name="arsivMenuBtn">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -91,6 +94,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="removeBtn">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Sınavı Sil</string>
           </property>
@@ -98,6 +104,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="removeAllBtn">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Tüm sınavları sil</string>
           </property>
@@ -143,7 +152,7 @@
         <property name="title">
          <string>Sınavın dosyaları</string>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="spacing">
           <number>0</number>
          </property>
@@ -166,6 +175,13 @@
              <width>150</width>
              <height>16777215</height>
             </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="downloadBtn">
+           <property name="text">
+            <string>Dosyayı indir</string>
            </property>
           </widget>
          </item>

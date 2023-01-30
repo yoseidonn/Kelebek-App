@@ -244,9 +244,6 @@ def shuffle_and_get_classrooms(exam):
         print(students)
     
     if len(students) == 0:
-        from ._shuffle import show
-        show(classroomsWithStudents)
-        print()
         return classroomsWithStudents
     
     else:

@@ -74,7 +74,11 @@ class ClassroomStruct:
         self.columns.clear()
         self.lastColumnIndex = 0
 
-    def change_yon(self):
+    def change_yon(self, reset = False):
+        if reset:
+            self.ogretmenSolFrame.setVisible(True)
+            self.ogretmenSagFrame.setVisible(False)
+            return
         if self.yonCombo.currentIndex() == 0:
             self.ogretmenSolFrame.setVisible(True)
             self.ogretmenSagFrame.setVisible(False)

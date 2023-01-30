@@ -9,10 +9,11 @@ import os, sys
 
 
 class Display():
-    def __init__(self, examsList: QListWidget, filesList: QListWidget, webEngineView: QWebEngineView):
+    def __init__(self, examsList: QListWidget, filesList: QListWidget, webEngineView: QWebEngineView, buttons: list):
         self.examsList = examsList
         self.filesList = filesList
         self.wev = webEngineView
+        self.downloadBtn = buttons[0]
         
         self.currentMode = 'salon_oturma_duzenleri.html'
         self.examItems = []
@@ -23,9 +24,30 @@ class Display():
         self.set_signals()
         
     def set_signals(self):
+        self.downloadBtn.setEnabled(False)
         self.examsList.itemClicked.connect(self.el_item_clicked)
         self.filesList.itemClicked.connect(self.fl_item_clicked)
+        self.downloadBtn.clicked.connect(self.download)
         
+    def download(self):
+        savePath = self.save_dialog()
+        #HTML yazısını çıkar ve _to_save.html ekle
+        modText = self.currentMode[0:-5] + "_to_save.html"
+        print("ModText:", modText)
+        saveFilePath = os.path.join('Saved', self.selectedExamName, modText)
+        print("Where to save:", savePath)
+        print("Saving file:", saveFilePath)
+        # save the self.selectedFilePath content as pdf file
+        
+    def save_dialog(self):
+        dialog = QFileDialog()
+        dialog.setOption(QFileDialog.ShowDirsOnly, True)
+        dialog.setWindowTitle("Kaydetme dizini seçiniz")
+        dialog.setAcceptMode(QFileDialog.AcceptOpen)
+        dialog.setFileMode(QFileDialog.Directory)
+        if dialog.exec_() == QFileDialog.Accepted:
+            return dialog.selectedFiles()[0]
+    
     ### Exam List Widget
     def el_item_clicked(self, item: QListWidgetItem):
         self.selectedExamName = item.text()
