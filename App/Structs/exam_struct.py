@@ -102,6 +102,8 @@ class ExamStruct():
     def et_selection_changed(self):
         ### IMPLEMENT THIS ALGORITHM LATER ON
         items = self.etw.selectedItems()
+        if len(items) == 0:
+            return
         rowIndexes = set()
         for item in items:
             rowIndexes.add(item.row())
@@ -113,7 +115,6 @@ class ExamStruct():
         self.refresh_item_status()
                 
     def gl_item_clicked(self, item: QListWidgetItem):
-        # to do -> checkbox'a basınca son durum seçilmemiş olarak göründüğü için tiklendiği an siliniyor...
         # checkState() returns 2 when box is checked, otherwise it returns 0
         flags = item.flags()
         if not (flags & Qt.ItemIsUserCheckable):
@@ -123,6 +124,15 @@ class ExamStruct():
             index = list(self.exams.keys()).index(self.selectedExamName)
             current = int(self.etw.item(index, 1).text())
             toAdd = len(grade)
+            all_used_grade_names = []
+            for examName in self.exams:
+                if examName != self.selectedExamName:
+                    all_used_grade_names.extend(self.exams[examName]["gradeNames"])
+            
+            if gradeName in all_used_grade_names:
+                print("bu sınıf seçili. lütfen önce iptal edin.")
+                return
+            
             if gradeName in self.exams[self.selectedExamName]["gradeNames"]:
                 #Değeri azalt ve itemi çıkart
                 self.exams[self.selectedExamName]["items"].remove(item)
@@ -171,6 +181,7 @@ class ExamStruct():
             
         self.etw.selectRow(len(self.exams) - 1)
         self.selectedExamName = list(self.exams.keys())[-1] if len(list(self.exams.keys())) != 0 else None
+        print("ended")
         
     def gl_draw(self):
         # SINIF İSİMLERİ ITEM'E ÇEVİRİLİP LİSTEYE EKLENİR
@@ -204,13 +215,13 @@ class ExamStruct():
 
     def et_remove_exam(self, all = False):
         if all:
-            self.exams = dict()
-            self.gradeItems = list()
-            
+            self.exams = {}
+            self.gradeItems = []
+
             self.et_set_ts()
             self.et_draw()
-            self.gl_set_ts()
             self.glw.clear()
+            self.gl_set_ts()
             self.gl_draw()
         else:
             pass

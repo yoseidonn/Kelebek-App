@@ -6,9 +6,11 @@ from PyQt5.uic import loadUi
 from PyQt5.QtTest import QTest
 
 from .HtmlCreater import classrooms_html, students_html
-from . import database, excel_reader, shuffle
+from . import database, excel_reader
 from pathlib import Path
-import os, sys, datetime
+import os, sys, datetime, pytz
+import urllib.request as req
+import urllib.error as err 
 
 
 class MainWindow(QMainWindow):
@@ -16,6 +18,11 @@ class MainWindow(QMainWindow):
         super().__init__()
         loadUi(os.path.join("Forms", "mainwindow.ui"), self)
 
+        x = self.is_date_over()
+        if x in ["NO_INTERNET", "ENDED"]:
+            print(x)
+            exit()
+            
         self.set_signs()
         self.set_ui()
         self.sws()
@@ -55,6 +62,8 @@ class MainWindow(QMainWindow):
         """
         This function, adds custom widgets and waits for signals comes from buttons.
         """
+        self.textBrowser.setReadOnly(True)
+        
         self.okulBilgileriFrame = OkulBilgileriFrame()
         self.ogrencilerFrame = OgrencilerFrame()
         self.salonlarFrame = SalonlarFrame()
@@ -73,14 +82,37 @@ class MainWindow(QMainWindow):
             "salonlarFrame": self.salonlarFrame,
             "yeniSinavFrame": self.yeniSinavFrame,
             "sinavlarFrame": self.sinavlarFrame,
-            "textEdit": self.textEdit,
+            "textBrowser": self.textBrowser,
         }
         [self.frameLayout.addWidget(self.frames[key]) for key in self.frames]
+    
+    def is_date_over(self):
+        try:
+            res = req.urlopen('http://just-the-time.appspot.com/')
+            print("internet var")
+        except:
+            print("internet yok")
+            dialog = NoInternetDialog()
+            return "NO_INTERNET"
+        
+        time_str = res.read().strip().decode()
+        date, hour = time_str.split(" ")        
+        year, month, day = date.split("-")
+        hour, minute, second = hour.split(":")
+
+        now = datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))
+
+        endDay = datetime.datetime(2023, 1, 30, 12, 30, 0)
+        if endDay >= now:
+            return "NOT_ENDED"
+        
+        dialog = DateIsOverDialog()
+        return "ENDED"
 
     def okul_frame(self):
         if self.frames["okulBilgileriFrame"].isVisible():
             [self.frames[key].setVisible(False) for key in self.frames]
-            self.textEdit.setVisible(True)
+            self.textBrowser.setVisible(True)
         else:
             [self.frames[key].setVisible(False) for key in self.frames]
             self.frames["okulBilgileriFrame"] = OkulBilgileriFrame()
@@ -89,7 +121,7 @@ class MainWindow(QMainWindow):
     def ogrenciler_frame(self):
         if self.frames["ogrencilerFrame"].isVisible():
             [self.frames[key].setVisible(False) for key in self.frames]
-            self.textEdit.setVisible(True)
+            self.textBrowser.setVisible(True)
         else:
             [self.frames[key].setVisible(False) for key in self.frames]
             self.frames["ogrencilerFrame"] = OgrencilerFrame()
@@ -98,7 +130,7 @@ class MainWindow(QMainWindow):
     def salonlar_frame(self):
         if self.frames["salonlarFrame"].isVisible():
             [self.frames[key].setVisible(False) for key in self.frames]
-            self.textEdit.setVisible(True)
+            self.textBrowser.setVisible(True)
         else:
             [self.frames[key].setVisible(False) for key in self.frames]
             self.frames["salonlarFrame"] = SalonlarFrame()
@@ -109,7 +141,7 @@ class MainWindow(QMainWindow):
 
         if self.frames["yeniSinavFrame"].isVisible():
             [self.frames[key].setVisible(False) for key in self.frames]
-            self.textEdit.setVisible(True)
+            self.textBrowser.setVisible(True)
         else:
             [self.frames[key].setVisible(False) for key in self.frames]
             self.frames["yeniSinavFrame"] = YeniSinavFrame()
@@ -118,7 +150,7 @@ class MainWindow(QMainWindow):
     def sinavlar_frame (self):
         if self.frames["sinavlarFrame"].isVisible():
             [self.frames[key].setVisible(False) for key in self.frames]
-            self.textEdit.setVisible(True)
+            self.textBrowser.setVisible(True)
         else:
             [self.frames[key].setVisible(False) for key in self.frames]
             self.frames["sinavlarFrame"] = SinavlarFrame()
@@ -135,9 +167,29 @@ class MainWindow(QMainWindow):
         Adjust the window settings
         """
         self.setWindowTitle("Kelebek sistemi")
-        self.setWindowRole("asd")
         self.setWindowIcon(QIcon(os.path.join("Images", "img", "butterfly.png")))
         self.show()
+
+class DateIsOverDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        loadUi(os.path.join("Forms", "date_is_over_dialog.ui"), self)
+
+        self.exitBtn.clicked.connect(self.close)
+        self.textBrowser.setReadOnly(True)
+
+        self.exec_()
+
+
+class NoInternetDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        loadUi(os.path.join("Forms", "no_internet_dialog.ui"), self)
+
+        self.exitBtn.clicked.connect(self.close)
+        self.textBrowser.setReadOnly(True)
+        
+        self.exec_()
 
 
 class OkulBilgileriFrame(QFrame):
@@ -149,7 +201,7 @@ class OkulBilgileriFrame(QFrame):
         self.set_ui()
         self.set_ts()
 
-        self.draw_texts()
+        self.draw_texts(schoolName=True, managerName=True, typee=True)
         self.draw_table()
         self.set_ui()
         
@@ -191,7 +243,7 @@ class OkulBilgileriFrame(QFrame):
                 typee = self.infos[2]
 
                 database.update_all_infos(schoolName, managerName, typee)
-                self.draw_texts()
+                self.draw_texts(schoolName = True)
                 [btn.setVisible(False) for btn in self.schoolNameButtons]
                 
             elif managerName:
@@ -200,7 +252,7 @@ class OkulBilgileriFrame(QFrame):
                 typee = self.infos[2]
                 
                 database.update_all_infos(schoolName, managerName, typee)
-                self.draw_texts()
+                self.draw_texts(managerName = True)
                 [btn.setVisible(False) for btn in self.managerNameButtons]
             
             elif typee:
@@ -208,12 +260,12 @@ class OkulBilgileriFrame(QFrame):
                 managerName = self.infos[1]
                 typee = self.typeCombo.currentText().upper().strip()
                 
-                self.draw_texts()
+                self.draw_texts(typee = True)
                 database.update_all_infos(schoolName, managerName, typee)
                 [btn.setVisible(False) for btn in self.typeNameButtons]
         
         elif mod == "disc":
-            self.draw_texts()
+            self.draw_texts(schoolName=schoolName, managerName=managerName, typee=typee)
 
             if schoolName:
                 [btn.setVisible(False) for btn in self.schoolNameButtons]
@@ -224,16 +276,20 @@ class OkulBilgileriFrame(QFrame):
             elif typee:
                 [btn.setVisible(False) for btn in self.typeNameButtons]
 
-    def draw_texts(self):
+    def draw_texts(self, schoolName = False, managerName = False, typee = False):
         self.infos = database.get_all_infos()
-        schoolName = self.infos[0]
-        managerName = self.infos[1]
-        typeName = self.infos[2]
-        self.schoolNameIn.setText(schoolName)
-        self.managerNameIn.setText(managerName)
-        if typeName == "Lise":
+        schoolNameText = self.infos[0]
+        managerNameText = self.infos[1]
+        typeNameText = self.infos[2]
+        if schoolName:
+            self.schoolNameIn.setText(schoolNameText)
+
+        if managerName:
+            self.managerNameIn.setText(managerNameText)
+            
+        if typee and typeNameText == "Lise":
             self.typeCombo.setCurrentIndex(0)
-        if typeName == "Ortaokul":
+        elif typee and typeNameText == "Ortaokul":
             self.typeCombo.setCurrentIndex(1)
         
     def draw_table(self):
@@ -242,7 +298,6 @@ class OkulBilgileriFrame(QFrame):
                 
         for rowIndex in range(len(infos)):
             values = infos[rowIndex].split(",")
-            print(f"Values: {values}")
             for colIndex in range(len(values)):
                 item = QTableWidgetItem(values[colIndex])
                 self.table.setItem(rowIndex, colIndex, item)
@@ -288,32 +343,59 @@ class OgrencilerFrame(QFrame):
         self.table.selectionModel().selectionChanged.connect(self.on_selection_changed) #KUTUCUK SECILINCE UYARI OLUSTURMA
 
         self.table.horizontalHeader().sectionClicked.connect(self.sort)
+        self.resetOrderButton.clicked.connect(self.draw_table)
         
-    def sort(self, section):
+    def sort(self, sectionIndex):
+        if sectionIndex == 0:
+            self.draw_table(order=True, sectionIndex=sectionIndex)
+
+        elif sectionIndex == 1:
+            self.draw_table(order=True, sectionIndex=sectionIndex)
+
+        elif sectionIndex == 2:
+            self.draw_table(order=True, sectionIndex=sectionIndex)
+
+        elif sectionIndex == 3:
+            self.draw_table(order=True, sectionIndex=sectionIndex)
+
+        elif sectionIndex == 4:
+            self.draw_table(order=True, sectionIndex=sectionIndex)
+            
         print("sort")
 
-    def draw_table(self, searchBy = False):
+    def draw_table(self, searchBy = False, order = False, sectionIndex = 0):
         BY_NO = "Numaraya göre"
         BY_FULLNAME = "Tam ada göre"
         BY_CLASS = "Sınıfa göre"
+
+        if order:
+            self.ogrencilerList = sorted(self.ogrencilerList, key=lambda ogrenci: ogrenci[sectionIndex])
+            self.set_table_items()
+            return
+        
         searchContent = self.searchIn.text().strip().upper()
         if searchContent == "":
             self.ogrencilerList = database.get_all_students()
+
         elif searchBy == BY_NO:
-            print("s")
             self.ogrencilerList = database.get_all_students(number = searchContent)
+
         elif searchBy == BY_FULLNAME:
             self.ogrencilerList = database.get_all_students(fullname = searchContent)
+
         elif searchBy == BY_CLASS:
             self.ogrencilerList = database.get_all_students(grade = searchContent)
 
+        self.set_table_items()
+
+    def set_table_items(self):
         self.table.setRowCount(len(self.ogrencilerList))
         for rowInd, student in enumerate(self.ogrencilerList):
             for columnInd, data_raw in enumerate(student):
                 self.table.setItem(rowInd, columnInd, QTableWidgetItem(str(data_raw)))
 
         self.table.show()
-    
+
     def change_search_by(self):
         self.searchBy = self.searchByCombo.currentText()
 
@@ -536,7 +618,7 @@ class SalonlarFrame(QFrame):
         self.salonNameIn.setPlaceholderText("Salon adı")
 
     def set_signals(self):
-        self.classroomTable.itemClicked.connect(self.classroom_item_clicked)
+        self.classroomList.itemClicked.connect(self.classroom_item_clicked)
         self.addButton.clicked.connect(self.add_button_clicked)
         self.saveButton.clicked.connect(self.save_button_clicked)
         self.cancelButton.clicked.connect(self.cancel_button_clicked)
@@ -549,31 +631,47 @@ class SalonlarFrame(QFrame):
         self.removeName = classroomName
 
     def add_button_clicked(self):
-        self.save_button_clicked(add = True)
-    
-    def save_button_clicked(self, add = False):
+        """# Salonu ekle
         salonAdi = self.salonNameIn.text().strip().upper()
         ogretmenY = self.yonCombo.currentText()
         kacli = self.kacliCombo.currentText()
         duzen = ",".join([str(column.deskCount) for column in self.Classroom.columns])
-        if not add:
-            database.remove_classroom(classroomName = self.removeName)
+        database.remove_classroom(classroomName = self.removeName)
 
         database.add_new_classroom(salonAdi, ogretmenY, kacli, duzen)
+
+        # Ana haline döndür
+        self.cancel_button_clicked()
+
+        # Listeyi bir daha çiz
+        self.classrooms = database.get_all_classrooms()
+        self.classroomNames = database.get_all_classrooms(onlyNames = True)
+        self.draw_list()"""
+        self.save_button_clicked(add = True)
+        
+    def save_button_clicked(self, add = False):
+        # Salonu ekle
+        salonAdi = self.salonNameIn.text().strip().upper()
+        ogretmenY = self.yonCombo.currentText()
+        kacli = self.kacliCombo.currentText()
+        duzen = ",".join([str(column.deskCount) for column in self.Classroom.columns])
+
+        # Ekleme değilse sil ve tekrar kaydet, ekleme ise sadece ekle
         if not add:
-            self.cancel_button_clicked()
-        else:
-            self.cancel_button_clicked(add = True)
+            database.remove_classroom(classroomName = self.removeName)
+        database.add_new_classroom(salonAdi, ogretmenY, kacli, duzen)
+
+        # Ana haline döndür
+        self.cancel_button_clicked()
+        
+        # Tabloyu çiz
         self.classrooms = database.get_all_classrooms()
         self.classroomNames = database.get_all_classrooms(onlyNames = True)
         self.draw_list()
 
-    def cancel_button_clicked(self, add=False):
-        from .Structs.classroom_struct import ClassroomStruct
-        buttons = [self.addColumn, self.removeColumn, self.addRow, self.removeRow]
-        self.Classroom = ClassroomStruct(self.grid, self.ogretmenSolFrame, self.ogretmenSagFrame, self.kacliCombo, self.yonCombo, buttons = buttons)
-        if not add:
-            self.classroomTable.selectedItems()[0].setSelected(False)
+    def cancel_button_clicked(self):
+        self.Classroom._reset()
+        self.Classroom.set_3x5()
         self.salonNameIn.clear()
     
         [button.setVisible(False) for button in self.buttons]
@@ -584,7 +682,7 @@ class SalonlarFrame(QFrame):
         self.classrooms = database.get_all_classrooms()
         self.classroomNames = database.get_all_classrooms(onlyNames = True)
         self.draw_list()
-        self.cancel_button_clicked(add = True)
+        self.cancel_button_clicked()
 
     def draw_selected_classroom(self, values):
         [button.setVisible(True) for button in self.buttons]
@@ -597,8 +695,8 @@ class SalonlarFrame(QFrame):
         self.kacliCombo.setCurrentIndex(self.DICT_HSPD[hspd])
 
     def draw_list(self):
-        self.classroomTable.clear()
-        self.classroomTable.addItems(self.classroomNames)
+        self.classroomList.clear()
+        self.classroomList.addItems(self.classroomNames)
 
 
 class YeniSinavFrame(QFrame):
@@ -633,73 +731,65 @@ class YeniSinavFrame(QFrame):
     def set_signals(self):
         self.continueButton.clicked.connect(self.next_step) #PRE-EVENT SIGNAL
         self.ogrenciKarmaButton.clicked.connect(lambda: self.next_step(karma = True))
-
+        self.masterExamNameIn.textChanged.connect(lambda: self.set_white(""))
+        
     def next_step(self, karma = True):
         if karma:
             from .shuffle import shuffle_and_get_classrooms
             exam = self.ExamStruct.exam
-            shuffleMethodIndex = self.algCombo.currentIndex()
-            algName = exam.algorithmName
-            options = exam.optionList
             sonuc = shuffle_and_get_classrooms(exam)
             if not sonuc:
                 print("Yetersiz yer")
                 # Tekrar deneyiniz penceresi ekle
                 pass
             else:
-                tarih = self.sinavTarihi
-
                 # Create files
-                con1 = classrooms_html.create(tarih, sonuc, exam.exams)
-                con2 = students_html.create(tarih, sonuc, exam.exams)
+                con1 = classrooms_html.create(self.examInfos, sonuc, exam.exams)
+                con2 = students_html.create(self.examInfos, sonuc, exam.exams)
 
-                self.show_result_frame(classroomsContainer = con1, studentsContainer = con2, date = tarih)
+                self.show_result_frame(classroomsContainer = con1, studentsContainer = con2)
 
         else:
-            minute = self.hourEdit.time().minute()
-            hour = self.hourEdit.time().hour()
+            if len(self.masterExamNameIn.text().strip()) == 0:
+                self.set_white("", red = True)
+                return
+            
             day = int(self.day.currentText())
             month = self.MONTHS[self.month.currentText()]
             year = int(self.year.currentText())
-            date = datetime.datetime(year, month, day, hour, minute)
-
+            date = datetime.datetime(year, month, day)
             tarih  = str(date.date())
-            charL = []
-            if hour < 10:
-                charL.append("0")
-                charL.append(str(hour))
-            else:
-                charL.append(str(hour))
             
-            charL.append(":")
+            self.masterExamName = self.masterExamNameIn.text().strip()
+            self.egitimOgretimYili = self.egitimOgretimCombo.currentText()
+            self.donem = self.donemCombo.currentText().upper()
+            self.kacinciYazili = self.doneminKacinciCombo.currentText().upper()
+            self.tarih = tarih
+            self.kacinciDers = self.dersSaatiCombo.currentText().upper()
+            self.examInfos = [self.egitimOgretimYili, self.donem, self.kacinciYazili, self.tarih, self.kacinciDers, self.masterExamName]
 
-            if minute < 10:
-                charL.append("0")
-                charL.append(str(minute))
-            else:
-                charL.append(str(minute))
-
-            saat="".join(charL)
-            self.sinavTarihi = "_".join([tarih, saat])
-            
-            self.doneminKacinciSinavi = self.donemCombo.currentText()
             self.upperOfExamInfos.setVisible(False)
             self.mainFrame.setVisible(True)
             self.isStarted = True
 
-    def show_result_frame(self, classroomsContainer: list, studentsContainer: list, date: str):
+    def show_result_frame(self, classroomsContainer: list, studentsContainer: list):
         # Dialog sonucuna göre dosyayı ya kayıtlara taşı ya da sil
         cFilePath, cContent = classroomsContainer
         sFilePath, sContent = studentsContainer
 
+        examPath = "_".join([self.examInfos[-1], self.examInfos[3], self.examInfos[4]])
+
         dialogSonuc = SonucDialog(classroomsHTML = cContent, studentsHTML = sContent).isAccepted
         if dialogSonuc:
-            os.mkdir(os.path.join('Saved', date))
-            Path(cFilePath).rename(os.path.join('Saved', date, 'salon_oturma_duzenleri.html'))
-            Path(sFilePath).rename(os.path.join('Saved', date, 'sinif_listeleri.html'))
+            try:
+                os.mkdir(os.path.join('Saved', examPath))
+            except FileExistsError:
+                pass
+            Path(cFilePath).rename(os.path.join('Saved', examPath, 'salon_oturma_duzenleri.html'))
+            Path(sFilePath).rename(os.path.join('Saved', examPath, 'sinif_listeleri.html'))
 
-            print(os.path.join('Saved', date, 'salon_oturma_duzenleri.html'))
-            print(os.path.join('Saved', date, 'sinif_listeleri.html'))
+            print(os.path.join('Saved', examPath, 'salon_oturma_duzenleri.html'))
+            print(os.path.join('Saved', examPath, 'sinif_listeleri.html'))
             
             self.upperOfExamInfos.setVisible(True)
             self.mainFrame.setVisible(False)
@@ -709,8 +799,13 @@ class YeniSinavFrame(QFrame):
             os.remove(cFilePath)
             os.remove(sFilePath)
 
-        os.rmdir(os.path.join('Temp', date))
+        os.rmdir(os.path.join('Temp', examPath))
         
+    def set_white(self, newText, red = False):
+        if red:
+            self.masterExamNameIn.setStyleSheet(f"background-color: rgb(255, 128, 128);")
+        else:
+            self.masterExamNameIn.setStyleSheet("background-color: white;")
         
 class SonucDialog(QDialog):
     def __init__(self, classroomsHTML, studentsHTML):
@@ -766,8 +861,10 @@ class SinavlarFrame(QFrame):
         loadUi(os.path.join("Forms", "sinavlar_frame.ui"), self)
         from .Structs.display_struct import Display
         
+        buttons = [self.downloadBtn]
+        
         self.set_ui()
-        self.Display = Display(examsList = self.examsList, filesList = self.filesList, webEngineView = self.wev)
+        self.Display = Display(examsList = self.examsList, filesList = self.filesList, webEngineView = self.wev, buttons = buttons)
         
     def set_ui(self):
         self.wev = QWebEngineView()

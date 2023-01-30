@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>1033</width>
     <height>601</height>
    </rect>
   </property>
@@ -137,7 +137,7 @@ border:  transparent;
                 <item>
                  <layout class="QHBoxLayout" name="frameLayout">
                   <item>
-                   <widget class="QTextEdit" name="textEdit">
+                   <widget class="QTextBrowser" name="textBrowser">
                     <property name="minimumSize">
                      <size>
                       <width>772</width>
@@ -149,11 +149,18 @@ border:  transparent;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic; color:#26a269;&quot;&gt;1. &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Öğrenciler penceresinden öğrencilerinizi ekleyin.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic; color:#26a269;&quot;&gt;2. &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Salonlar penceresinden salonlarınızı düzenleyin.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic; color:#26a269;&quot;&gt;3. &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Yeni salon düzeni oluştur'a tıklayın&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic; color:#26a269;&quot;&gt;1. &lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Öğrenciler&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt; penceresinden öğrencilerinizi ekleyin.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic; color:#26a269;&quot;&gt;2. &lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Salonlar&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt; penceresinden salonlarınızı düzenleyin.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic; color:#26a269;&quot;&gt;3. &lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Yeni sınav oluştur&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;'a tıklayın&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; color:#000000;&quot;&gt;Ve hazırsınız! Artık yeni sınav düzeninizi pdf ya da excel formatında indirmek sadece bir tık uzağınızda!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; color:#000000;&quot;&gt;Ve hazırsınız! Artık yeni sınav düzeninizi pdf ya da excel formatında indirmek sadece bir tık uzağınızda!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#000000;&quot;&gt;DENEME SÜRÜMÜ DESTEĞİ SONA ERİŞ TARİHİ: 30 Ocak 2023, 12:30&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                    </widget>
                   </item>
@@ -189,7 +196,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1033</width>
      <height>22</height>
     </rect>
    </property>

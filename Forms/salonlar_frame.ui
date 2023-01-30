@@ -23,7 +23,7 @@ border: none
    <property name="spacing">
     <number>10</number>
    </property>
-   <item>
+   <item alignment="Qt::AlignLeft">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Salonlar</string>
@@ -45,7 +45,7 @@ border: none
        <number>0</number>
       </property>
       <item>
-       <widget class="QListWidget" name="classroomTable"/>
+       <widget class="QListWidget" name="classroomList"/>
       </item>
      </layout>
     </widget>

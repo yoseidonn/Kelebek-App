@@ -13,13 +13,14 @@ BODY = os.path.join('Templates', 'StudentsTemplates', 'body.html')
 # PRE-DEFINED SEPERATOR FOR HTMLS
 SEPERATOR = "{{}}"
 
-def create(examDate, classrooms, exams):
+def create(examInfos, classrooms, exams):
     # classrooms/sonuc from shuffle.shuffle()
 
     with open(HEAD, "r", encoding="utf-8") as headHTML:
         head = headHTML.read()
         head = head.split(SEPERATOR)
-        head.insert(1, f'{examDate} Sınıf listeleri')
+        masterExamName = examInfos[-1]
+        head.insert(1, f'{masterExamName} Sınıf listeleri')
         head = "".join(head)
 
     with open(BODY, "r", encoding="utf-8") as bodyHTML:
@@ -40,15 +41,16 @@ def create(examDate, classrooms, exams):
         fullHtml = "".join(base)
 
     fileName = "sinif_listeleri.html"
+    examName = "_".join([examInfos[-1], examInfos[3], examInfos[4]])
     try:
-        os.mkdir(os.path.join('Temp', examDate))
+        os.mkdir(os.path.join('Temp', examName))
     except FileExistsError:
         pass
     
-    with open(os.path.join('Temp', examDate, fileName), 'w', encoding='utf-8') as newFile:
+    with open(os.path.join('Temp', examName, fileName), 'w', encoding='utf-8') as newFile:
         newFile.write(fullHtml)
 
-    filePath = os.path.join('Temp', examDate, fileName)
+    filePath = os.path.join('Temp', examName, fileName)
     htmlContent = fullHtml
      
     return (filePath, htmlContent)
@@ -72,11 +74,14 @@ def html(grades):
                 
     bodyOpen = '<tbody>'
     bodyClose = '</tbody>'
+    outerOpener = '<div class="outer">'
+    outerCloser = '</div>'
     row = '<tr> <td>{}</td> <td>{}</td> <td>{}</td> </tr>'
     
     
     for gradeName in grades:
         i = 1
+        text_array.append(outerOpener)
         text_array.append(f'<h2>{gradeName}</h2>')
         text_array.append(wrapperStart)
         text_array.append(tableStart)
@@ -103,6 +108,7 @@ def html(grades):
         text_array.append(tableEnd)
         text_array.append(wrapperEnd)
         text_array.append("<br><br><br>")
+        text_array.append(outerCloser)
 
     html_text = " ".join(text_array)
 
