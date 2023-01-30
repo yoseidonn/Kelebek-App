@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1052</width>
+    <width>1188</width>
     <height>565</height>
    </rect>
   </property>
@@ -956,21 +956,7 @@ border:none;
                 <number>0</number>
                </property>
                <item>
-                <widget class="QScrollArea" name="scrollArea">
-                 <property name="widgetResizable">
-                  <bool>true</bool>
-                 </property>
-                 <widget class="QWidget" name="scrollAreaWidgetContents">
-                  <property name="geometry">
-                   <rect>
-                    <x>0</x>
-                    <y>0</y>
-                    <width>75</width>
-                    <height>389</height>
-                   </rect>
-                  </property>
-                 </widget>
-                </widget>
+                <widget class="QListWidget" name="gradeList"/>
                </item>
               </layout>
              </widget>
@@ -1233,7 +1219,7 @@ border: none;
              <number>0</number>
             </property>
             <item alignment="Qt::AlignRight|Qt::AlignBottom">
-             <widget class="QPushButton" name="ogrenciKarmaButton">
+             <widget class="QPushButton" name="createButton">
               <property name="text">
                <string>Öğrenci karma</string>
               </property>

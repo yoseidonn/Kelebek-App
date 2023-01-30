@@ -50,6 +50,7 @@ class MainWindow(QMainWindow):
     def changed(self, checkbox: QCheckBox):
         print(checkbox, checkbox.text())
 
+
 if __name__ == '__main__':
     app = QApplication([])
     window = MainWindow()

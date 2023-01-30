@@ -14,7 +14,7 @@ class ExamStruct():
     # gl_.. Grade List
     def __init__(self,
                 examTable: QTableWidget,        # Sınavlar
-                scrollArea: QScrollArea,        # Sınıflar
+                gradeList: QListWidget,   # Sınıflar
                 classroomList: QListWidget,     # Salonlar
                 inputPlace: QLineEdit,          # Sınav adı
                 addButton: QPushButton,         # Sınavı ekle
@@ -27,7 +27,7 @@ class ExamStruct():
                 sinavFrame):                    # YeniSinavFrame
 
         self.etw = examTable
-        self.scrollArea = scrollArea
+        self.glw = gradeList
         self.clw = classroomList
         self.inputPlace = inputPlace
         self.addButton = addButton
@@ -46,7 +46,7 @@ class ExamStruct():
 
         # VARIABLES
         self.classroomItems = list()
-        self.gradeItems = list()
+        self.gradeCheckBoxes = list()
         self.classroomNames = list()
         self.exams = dict()
         self.selectedExamName = str()
