@@ -63,6 +63,7 @@ class MainWindow(QMainWindow):
         This function, adds custom widgets and waits for signals comes from buttons.
         """
         self.textBrowser.setReadOnly(True)
+        self.textBrowser2.setReadOnly(True)
         
         self.okulBilgileriFrame = OkulBilgileriFrame()
         self.ogrencilerFrame = OgrencilerFrame()
@@ -82,9 +83,9 @@ class MainWindow(QMainWindow):
             "salonlarFrame": self.salonlarFrame,
             "yeniSinavFrame": self.yeniSinavFrame,
             "sinavlarFrame": self.sinavlarFrame,
-            "textBrowser": self.textBrowser,
+            "textFrame": self.textFrame,
         }
-        [self.frameLayout.addWidget(self.frames[key]) for key in self.frames]
+        [self.MainLayout.addWidget(self.frames[key]) for key in self.frames]
     
     def is_date_over(self):
         try:
@@ -102,7 +103,7 @@ class MainWindow(QMainWindow):
 
         now = datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))
 
-        endDay = datetime.datetime(2023, 1, 30, 12, 30, 0)
+        endDay = datetime.datetime(2023, 2, 28, 12, 30, 0)
         if endDay >= now:
             return "NOT_ENDED"
         
@@ -112,49 +113,49 @@ class MainWindow(QMainWindow):
     def okul_frame(self):
         if self.frames["okulBilgileriFrame"].isVisible():
             [self.frames[key].setVisible(False) for key in self.frames]
-            self.textBrowser.setVisible(True)
+            self.textFrame.setVisible(True)
         else:
             [self.frames[key].setVisible(False) for key in self.frames]
             self.frames["okulBilgileriFrame"] = OkulBilgileriFrame()
-            self.frameLayout.addWidget(self.frames["okulBilgileriFrame"])
+            self.MainLayout.addWidget(self.frames["okulBilgileriFrame"])
 
     def ogrenciler_frame(self):
         if self.frames["ogrencilerFrame"].isVisible():
             [self.frames[key].setVisible(False) for key in self.frames]
-            self.textBrowser.setVisible(True)
+            self.textFrame.setVisible(True)
         else:
             [self.frames[key].setVisible(False) for key in self.frames]
             self.frames["ogrencilerFrame"] = OgrencilerFrame()
-            self.frameLayout.addWidget(self.frames["ogrencilerFrame"])
+            self.MainLayout.addWidget(self.frames["ogrencilerFrame"])
 
     def salonlar_frame(self):
         if self.frames["salonlarFrame"].isVisible():
             [self.frames[key].setVisible(False) for key in self.frames]
-            self.textBrowser.setVisible(True)
+            self.textFrame.setVisible(True)
         else:
             [self.frames[key].setVisible(False) for key in self.frames]
             self.frames["salonlarFrame"] = SalonlarFrame()
-            self.frameLayout.addWidget(self.frames["salonlarFrame"])
+            self.MainLayout.addWidget(self.frames["salonlarFrame"])
 
     def yeni_sinav_frame(self):
         self.yeniSinavFrame = YeniSinavFrame()
 
         if self.frames["yeniSinavFrame"].isVisible():
             [self.frames[key].setVisible(False) for key in self.frames]
-            self.textBrowser.setVisible(True)
+            self.textFrame.setVisible(True)
         else:
             [self.frames[key].setVisible(False) for key in self.frames]
             self.frames["yeniSinavFrame"] = YeniSinavFrame()
-            self.frameLayout.addWidget(self.frames["yeniSinavFrame"])
+            self.MainLayout.addWidget(self.frames["yeniSinavFrame"])
 
     def sinavlar_frame (self):
         if self.frames["sinavlarFrame"].isVisible():
             [self.frames[key].setVisible(False) for key in self.frames]
-            self.textBrowser.setVisible(True)
+            self.textFrame.setVisible(True)
         else:
             [self.frames[key].setVisible(False) for key in self.frames]
             self.frames["sinavlarFrame"] = SinavlarFrame()
-            self.frameLayout.addWidget(self.frames["sinavlarFrame"])
+            self.MainLayout.addWidget(self.frames["sinavlarFrame"])
 
     def gozetmen_ata_frame(self):
         pass

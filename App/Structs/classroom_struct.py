@@ -3,6 +3,12 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import os, sys, functools
 
+# CONSTANTS
+SOL = "Solda"
+SAG = "Sağda"
+TEK = "1'li"
+CIFT = "2'li"
+
 
 class ClassroomStruct:
     def __init__(self, grid: QGridLayout, solFrame: QFrame, sagFrame: QFrame, kacliCombo: QComboBox, yonCombo: QComboBox, buttons = []):
@@ -24,7 +30,7 @@ class ClassroomStruct:
         
     def set_signals_and_ui(self):
         #SIGNALS
-        self.yonCombo.currentIndexChanged.connect(self.change_yon)
+        self.yonCombo.currentIndexChanged.connect(lambda: self.change_yon(direction=self.yonCombo.currentText()))
         self.kacliCombo.currentIndexChanged.connect(lambda: self.change_kacli(mode=self.kacliCombo.currentText()))
         
         self.addColumnButton.clicked.connect(self.add_column)
@@ -74,24 +80,31 @@ class ClassroomStruct:
         self.columns.clear()
         self.lastColumnIndex = 0
 
-    def change_yon(self, reset = False):
+    def change_yon(self, direction="Solda", reset = False):
+        print("'Yon' değiştirildi.")
         if reset:
             self.ogretmenSolFrame.setVisible(True)
             self.ogretmenSagFrame.setVisible(False)
             return
-        if self.yonCombo.currentIndex() == 0:
+
+        if direction == SOL:
+            #print("Sol")
             self.ogretmenSolFrame.setVisible(True)
             self.ogretmenSagFrame.setVisible(False)
-        else:
+        elif direction == SAG:
+            #print("Sağ")
             self.ogretmenSolFrame.setVisible(False)
             self.ogretmenSagFrame.setVisible(True)
 
     def change_kacli(self, mode):
+        #print("'Kaçlı' değiştirildi.")
         for column in self.columns:
             for desk in column.desks:
-                if mode == "1'li":
+                if mode == TEK:
+                    #print(TEK)
                     desk.set_single()
-                else:
+                elif mode == CIFT:
+                    #print(CIFT)
                     desk.set_double()
 
     def set_3x5(self):

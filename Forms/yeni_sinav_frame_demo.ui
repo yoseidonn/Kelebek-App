@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>997</width>
+    <width>1052</width>
     <height>565</height>
    </rect>
   </property>
@@ -18,6 +18,11 @@
   </property>
   <property name="windowTitle">
    <string>Frame</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QFrame {
+border:none;
+}</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
@@ -116,104 +121,6 @@
                  <item>
                   <property name="text">
                    <string>2029-2030</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="groupBox_26">
-              <property name="title">
-               <string>Kaçıncı dönem?</string>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <item>
-                <widget class="QComboBox" name="donemCombo">
-                 <property name="maximumSize">
-                  <size>
-                   <width>64000</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>1. Dönem</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>2. Dönem</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="groupBox_24">
-              <property name="title">
-               <string>Dönemin kaçıncı sınavı?</string>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
-               <item>
-                <widget class="QComboBox" name="doneminKacinciCombo">
-                 <property name="maximumSize">
-                  <size>
-                   <width>64000</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>1. Sınav</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>2. Sınav</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>3. Sınav</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>4. Sınav</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>5. Sınav</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>6. Sınav</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>7. Sınav</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>8. Sınav</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>9. Sınav</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>10. Sınav</string>
                   </property>
                  </item>
                 </widget>
@@ -530,6 +437,104 @@
                    </widget>
                   </item>
                  </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_26">
+              <property name="title">
+               <string>Kaçıncı dönem?</string>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QComboBox" name="donemCombo">
+                 <property name="maximumSize">
+                  <size>
+                   <width>64000</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>1. Dönem</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>2. Dönem</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_24">
+              <property name="title">
+               <string>Dönemin kaçıncı sınavı?</string>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <widget class="QComboBox" name="doneminKacinciCombo">
+                 <property name="maximumSize">
+                  <size>
+                   <width>64000</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>1. Sınav</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>2. Sınav</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>3. Sınav</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>4. Sınav</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>5. Sınav</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>6. Sınav</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>7. Sınav</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>8. Sınav</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>9. Sınav</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>10. Sınav</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
               </layout>
@@ -955,12 +960,18 @@
                  <property name="minimumSize">
                   <size>
                    <width>97</width>
-                   <height>0</height>
+                   <height>389</height>
                   </size>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">border:none
 </string>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="sizeAdjustPolicy">
+                  <enum>QAbstractScrollArea::AdjustIgnored</enum>
                  </property>
                  <property name="widgetResizable">
                   <bool>true</bool>
@@ -974,7 +985,7 @@
                     <x>0</x>
                     <y>0</y>
                     <width>97</width>
-                    <height>377</height>
+                    <height>389</height>
                    </rect>
                   </property>
                   <property name="layoutDirection">
@@ -985,7 +996,10 @@
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_5">
                    <property name="spacing">
-                    <number>0</number>
+                    <number>5</number>
+                   </property>
+                   <property name="sizeConstraint">
+                    <enum>QLayout::SetDefaultConstraint</enum>
                    </property>
                    <property name="leftMargin">
                     <number>0</number>
@@ -1002,7 +1016,32 @@
                    <item>
                     <widget class="QCheckBox" name="checkBox">
                      <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <property name="text">
+                      <string>CheckBox</string>
+                     </property>
+                     <property name="checkable">
+                      <bool>true</bool>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                     <property name="autoRepeat">
                       <bool>false</bool>
+                     </property>
+                     <property name="autoExclusive">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_3">
+                     <property name="enabled">
+                      <bool>true</bool>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -1026,8 +1065,17 @@
                    </item>
                    <item>
                     <widget class="QCheckBox" name="checkBox_5">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
                      <property name="text">
                       <string>CheckBox</string>
+                     </property>
+                     <property name="checkable">
+                      <bool>true</bool>
                      </property>
                      <property name="checked">
                       <bool>true</bool>
@@ -1035,26 +1083,83 @@
                      <property name="autoRepeat">
                       <bool>false</bool>
                      </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QCheckBox" name="checkBox_4">
-                     <property name="text">
-                      <string>CheckBox</string>
+                     <property name="autoExclusive">
+                      <bool>false</bool>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QCheckBox" name="checkBox_3">
+                    <widget class="QCheckBox" name="checkBox_6">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
                      <property name="text">
                       <string>CheckBox</string>
+                     </property>
+                     <property name="checkable">
+                      <bool>true</bool>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                     <property name="autoRepeat">
+                      <bool>false</bool>
+                     </property>
+                     <property name="autoExclusive">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_4">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <property name="text">
+                      <string>CheckBox</string>
+                     </property>
+                     <property name="checkable">
+                      <bool>true</bool>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                     <property name="autoRepeat">
+                      <bool>false</bool>
+                     </property>
+                     <property name="autoExclusive">
+                      <bool>false</bool>
                      </property>
                     </widget>
                    </item>
                    <item>
                     <widget class="QCheckBox" name="checkBox_2">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
                      <property name="text">
                       <string>CheckBox</string>
+                     </property>
+                     <property name="checkable">
+                      <bool>true</bool>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                     <property name="autoRepeat">
+                      <bool>false</bool>
+                     </property>
+                     <property name="autoExclusive">
+                      <bool>false</bool>
                      </property>
                     </widget>
                    </item>
