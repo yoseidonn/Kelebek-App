@@ -14,7 +14,7 @@ class ExamStruct():
     # gl_.. Grade List
     def __init__(self,
                 examTable: QTableWidget,        # Sınavlar
-                gradeListWidget: QListWidget,   # Sınıflar
+                scrollArea: QScrollArea,        # Sınıflar
                 classroomList: QListWidget,     # Salonlar
                 inputPlace: QLineEdit,          # Sınav adı
                 addButton: QPushButton,         # Sınavı ekle
@@ -27,7 +27,7 @@ class ExamStruct():
                 sinavFrame):                    # YeniSinavFrame
 
         self.etw = examTable
-        self.glw = gradeListWidget
+        self.scrollArea = scrollArea
         self.clw = classroomList
         self.inputPlace = inputPlace
         self.addButton = addButton
@@ -58,9 +58,9 @@ class ExamStruct():
         self.gl_set_signals()
         self.cl_set_signals()
         
-        self.et_set_ts()
-        self.gl_set_ts()
-        self.cl_set_ts()
+        self.et_adjust_settings()
+        self.gl_adjust_settings()
+        self.cl_adjust_settings()
 
         self.et_draw()
         self.gl_draw()
@@ -79,9 +79,6 @@ class ExamStruct():
         self.inputPlace.textChanged.connect(self.et_set_white)
         self.etw.itemSelectionChanged.connect(self.et_selection_changed)
 
-    def gl_set_signals(self):
-        self.glw.itemClicked.connect(self.gl_item_clicked)
-    
     def cl_set_signals(self):
         self.clw.itemClicked.connect(self.cl_item_clicked)
     ######################################################
@@ -200,6 +197,7 @@ class ExamStruct():
             
     def cl_draw(self):
         pass
+    
     ######################################################## Exam Table
     def et_add_exam(self):
         examName = self.inputPlace.text().strip().upper()
@@ -231,7 +229,8 @@ class ExamStruct():
         if color in self.inputPlace.styleSheet():
             self.inputPlace.setStyleSheet("background-color: rgb(255, 255, 255);")
 
-    def et_set_ts(self):
+    ###########################
+    def et_adjust_settings(self):
         self.etw.setColumnCount(2)
         columnHeaders = ["Sınav adı", "Öğrenci sayısı"]
         self.etw.setHorizontalHeaderLabels(columnHeaders)
@@ -240,18 +239,19 @@ class ExamStruct():
         self.etw.setEditTriggers(QTableWidget.NoEditTriggers)
         self.etw.verticalHeader().hide()
      
-    def gl_set_ts(self):
+    def gl_adjust_settings(self):
         for gradeName in self.gradeNames:
             item = QListWidgetItem(gradeName)
             self.gradeItems.append(item)
             self.glw.addItem(item) 
             
-    def cl_set_ts(self):
+    def cl_adjust_settings(self):
         for classroomName in self.classroomsNames:
             item = QListWidgetItem(classroomName)
             item.setFlags(Qt.NoItemFlags)
             self.classroomItems.append(item)
             self.clw.addItem(item) 
+
     ########################
     def create(self):
         algorithm = self.algorithmCombo.currentText()
