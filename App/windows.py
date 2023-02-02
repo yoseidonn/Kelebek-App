@@ -709,7 +709,7 @@ class YeniSinavFrame(QFrame):
         loadUi(os.path.join("Forms", "yeni_sinav_frame.ui"), self)
         from .Structs.exam_struct import ExamStruct
         self.ExamStruct = ExamStruct(examTable = self.examTable,
-                                    gradeList = self.gradeListWidget,
+                                    gradeList = self.gradeList,
                                     classroomList = self.classroomList,
                                     inputPlace = self.examNameIn,
                                     addButton = self.addButton,
@@ -718,7 +718,7 @@ class YeniSinavFrame(QFrame):
                                     algorithmCombo = self.algCombo,
                                     kizErkCheck = self.kizErkCheck,
                                     omyCheck = self.omyCheck,
-                                    createButton = self.ogrenciKarmaButton,
+                                    createButton = self.createButton,
                                     sinavFrame = self)
 
         self.isStarted = False

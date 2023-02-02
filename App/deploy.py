@@ -1,255 +1,164 @@
-import random
+import random, math
 from App import database
 
-def check(oturmaDuzeni: list, ogrenciler: dict, kacli: str, cinsiyet: str, sinavAdi: str, konum: list, karma: str, kizErk: bool):
-    TAM_KARMA = 'Tam karma: Yan yana ve çapraz oturmasın'
-    ALTERNATIF_KARMA = 'Alternatif karma: Yan yana oturmasın (Sayıya göre çapraz oturabilir)'
-    EN_AZ_KARMA = 'En az karma (Sayıya göre yan yana veya çapraz oturabilirler)'
-    colInd, rowInd, desk, deskNo = konum
+class Desk:
+    def __init__(self, desk):
+        self.places = desk
+
+class Place:
+    def __init__(self, columnIndex, rowIndex, deskNo, holding = None):
+        self.columnIndex = columnIndex
+        self.rowIndex = rowIndex
+        self.deskNo = deskNo
+        self.holding = holding
     
-    crossStudents = []
-    sideStudents = []
-    nextToStudent = None
-    if kacli == "1'li":
-        try:
-            leftDesk = oturmaDuzeni[colInd-1][rowInd]
-            key = list(leftDesk.keys())[0]
-            student = leftDesk[key]
-            if student is not None:
-                sideStudents.append(student)
-        except Exception as e:
-            pass
-            #print(e)
-            
-        try:
-            rightDesk = oturmaDuzeni[colInd+1][rowInd]
-            key = list(rightDesk.keys())[0]
-            student = rightDesk[key]
-            if student is not None:
-                sideStudents.append(student)
-        except Exception as e:
-            pass
-            #print(e)
+    def get_place_infos(self):
+        return self.columnIndex, self.rowIndex, self.deskNo, self.holding
+
+    def __str__(self):
+        return f"{self.columnIndex}, {self.rowIndex}, {self.deskNo}"
+    
         
-    elif kacli == "2'li":
-        solSag = list(desk.keys()).index(deskNo)
-        if solSag:
-            #Sağ
-            try:
-                leftForeDesk = oturmaDuzeni[colInd][rowInd+1]
-                key = list(leftForeDesk.keys())[0]
-                student = leftForeDesk[key]
-                if student is not None:
-                    crossStudents.append(student)
-            except Exception as e:
-                pass
-                #print(e)
-                
-            try:
-                leftBackDesk = oturmaDuzeni[colInd][rowInd-1]
-                key = list(leftBackDesk.keys())[0]
-                student = leftBackDesk[key]
-                if student is not None:
-                    crossStudents.append(student)
-            except Exception as e:
-                pass
-                #print(e)
+def get_places(arr) -> list[Place]:
+    places = list()
+    for columnIndex, column in enumerate(arr):
+        for rowIndex, desk in enumerate(column):
+            for deskNo, holding in desk.items():
+                place = Place(columnIndex, rowIndex, deskNo, holding)
+                places.append(place)
 
-            try:
-                leftDesk = oturmaDuzeni[colInd][rowInd]
-                key = list(leftDesk.keys())[0]
-                student = leftDesk[key]
-                if student is not None:
-                    sideStudents.append(student)
-                    nextToStudent = student
-            except Exception as e:
-                pass
-                #print(e)
+    return places
 
-            try:
-                rightDesk = oturmaDuzeni[colInd+1][rowInd]
-                key = list(rightDesk.keys())[0]
-                student = rightDesk[key]
-                if student is not None:
-                    sideStudents.append(student)
-            except Exception as e:
-                pass
-                #print(e)
-
-        else:
-            try:
-                rightForeDesk = oturmaDuzeni[colInd][rowInd+1]
-                key = list(rightForeDesk.keys())[1]
-                student = rightForeDesk[key]
-                if student is not None:
-                    crossStudents.append(student)
-            except Exception as e:
-                pass
-                #print(e)
-
-            try:
-                rightBackDesk = oturmaDuzeni[colInd][rowInd-1]
-                key = list(rightBackDesk.keys())[1]
-                student = rightBackDesk[key]
-                if student is not None:
-                    crossStudents.append(student)
-            except Exception as e:
-                pass
-                #print(e)
-                
-            try:
-                leftDesk = oturmaDuzeni[colInd-1][rowInd]
-                key = list(leftDesk.keys())[1]
-                student = leftDesk[key]
-                if student is not None:
-                    sideStudents.append(student)
-            except Exception as e:
-                pass
-                #print(e)
-            
-            try:
-                rightDesk = oturmaDuzeni[colInd+1][rowInd]
-                key = list(rightDesk.keys())[0]
-                student = rightDesk[key]
-                if student is not None:
-                    sideStudents.append(student)
-                    nextToStudent = student
-            except Exception as e:
-                pass
-                #print(e)
-                
-            
-    if karma == TAM_KARMA and not kizErk:
-        for student in sideStudents:
-            if ogrenciler[student] == sinavAdi:
-                return False
-            
-        for student in crossStudents:
-            if ogrenciler[student] == sinavAdi:
-                return False
+def empty_count(arrangement):
+    count = 0
+    for columnIndex, column in enumerate(arrangement):
+        for rowIndex, desk in enumerate(column):
+            for deskNo, place in desk.items():
+                if not place:
+                    count += 1
+                    
+    return count
+    
+def seperate_students(students):
+    seperatedStudents = dict()
+    lastGrade = ""
+    for student in students:
+        grade = student[4]
+        if grade != lastGrade:
+            lastGrade = grade
+            seperatedStudents.update({grade: list()})
         
-            
-    elif karma == TAM_KARMA and kizErk:
-        for student in sideStudents:
-            if (ogrenciler[student] == sinavAdi):
-                return False
-            
-        for student in crossStudents:
-            if (ogrenciler[student] == sinavAdi):
-                return False
-            
-        if nextToStudent is not None:
-            if nextToStudent[3] != cinsiyet:
-                return False
+        seperatedStudents[grade].append(student)
 
-    elif karma == ALTERNATIF_KARMA and not kizErk:
-        for student in sideStudents:
-            if ogrenciler[student] == sinavAdi:
-                return False
-            
-    elif karma == ALTERNATIF_KARMA and kizErk:
-        for student in sideStudents:
-            if (ogrenciler[student] == sinavAdi):
-                return False
-            
-        if nextToStudent is not None:
-            if nextToStudent[3] != cinsiyet:
-                return False
-        
-    elif karma == EN_AZ_KARMA and not kizErk:
-        pass
+    for gradeName, students in seperatedStudents.items():
+        random.shuffle(students)
 
-    elif karma == EN_AZ_KARMA and kizErk:
-        solSag = list(desk.keys()).index(deskNo)
-        if solSag:
-            #Sağ
-            key = list(desk.keys())[0]
-            if desk[key][3] != cinsiyet:
-                return False
+    return seperatedStudents
 
+def students_left(seperatedStudents):
+    studentsLeft = 0
+    for gradeName, students in seperatedStudents.items():
+        studentsLeft += len(students)
+            
+def check_all_desks(deskInfos: list) -> bool:
     return True
 
-def get_students_by_exam(exams):
-    studentsBackup = {}
-    for eName in exams:
-        for gradeName in exams[eName]:
-            result = database.get_all_students(grade = gradeName)
-            for student in result:
-                studentsBackup.update({student: eName})
+
+def deploy_students(classrooms: dict, students: list) -> dict:
+    attempt = 5
+    while attempt:
+        seperatedStudents = seperate_students(students)
+        for gradeName, gradeStudents in seperatedStudents.items():
+            attemptGrade, ended = 2, False
+            while attemptGrade and not ended:
+                for classroomName, classroomsDict in classrooms.items():
+                    # Buraya öğretmen masası kontrolü ekle
+                    arr = classroomsDict["oturma_duzeni"]
+                    # Eğer hala öğrenci varsa ama left sıfır çıkıyorsa öğrenci sayısı salon sayısından azdır.
+                    # Bu durumda left için bir yaparsak her sınıfa birer tane olacak şekilde öğrencileri dağıtmayı dener.
+                    left = len(gradeStudents) // len(classrooms)
+                    if len(gradeStudents) and not left:
+                        left = 1
+                        
+                    emptyCount = empty_count(arr)
+                    places = get_places(arr)
+                    while emptyCount and left:
+                        emptyCount -= 1
+
+                        placeCount = len(places)
+                        placeIndex = random.randint(0, placeCount - 1)
+                        place = places[placeIndex]
+
+                        columnIndex, rowIndex, deskNo, holding = place.get_place_infos()
+                        if holding:
+                            continue
+                        
+                        student = gradeStudents[-1]
+                        deskInfos = [columnIndex, rowIndex, deskNo, holding]
+                        if check_all_desks(deskInfos = deskInfos):
+                            arr[columnIndex][rowIndex][deskNo] = student
+                            gradeStudents.pop(-1)
+                            left -= 1
+                        
+                        places.remove(place) 
+
+                if not gradeStudents:
+                    ended = True
+                attemptGrade -= 1
                 
-    return studentsBackup
+        studentsLeftCount = students_left(seperatedStudents)
+        if studentsLeftCount:
+            attempt -= 1
+        else:
+            attempt = 0
+
+    return classrooms
+
+def print_classrooms(classrooms):
+    for classroom_name, columns in classrooms.items():
+        print(f"Classroom: {classroom_name}")
+        for column in columns:
+            for row in column:
+                print(row)
+        print("\n")
+
+def print_students(seperatedStudents):
+    for gradeName, students in seperatedStudents.items():
+        print(gradeName)
+        [print(student) for student in students]
+        print()
 
 def deploy_and_get_classrooms(exam):
-    exams = exam.exams
+    students = get_students(exam.exams)
     classroomNames = exam.classroomNames
-    algorithmName = exam.algorithmName
-    optionList = exam.optionList
-    studentsBackup = get_students_by_exam(exams)
-    classroomsBackup = database.get_name_given_classrooms(classroomNames) # This function returns a dictionary which has classrooms consists of informations and layout, named "oturma_duzeni".
-    algorithmIndex = algorithmNames[algorithmName]
+    classrooms = database.get_name_given_classrooms(classroomNames)
+    
+    print("----")
+    
+    classrooms = deploy_students(classrooms, students)
+    return classrooms
 
-    karma = algorithmName
-    kizErk = True if optionList[0] else False
-    omy = optionList[1]
+def get_students(exams):
+    grades = list()
+    for examName, gradess in exams.items():
+        grades.extend(gradess)
+        
+    students = database.get_grade_given_students(grades)
 
-    tried = 1
-    ogretmenMasasi = None
-    students = studentsBackup
-    while len(students) != 0 and tried <= 5:
-        print("----try-------")
-        classroomsWithStudents = dict()
-        classrooms = classroomsBackup.copy()
-        students = studentsBackup.copy()
-        for cName in classrooms:
-            kacli = classrooms[cName]['kacli']
-            ogretmenYonu = classrooms[cName]['ogretmen_yonu']
-            if omy:
-                keys = list(students.keys())
-                random.shuffle(keys)
-                random.shuffle(keys)
-                random.shuffle(keys)
-                try:
-                    key = keys[-1]
-                    student = key
-                    eName = students[key]
-                    ogretmenMasasi = [eName, student]
-                    students.pop(key)
-                except IndexError:
-                    pass
-                    
-            oturmaDuzeni = classrooms[cName]['oturma_duzeni']
-            for colIndex in range(len(oturmaDuzeni)):
-                    for rowIndex in range(len(oturmaDuzeni[colIndex])):
-                        desk = oturmaDuzeni[colIndex][rowIndex] #Dictionary
-                        for deskNo in desk:
-                            keys = list(students.keys())
-                            random.shuffle(keys)
-                            random.shuffle(keys)
-                            random.shuffle(keys)
-                            print(len(students))    
-                            for key in keys:
-                                student = key
-                                cinsiyet = student[3]
-                                sinavAdi = students[key]
-                                location = [colIndex, rowIndex, desk, deskNo]
-                                isPassed = check(oturmaDuzeni, studentsBackup, kacli, cinsiyet, sinavAdi, location, karma, kizErk)
-                                if isPassed:
-                                    desk.update({deskNo: student})
-                                    students.pop(student)
-                                    print(student, colIndex, rowIndex, deskNo)
-                                    break
+    return students
 
-            classroomsWithStudents.update({cName: {"oturma_duzeni": oturmaDuzeni, "ogretmen_masasi": ogretmenMasasi, "kacli": kacli, "ogretmen_yonu": ogretmenYonu}})
-        tried += 1   
-        print(students)
-    
-    if len(students) == 0:
-        return classroomsWithStudents
-    
-    else:
-        return False
-    
-    
-algorithmNames = {'Tam karma: Yan yana ve çapraz oturmasın': 0,
-                  'Alternatif karma: Yan yana oturmasın (Sayıya göre çapraz oturabilir)': 1,
-                  'En az karma (Sayıya göre yan yana veya çapraz oturabilirler)': 2}
+if __name__ == '__main__':
+    students = [("Yusuf", "11/A"), ("Ali",  "11/A"), ("Veli", "11/A"), ("Deli", "11/B"),
+                ("İsta", "11/B"), ("Ahmet", "11/C"), ("Kemal", "11/C"), ("Mehmet", "11/C")]
+
+    classrooms = {
+                "classroom1": [[{1: None, 2: None}, {3: None, 4: None},  {5: None, 6: None}],
+                               [{7: None, 8: None}, {9: None, 10: None}, {11: None, 12: None}],
+                               [{13: None, 14: None}, {15: None, 16: None}]],
+                            
+                "classroom2": [[{1: None, 2: None}, {3: None, 4: None},  {5: None, 6: None}],
+                               [{7: None, 8: None}, {9: None, 10: None}, {11: None, 12: None}]]
+                }
+
+    classrooms = deploy_students(classrooms, students)
+    print_classrooms(classrooms)
