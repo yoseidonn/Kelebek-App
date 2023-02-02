@@ -18,10 +18,10 @@ class MainWindow(QMainWindow):
         super().__init__()
         loadUi(os.path.join("Forms", "mainwindow.ui"), self)
 
-        x = self.is_date_over()
+        """x = self.is_date_over()
         if x in ["NO_INTERNET", "ENDED"]:
             print(x)
-            exit()
+            exit()"""
             
         self.set_signs()
         self.set_ui()
@@ -709,7 +709,7 @@ class YeniSinavFrame(QFrame):
         loadUi(os.path.join("Forms", "yeni_sinav_frame.ui"), self)
         from .Structs.exam_struct import ExamStruct
         self.ExamStruct = ExamStruct(examTable = self.examTable,
-                                    gradeListWidget = self.gradeListWidget,
+                                    gradeList = self.gradeListWidget,
                                     classroomList = self.classroomList,
                                     inputPlace = self.examNameIn,
                                     addButton = self.addButton,
@@ -731,129 +731,41 @@ class YeniSinavFrame(QFrame):
 
     def set_signals(self):
         self.continueButton.clicked.connect(self.next_step) #PRE-EVENT SIGNAL
-        self.ogrenciKarmaButton.clicked.connect(lambda: self.next_step(karma = True))
         self.masterExamNameIn.textChanged.connect(lambda: self.set_white(""))
         
-    def next_step(self, karma = True):
-        if karma:
-            from .shuffle import shuffle_and_get_classrooms
-            exam = self.ExamStruct.exam
-            sonuc = shuffle_and_get_classrooms(exam)
-            if not sonuc:
-                print("Yetersiz yer")
-                # Tekrar deneyiniz penceresi ekle
-                pass
-            else:
-                # Create files
-                con1 = classrooms_html.create(self.examInfos, sonuc, exam.exams)
-                con2 = students_html.create(self.examInfos, sonuc, exam.exams)
-
-                self.show_result_frame(classroomsContainer = con1, studentsContainer = con2)
-
-        else:
-            if len(self.masterExamNameIn.text().strip()) == 0:
-                self.set_white("", red = True)
-                return
+    def next_step(self):
+        if len(self.masterExamNameIn.text().strip()) == 0:
+            self.set_white("", red = True)
+            return
             
-            day = int(self.day.currentText())
-            month = self.MONTHS[self.month.currentText()]
-            year = int(self.year.currentText())
-            date = datetime.datetime(year, month, day)
-            tarih  = str(date.date())
+        day = int(self.day.currentText())
+        month = self.MONTHS[self.month.currentText()]
+        year = int(self.year.currentText())
+        date = datetime.datetime(year, month, day)
+        tarih  = str(date.date())
             
-            self.masterExamName = self.masterExamNameIn.text().strip()
-            self.egitimOgretimYili = self.egitimOgretimCombo.currentText()
-            self.donem = self.donemCombo.currentText().upper()
-            self.kacinciYazili = self.doneminKacinciCombo.currentText().upper()
-            self.tarih = tarih
-            self.kacinciDers = self.dersSaatiCombo.currentText().upper()
-            self.examInfos = [self.egitimOgretimYili, self.donem, self.kacinciYazili, self.tarih, self.kacinciDers, self.masterExamName]
-
-            self.upperOfExamInfos.setVisible(False)
-            self.mainFrame.setVisible(True)
-            self.isStarted = True
-
-    def show_result_frame(self, classroomsContainer: list, studentsContainer: list):
-        # Dialog sonucuna göre dosyayı ya kayıtlara taşı ya da sil
-        cFilePath, cContent = classroomsContainer
-        sFilePath, sContent = studentsContainer
-
-        examPath = "_".join([self.examInfos[-1], self.examInfos[3], self.examInfos[4]])
-
-        dialogSonuc = SonucDialog(classroomsHTML = cContent, studentsHTML = sContent).isAccepted
-        if dialogSonuc:
-            try:
-                os.mkdir(os.path.join('Saved', examPath))
-            except FileExistsError:
-                pass
-            Path(cFilePath).rename(os.path.join('Saved', examPath, 'salon_oturma_duzenleri.html'))
-            Path(sFilePath).rename(os.path.join('Saved', examPath, 'sinif_listeleri.html'))
-
-            print(os.path.join('Saved', examPath, 'salon_oturma_duzenleri.html'))
-            print(os.path.join('Saved', examPath, 'sinif_listeleri.html'))
-            
-            self.upperOfExamInfos.setVisible(True)
-            self.mainFrame.setVisible(False)
-            self.isStarted = False
-            
-        else:
-            os.remove(cFilePath)
-            os.remove(sFilePath)
-
-        os.rmdir(os.path.join('Temp', examPath))
+        self.masterExamName = self.masterExamNameIn.text().strip()
+        self.egitimOgretimYili = self.egitimOgretimCombo.currentText()
+        self.donem = self.donemCombo.currentText().upper()
+        self.kacinciYazili = self.doneminKacinciCombo.currentText().upper()
+        self.tarih = tarih
+        self.kacinciDers = self.dersSaatiCombo.currentText().upper()
+        self.examInfos = [self.egitimOgretimYili, self.donem, self.kacinciYazili, self.tarih, self.kacinciDers, self.masterExamName]
+        self.ExamStruct.examInfos = self.examInfos
+        self.upperOfExamInfos.setVisible(False)
+        self.mainFrame.setVisible(True)
+        self.isStarted = True
         
+    def reset(self):
+        self.upperOfExamInfos.setVisible(True)
+        self.mainFrame.setVisible(False)
+        self.isStarted = False
+            
     def set_white(self, newText, red = False):
         if red:
             self.masterExamNameIn.setStyleSheet(f"background-color: rgb(255, 128, 128);")
         else:
             self.masterExamNameIn.setStyleSheet("background-color: white;")
-        
-class SonucDialog(QDialog):
-    def __init__(self, classroomsHTML, studentsHTML):
-        super().__init__()
-        loadUi(os.path.join("Forms", "sonuc_dialog.ui"), self)
-        
-        self.classroomsHTML = classroomsHTML
-        self.studentsHTML = studentsHTML
-        self.isAccepted = False
-
-        self.wev = QWebEngineView()
-        self.previewLayout.addWidget(self.wev)
-
-        self.set_flw()
-        self.set_signals()
-        self.exec_()
-    
-    def set_signals(self):
-        self.filesList.itemClicked.connect(self.fl_item_clicked)
-        self.saveBtn.clicked.connect(lambda: self.close(key = True))
-        self.discardBtn.clicked.connect(self.close)
-        
-    def fl_item_clicked(self, item: QListWidgetItem):
-        print(item.text())
-        if item.text() == 'Salon oturma düzenleri':
-            self.wev.setHtml(self.classroomsHTML)
-
-        else:
-            self.wev.setHtml(self.studentsHTML)
-        
-    def close(self, key = False):
-        # self.accept is just for close the window
-        if key:
-            self.isAccepted = True
-            self.accept()
-            return
-        self.isAccepted = False
-        self.accept()
-        
-    def set_flw(self):
-        item1 = QListWidgetItem('Salon oturma düzenleri')
-        item2 = QListWidgetItem('Sınıf listeleri')
-        item1.setSelected(True)
-
-        self.filesList.addItem(item1)
-        self.filesList.addItem(item2)
-        self.wev.setHtml(self.classroomsHTML)
 
 
 class SinavlarFrame(QFrame):

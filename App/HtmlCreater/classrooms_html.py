@@ -1,5 +1,5 @@
 from App import database
-import os
+import os, shutil
 
 # PATHS
 BASE = os.path.join('Templates', 'ClassroomsTemplates', 'base.html')
@@ -45,7 +45,7 @@ def create(examInfos, classrooms, exams):
     try:
         os.mkdir(os.path.join('Temp', examName))
     except FileExistsError:
-        os.rmdir(os.path.join('Temp', examName))
+        shutil.rmtree(os.path.join('Temp', examName))
         os.mkdir(os.path.join('Temp', examName))
 
     with open(os.path.join('Temp', examName, fileName), 'w', encoding='utf-8') as newFile:
