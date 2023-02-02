@@ -179,7 +179,7 @@ def get_students_by_exam(exams):
                 
     return studentsBackup
 
-def shuffle_and_get_classrooms(exam):
+def deploy_and_get_classrooms(exam):
     exams = exam.exams
     classroomNames = exam.classroomNames
     algorithmName = exam.algorithmName
