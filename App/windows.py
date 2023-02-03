@@ -731,11 +731,11 @@ class YeniSinavFrame(QFrame):
 
     def set_signals(self):
         self.continueButton.clicked.connect(self.next_step) #PRE-EVENT SIGNAL
-        self.masterExamNameIn.textChanged.connect(lambda: self.set_white(""))
+        self.masterExamNameIn.textChanged.connect(self.set_white)
         
     def next_step(self):
         if len(self.masterExamNameIn.text().strip()) == 0:
-            self.set_white("", red = True)
+            self.set_red()
             return
             
         day = int(self.day.currentText())
@@ -761,12 +761,12 @@ class YeniSinavFrame(QFrame):
         self.mainFrame.setVisible(False)
         self.isStarted = False
             
-    def set_white(self, newText, red = False):
-        if red:
-            self.masterExamNameIn.setStyleSheet(f"background-color: rgb(255, 128, 128);")
-        else:
-            self.masterExamNameIn.setStyleSheet("background-color: white;")
-
+    def set_white(self):
+        self.masterExamNameIn.setStyleSheet("background-color: white;")
+    
+    def set_red(self):
+        self.masterExamNameIn.setStyleSheet(f"background-color: rgb(255, 128, 128);")
+    
 
 class SinavlarFrame(QFrame):
     def __init__(self):

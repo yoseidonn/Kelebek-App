@@ -416,11 +416,6 @@ border:none;
                    <widget class="QComboBox" name="year">
                     <item>
                      <property name="text">
-                      <string>2022</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
                       <string>2023</string>
                      </property>
                     </item>
@@ -432,6 +427,16 @@ border:none;
                     <item>
                      <property name="text">
                       <string>2025</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>2026</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>2027</string>
                      </property>
                     </item>
                    </widget>

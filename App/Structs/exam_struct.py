@@ -6,7 +6,8 @@ from PyQt5.uic import loadUi
 
 from App import database
 from App.colors import COLOR_PALETTE
-from App.HtmlCreater import classrooms_html, students_html
+from App.HtmlCreater import classrooms_html, students_html_demo
+from App.deploy import deploy_and_get_classrooms
 
 from pathlib import Path
 import os, sys, random, time
@@ -51,11 +52,7 @@ class ExamStruct():
         self.classroomsNames = database.get_all_classrooms(onlyNames=True)
 
         # VARIABLES
-        self.examInfos = list()             # self.egitimOgretimYili, self.donem, self.kacinciYazili, self.tarih, self.kacinciDers, self.masterExamName
-        self.gradeCheckBoxes = list()       # To hold the checkboxes for enabling all when i need
-        self.classroomNames = list()        # To hold the selected classroom names
-        self.exams = dict()                 # To hold the exam names with gradenames
-        self.selectedExamName = str()
+        self.set_start_variables()
         
         # RENDER THE FRAME
         self.set_ui()
@@ -63,12 +60,25 @@ class ExamStruct():
         
         self.adjust_widget_settings()
 
+    def set_start_variables(self):
+        self.examInfos = list()             # self.egitimOgretimYili, self.donem, self.kacinciYazili, self.tarih, self.kacinciDers, self.masterExamName
+        self.gradeCheckBoxes = list()       # To hold the checkboxes for enabling all when i need
+        self.classroomNames = list()        # To hold the selected classroom names
+        self.exams = dict()                 # To hold the exam names with gradenames
+        self.selectedExamName = str()
+
     def set_ui(self):
-        pass
+        self.removeButton.setEnabled(False)
+        self.removeAllButton.setEnabled(False)
     
     def set_signals(self):
         self.addButton.clicked.connect(self.add_exam)
+        self.removeButton.clicked.connect(self.remove_exam)
+        self.removeAllButton.clicked.connect(self.remove_all_exams)
+        self.inputPlace.textChanged.connect(self.set_white)
+
         self.examTableWidget.itemSelectionChanged.connect(self.on_cell_change)
+
         self.createButton.clicked.connect(self.create)
         
     def add_exam(self):
@@ -81,10 +91,27 @@ class ExamStruct():
                                           "checkBoxes": [],
                                           "paletteColor": color
                                           }})
+
+            self.inputPlace.clear()
             self.draw_exam_table()
 
+            self.removeButton.setEnabled(True)
+            self.removeAllButton.setEnabled(True)
+
         else:
-            self.inputPlace.setStyleSheet("background-color: ")
+            self.set_red()       # Input place
+
+    def remove_exam(self):
+        del self.exams[self.selectedExamName]
+        self.draw_exam_table()
+        pass
+
+    def remove_all_exams(self):
+        self.set_start_variables()
+        self.adjust_widget_settings()
+        self.removeButton.setEnabled(False)
+        self.removeAllButton.setEnabled(False)
+
 
     def on_cell_change(self):
         item = self.examTableWidget.currentItem()
@@ -95,7 +122,7 @@ class ExamStruct():
         # Seçili sınavın rengini palet rengine ata
         keys = list(self.exams.keys())
         examName = keys[rowIndex]
-        self.selectedExamName = examName                        # 3. Yorumda kullanılıyor.
+        self.selectedExamName = examName                        # draw_exam_table da kullanılıyor
         examColor = self.exams[examName]["paletteColor"]
         highLightColor = QColor(*examColor, 100)
 
@@ -194,7 +221,12 @@ class ExamStruct():
             self.classroomListWidget.addItem(item)
             self.classroomListWidget.setItemWidget(item, checkbox)
     
-    def adjust_widget_settings(self):
+    def adjust_widget_settings(self, reset = False):
+        if reset:
+            self.examTableWidget.clear()
+            self.gradeListWidget.clear()
+            self.classroomListWidget.clear()
+
             # Exams table
         # Tablo ayarlarını yap
         self.examTableWidget.setColumnCount(2)
@@ -215,6 +247,12 @@ class ExamStruct():
         self.draw_grade_table()
         self.draw_classroom_table()
     
+    def set_white(self):
+        self.inputPlace.setStyleSheet("background-color: white;")
+    
+    def set_red(self):
+        self.inputPlace.setStyleSheet(f"background-color: rgb(255, 128, 128);")
+    
     def create(self):
         algorithm = self.algorithmCombo.currentText()
         options = [self.kizErkCheck.isChecked(), self.omyCheck.isChecked()]
@@ -223,7 +261,6 @@ class ExamStruct():
         self.deploy_step()
         
     def deploy_step(self):
-        from App.deploy import deploy_and_get_classrooms
         sonuc = deploy_and_get_classrooms(self.exam)
         if not sonuc:
             print("Yetersiz yer")
@@ -232,7 +269,7 @@ class ExamStruct():
         else:
             # Create files
             con1 = classrooms_html.create(self.examInfos, sonuc, self.exam.exams)
-            con2 = students_html.create(self.examInfos, sonuc, self.exam.exams)
+            con2 = students_html_demo.create(self.examInfos, sonuc, self.exam.exams)
 
             self.show_result_frame(classroomsContainer = con1, studentsContainer = con2)
             self.sinavFrame.reset()
@@ -253,8 +290,8 @@ class ExamStruct():
             Path(cFilePath).rename(os.path.join('Saved', examPath, 'salon_oturma_duzenleri.html'))
             Path(sFilePath).rename(os.path.join('Saved', examPath, 'sinif_listeleri.html'))
 
-            print(os.path.join('Saved', examPath, 'salon_oturma_duzenleri.html'))
-            print(os.path.join('Saved', examPath, 'sinif_listeleri.html'))
+            #print(os.path.join('Saved', examPath, 'salon_oturma_duzenleri.html'))
+            #print(os.path.join('Saved', examPath, 'sinif_listeleri.html'))
             
         else:
             os.remove(cFilePath)
