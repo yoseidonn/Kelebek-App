@@ -1,5 +1,5 @@
 import random, math
-
+from . import database
 
 class Place:
     def __init__(self, columnIndex, rowIndex, deskNo, holding = None):
@@ -109,7 +109,7 @@ def deploy_students(classrooms: dict, students: list, exam) -> dict:
                         deskInfos = [columnIndex, rowIndex, deskNo, holding]
                         algorithmName = exam.algorithmName
                         options = exam.optionList
-                        if check_all_desks(algorithm = algorithmName, optins = options, deskInfos = deskInfos):
+                        if check_all_desks(algorithm = algorithmName, options = options, deskInfos = deskInfos):
                             arr[columnIndex][rowIndex][deskNo] = student
                             gradeStudents.pop(-1)
                             left -= 1

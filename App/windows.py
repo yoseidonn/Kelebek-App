@@ -315,7 +315,8 @@ class OkulBilgileriFrame(QFrame):
 
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
-
+        self.table.setSelectionMode(QAbstractItemView.NoSelection)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
     
 class OgrencilerFrame(QFrame):
     def __init__(self):
