@@ -112,9 +112,10 @@ class ExamStruct():
         self.removeButton.setEnabled(False)
         self.removeAllButton.setEnabled(False)
 
-
     def on_cell_change(self):
         item = self.examTableWidget.currentItem()
+        if item is None:
+            return
         rowIndex = item.row()
         self.examTableWidget.selectRow(rowIndex)
         print("Row selected.", rowIndex)
@@ -224,7 +225,10 @@ class ExamStruct():
     def adjust_widget_settings(self, reset = False):
         if reset:
             self.examTableWidget.clear()
+
             self.gradeListWidget.clear()
+            self.gradeCheckBoxes = []
+
             self.classroomListWidget.clear()
 
             # Exams table
@@ -322,7 +326,6 @@ class Exam():
     def __str__(self):
         string = f"Sınavlar: {self.exams}\n\n{self.classrooms}\n\nÖğrenciler {self.algorithmName} ile karılacaktır.\n\nSeçenekler: {self.optionList}"
         return string
-
 
         
 class SonucDialog(QDialog):

@@ -17,11 +17,10 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         loadUi(os.path.join("Forms", "mainwindow.ui"), self)
-
-        """x = self.is_date_over()
+        x = self.is_date_over()
         if x in ["NO_INTERNET", "ENDED"]:
             print(x)
-            exit()"""
+            exit()
             
         self.set_signs()
         self.set_ui()

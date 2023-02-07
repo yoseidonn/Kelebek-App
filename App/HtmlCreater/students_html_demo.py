@@ -112,65 +112,6 @@ def classrooms_to_grades(classrooms):
         
     return seperated
 
-def html(grades):
-    text_array = []
-
-    wrapperStart = '<div class="table-wrapper">'
-    wrapperEnd = '</div>'
-    
-    tableStart = '<table class="fl-table">'
-    tableEnd = '</table>'
-    
-    head = '''<thead>
-                    <tr>
-                        <th>Sıra</th>
-                        <th>Öğrenci</th> 
-                        <th>Sınav yeri</th> 
-                    </tr>
-                </head>'''
-                
-    bodyOpen = '<tbody>'
-    bodyClose = '</tbody>'
-    outerOpener = '<div class="outer">'
-    outerCloser = '</div>'
-    row = '<tr> <td>{}</td> <td>{}</td> <td>{}</td> </tr>'
-    
-    
-    for gradeName in grades:
-        i = 1
-        text_array.append(outerOpener)
-        text_array.append(f'<h2>{gradeName}</h2>')
-        text_array.append(wrapperStart)
-        text_array.append(tableStart)
-        text_array.append(head)
-        text_array.append(bodyOpen)
-    
-        for info in grades[gradeName]:
-            if info[2] == "Öğretmen masası":
-                grade, name, placeInfo = info
-                newRow = row.format(str(i), name, placeInfo)
-                text_array.append(newRow)
-                i += 1
-                continue
-            
-            student = info[1]
-            fullName = f'{student[1]} {student[2]}'
-            examClassroom, examDeskNo = info[2], info[3]
-            placeInfo = f'{examClassroom} {examDeskNo}'
-            newRow = row.format(str(i), fullName, placeInfo)
-            text_array.append(newRow)
-            i += 1
-
-        text_array.append(bodyClose)
-        text_array.append(tableEnd)
-        text_array.append(wrapperEnd)
-        text_array.append("<br><br><br>")
-        text_array.append(outerCloser)
-
-    html_text = " ".join(text_array)
-
-    return html_text 
-
 def layer_function(classrooms):
     counter = 0
     mixed = {}
@@ -196,7 +137,6 @@ def layer_function(classrooms):
                         grade = student[4]
                         info = [grade, student, classroom, deskNo]
                         mixed.update({no: info})
-    
     
     seperated = {}
     createds = []

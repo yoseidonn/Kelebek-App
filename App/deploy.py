@@ -1,9 +1,5 @@
 import random, math
-from App import database
 
-class Desk:
-    def __init__(self, desk):
-        self.places = desk
 
 class Place:
     def __init__(self, columnIndex, rowIndex, deskNo, holding = None):
@@ -12,12 +8,29 @@ class Place:
         self.deskNo = deskNo
         self.holding = holding
     
-    def get_place_infos(self):
+    def get_place_infos(self) -> tuple:
         return self.columnIndex, self.rowIndex, self.deskNo, self.holding
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.columnIndex}, {self.rowIndex}, {self.deskNo}"
     
+
+def check_all_desks(algorithm: str, options: list, deskInfos: list) -> bool:
+    print()
+    print(algorithm)
+    print(options)
+    print(deskInfos)
+    print()
+    return True
+
+def get_students(exams):
+    grades = list()
+    for examName, gradess in exams.items():
+        grades.extend(gradess)
+        
+    students = database.get_grade_given_students(grades)
+
+    return students
         
 def get_places(arr) -> list[Place]:
     places = list()
@@ -29,7 +42,7 @@ def get_places(arr) -> list[Place]:
 
     return places
 
-def empty_count(arrangement):
+def empty_count(arrangement) -> int:
     count = 0
     for columnIndex, column in enumerate(arrangement):
         for rowIndex, desk in enumerate(column):
@@ -39,7 +52,7 @@ def empty_count(arrangement):
                     
     return count
     
-def seperate_students(students):
+def seperate_students(students) -> int:
     seperatedStudents = dict()
     lastGrade = ""
     for student in students:
@@ -55,16 +68,14 @@ def seperate_students(students):
 
     return seperatedStudents
 
-def students_left(seperatedStudents):
+def students_left(seperatedStudents: dict) -> int:
     studentsLeft = 0
     for gradeName, students in seperatedStudents.items():
         studentsLeft += len(students)
+        
+    return studentsLeft
             
-def check_all_desks(deskInfos: list) -> bool:
-    return True
-
-
-def deploy_students(classrooms: dict, students: list) -> dict:
+def deploy_students(classrooms: dict, students: list, exam) -> dict:
     attempt = 5
     while attempt:
         seperatedStudents = seperate_students(students)
@@ -94,8 +105,11 @@ def deploy_students(classrooms: dict, students: list) -> dict:
                             continue
                         
                         student = gradeStudents[-1]
+                        
                         deskInfos = [columnIndex, rowIndex, deskNo, holding]
-                        if check_all_desks(deskInfos = deskInfos):
+                        algorithmName = exam.algorithmName
+                        options = exam.optionList
+                        if check_all_desks(algorithm = algorithmName, optins = options, deskInfos = deskInfos):
                             arr[columnIndex][rowIndex][deskNo] = student
                             gradeStudents.pop(-1)
                             left -= 1
@@ -133,19 +147,9 @@ def deploy_and_get_classrooms(exam):
     classroomNames = exam.classroomNames
     classrooms = database.get_name_given_classrooms(classroomNames)
     
-    print("----")
-    
-    classrooms = deploy_students(classrooms, students)
+    classrooms = deploy_students(classrooms, students, exam)
     return classrooms
 
-def get_students(exams):
-    grades = list()
-    for examName, gradess in exams.items():
-        grades.extend(gradess)
-        
-    students = database.get_grade_given_students(grades)
-
-    return students
 
 if __name__ == '__main__':
     students = [("Yusuf", "11/A"), ("Ali",  "11/A"), ("Veli", "11/A"), ("Deli", "11/B"),
