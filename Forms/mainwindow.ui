@@ -40,6 +40,9 @@ border:  transparent;
       <item>
        <widget class="QFrame" name="textFrame">
         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>9</number>
+         </property>
          <item>
           <widget class="QTextBrowser" name="textBrowser">
            <property name="minimumSize">
@@ -109,16 +112,6 @@ p, li { white-space: pre-wrap; }
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1033</width>
-     <height>22</height>
-    </rect>
-   </property>
   </widget>
  </widget>
  <resources>
