@@ -17,11 +17,10 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         loadUi(os.path.join("Forms", "mainwindow.ui"), self)
-
-        """x = self.is_date_over()
+        x = self.is_date_over()
         if x in ["NO_INTERNET", "ENDED"]:
             print(x)
-            exit()"""
+            exit()
             
         self.set_signs()
         self.set_ui()
@@ -316,7 +315,8 @@ class OkulBilgileriFrame(QFrame):
 
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
-
+        self.table.setSelectionMode(QAbstractItemView.NoSelection)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
     
 class OgrencilerFrame(QFrame):
     def __init__(self):
@@ -709,7 +709,7 @@ class YeniSinavFrame(QFrame):
         loadUi(os.path.join("Forms", "yeni_sinav_frame.ui"), self)
         from .Structs.exam_struct import ExamStruct
         self.ExamStruct = ExamStruct(examTable = self.examTable,
-                                    gradeList = self.gradeListWidget,
+                                    gradeList = self.gradeList,
                                     classroomList = self.classroomList,
                                     inputPlace = self.examNameIn,
                                     addButton = self.addButton,
@@ -718,7 +718,7 @@ class YeniSinavFrame(QFrame):
                                     algorithmCombo = self.algCombo,
                                     kizErkCheck = self.kizErkCheck,
                                     omyCheck = self.omyCheck,
-                                    createButton = self.ogrenciKarmaButton,
+                                    createButton = self.createButton,
                                     sinavFrame = self)
 
         self.isStarted = False
@@ -731,11 +731,11 @@ class YeniSinavFrame(QFrame):
 
     def set_signals(self):
         self.continueButton.clicked.connect(self.next_step) #PRE-EVENT SIGNAL
-        self.masterExamNameIn.textChanged.connect(lambda: self.set_white(""))
+        self.masterExamNameIn.textChanged.connect(self.set_white)
         
     def next_step(self):
         if len(self.masterExamNameIn.text().strip()) == 0:
-            self.set_white("", red = True)
+            self.set_red()
             return
             
         day = int(self.day.currentText())
@@ -761,12 +761,12 @@ class YeniSinavFrame(QFrame):
         self.mainFrame.setVisible(False)
         self.isStarted = False
             
-    def set_white(self, newText, red = False):
-        if red:
-            self.masterExamNameIn.setStyleSheet(f"background-color: rgb(255, 128, 128);")
-        else:
-            self.masterExamNameIn.setStyleSheet("background-color: white;")
-
+    def set_white(self):
+        self.masterExamNameIn.setStyleSheet("background-color: white;")
+    
+    def set_red(self):
+        self.masterExamNameIn.setStyleSheet(f"background-color: rgb(255, 128, 128);")
+    
 
 class SinavlarFrame(QFrame):
     def __init__(self):

@@ -1,0 +1,21 @@
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        page-break-after: always;
+    }
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 2cm;
+        }
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>

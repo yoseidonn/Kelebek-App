@@ -149,6 +149,18 @@ def get_all_students(number = False, fullname = False, grade = False, withGrades
 
     return students
 
+def get_grade_given_students(grades: list or tuple) -> list:
+    """
+    Sınıf adı verilen tüm öğrencilerin bulunduğu bir öğrenci havuzu döndürür. -list-
+    """
+    students = list()
+    QUERY = "SELECT * FROM ogrenciler WHERE sinif = ?"
+    for gradeName in grades:
+        result = cur.execute(QUERY, (gradeName,)).fetchall()
+        students.extend(result)
+
+    return students
+
 def remove_one_student(number) -> None:
     """
     Numarası verilen öğrenci kaydını siler.

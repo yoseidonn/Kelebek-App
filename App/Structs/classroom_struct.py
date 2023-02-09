@@ -81,7 +81,7 @@ class ClassroomStruct:
         self.lastColumnIndex = 0
 
     def change_yon(self, direction="Solda", reset = False):
-        print("'Yon' değiştirildi.")
+        #print("'Yon' değiştirildi.")
         if reset:
             self.ogretmenSolFrame.setVisible(True)
             self.ogretmenSagFrame.setVisible(False)
@@ -145,8 +145,9 @@ class Column:
             del sourceObject
 
         else:
-            print(event.button() == 1, sourceObject.rowIndex != (self.lastRowIndex - 1))
-            print(sourceObject.rowIndex, (self.lastRowIndex - 1))
+            #print(event.button() == 1, sourceObject.rowIndex != (self.lastRowIndex - 1))
+            #print(sourceObject.rowIndex, (self.lastRowIndex - 1))
+            pass
 
     def add_desk(self, multiple = False):
         a = {"1'li": 1, "2'li": 2}
