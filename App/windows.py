@@ -8,7 +8,7 @@ from PyQt5.QtTest import QTest
 from .HtmlCreater import classrooms_html, students_html
 from . import database, excel_reader
 from pathlib import Path
-import os, sys, datetime, pytz
+import os, sys, datetime
 import urllib.request as req
 import urllib.error as err 
 
