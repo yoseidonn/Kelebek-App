@@ -1,2 +1,0 @@
-    Yeni sınav ekle penceresi
--Sınav silme özellikleri eklendi.
