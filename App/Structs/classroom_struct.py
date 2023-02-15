@@ -11,12 +11,12 @@ CIFT = "2'li"
 
 
 class ClassroomStruct:
-    def __init__(self, grid: QGridLayout, solFrame: QFrame, sagFrame: QFrame, kacliCombo: QComboBox, yonCombo: QComboBox, buttons = []):
+    def __init__(self, grid: QGridLayout, leftFrame: QFrame, rightFrame: QFrame, dualCombo: QComboBox, directionCombo: QComboBox, buttons = []):
         self.grid = grid
-        self.ogretmenSolFrame= solFrame
-        self.ogretmenSagFrame = sagFrame
-        self.kacliCombo = kacliCombo
-        self.yonCombo = yonCombo
+        self.teacherLeftFrame = leftFrame
+        self.teacherRightFrame = rightFrame
+        self.dualCombo = dualCombo
+        self.directionCombo = directionCombo
         self.addColumnButton, self.removeColumnButton, self.addRowButton, self.removeRowButton = buttons
 
         self.columns = []
@@ -30,8 +30,8 @@ class ClassroomStruct:
         
     def set_signals_and_ui(self):
         #SIGNALS
-        self.yonCombo.currentIndexChanged.connect(lambda: self.change_yon(direction=self.yonCombo.currentText()))
-        self.kacliCombo.currentIndexChanged.connect(lambda: self.change_kacli(mode=self.kacliCombo.currentText()))
+        self.directionCombo.currentIndexChanged.connect(lambda: self.change_yon(direction=self.directionCombo.currentText()))
+        self.dualCombo.currentIndexChanged.connect(lambda: self.change_kacli(mode=self.dualCombo.currentText()))
         
         self.addColumnButton.clicked.connect(self.add_column)
         self.removeColumnButton.clicked.connect(self.remove_column)
@@ -39,8 +39,8 @@ class ClassroomStruct:
         self.removeRowButton.clicked.connect(self.remove_row)
 
         #UI
-        self.yonCombo.setCurrentIndex(0)
-        self.kacliCombo.setCurrentIndex(1)
+        self.directionCombo.setCurrentIndex(0)
+        self.dualCombo.setCurrentIndex(1)
         
     def add_column(self):
         maxRowCount = max([column.deskCount for column in self.columns])
@@ -49,7 +49,7 @@ class ClassroomStruct:
                 for i in range(maxRowCount - column.deskCount):
                     column.add_desk()
 
-        newColumn = Column(self, self.grid, self.kacliCombo, self.lastColumnIndex)
+        newColumn = Column(self, self.grid, self.dualCombo, self.lastColumnIndex)
         newColumn.add_desk(multiple=maxRowCount)
         self.columns.append(newColumn)
         self.lastColumnIndex += 1
@@ -80,21 +80,24 @@ class ClassroomStruct:
         self.columns.clear()
         self.lastColumnIndex = 0
 
+        self.directionCombo.setCurrentIndex(0)
+        self.dualCombo.setCurrentIndex(1)
+
     def change_yon(self, direction="Solda", reset = False):
         #print("'Yon' değiştirildi.")
         if reset:
-            self.ogretmenSolFrame.setVisible(True)
-            self.ogretmenSagFrame.setVisible(False)
+            self.teacherLeftFrame.setVisible(True)
+            self.teacherRightFrame.setVisible(False)
             return
 
         if direction == SOL:
             #print("Sol")
-            self.ogretmenSolFrame.setVisible(True)
-            self.ogretmenSagFrame.setVisible(False)
+            self.teacherLeftFrame.setVisible(True)
+            self.teacherRightFrame.setVisible(False)
         elif direction == SAG:
             #print("Sağ")
-            self.ogretmenSolFrame.setVisible(False)
-            self.ogretmenSagFrame.setVisible(True)
+            self.teacherLeftFrame.setVisible(False)
+            self.teacherRightFrame.setVisible(True)
 
     def change_kacli(self, mode):
         #print("'Kaçlı' değiştirildi.")
@@ -109,7 +112,7 @@ class ClassroomStruct:
 
     def set_3x5(self):
         for i in range(3):
-            self.columns.append(newColumn:=Column(self, self.grid, self.kacliCombo, self.lastColumnIndex))
+            self.columns.append(newColumn:=Column(self, self.grid, self.dualCombo, self.lastColumnIndex))
             self.lastColumnIndex += 1
             newColumn.add_desk(multiple=5)
 
@@ -117,7 +120,7 @@ class ClassroomStruct:
         self._reset()
         rowCounts = layout.split(",")
         for _ in range(len(rowCounts)):
-            newColumn = Column(self, self.grid, self.kacliCombo, self.lastColumnIndex, mode = 2)
+            newColumn = Column(self, self.grid, self.dualCombo, self.lastColumnIndex, mode = 2)
             self.lastColumnIndex += 1
             self.columns.append(newColumn)
             
@@ -125,9 +128,9 @@ class ClassroomStruct:
             [self.columns[columnInx].add_desk() for _ in range(int(count))]
 
 class Column:
-    def __init__(self, Structer: ClassroomStruct, grid: QGridLayout, kacliCombo: QComboBox, columnIndex: int, mode = 2):
+    def __init__(self, Structer: ClassroomStruct, grid: QGridLayout, dualCombo: QComboBox, columnIndex: int, mode = 2):
         self.grid = grid
-        self.kacliCombo = kacliCombo
+        self.dualCombo = dualCombo
         self.columnIndex = columnIndex
         self.Structer = Structer
 
@@ -151,7 +154,7 @@ class Column:
 
     def add_desk(self, multiple = False):
         a = {"1'li": 1, "2'li": 2}
-        mode = a[self.kacliCombo.currentText()]#Tekli ikili
+        mode = a[self.dualCombo.currentText()]#Tekli ikili
         if multiple:
             for i in range(multiple):
                 newDesk = Desk(self, self.columnIndex, self.lastRowIndex, mode=mode)

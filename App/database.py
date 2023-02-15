@@ -206,8 +206,8 @@ def get_all_classrooms(onlyNames = False) -> list or dict:
     }
     """
 
-    QUERY = "SELECT derslik_adi FROM salonlar"
-    QUERY_2 = "SELECT derslik_adi, ogretmen_yonu, kacli, oturma_duzeni FROM salonlar"
+    QUERY = "SELECT derslik_adi FROM salonlar ORDER BY derslik_adi"
+    QUERY_2 = "SELECT derslik_adi, ogretmen_yonu, kacli, oturma_duzeni FROM salonlar ORDER BY derslik_adi"
     
     salonAdlari = []
     salonAdlariTuple = cur.execute(QUERY).fetchall()
@@ -220,10 +220,12 @@ def get_all_classrooms(onlyNames = False) -> list or dict:
     # SALON BİLGİLERİ
     salonlar = {}
     salonlarTuples = cur.execute(QUERY_2).fetchall()
-    salonlarTuples.sort()
+    print('Database query1:', *salonlarTuples)
     
     for salonAdi, salon in zip(salonAdlari, salonlarTuples):
         salonlar.update({salonAdi: list(salon)})
+    
+    print('Database query2:', salonlar)
 
     return salonlar
 

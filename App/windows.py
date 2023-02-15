@@ -8,7 +8,7 @@ from PyQt5.QtTest import QTest
 from .HtmlCreater import classrooms_html, students_html
 from . import database, excel_reader
 from pathlib import Path
-import os, sys, datetime, pytz
+import os, sys, datetime
 import urllib.request as req
 import urllib.error as err 
 
@@ -588,9 +588,6 @@ class OnayDialog(QDialog):
 
 
 class SalonlarFrame(QFrame):
-    DICT_YON={"Solda": 0, "Sağda": 1}
-    DICT_HSPD={"1'li": 0, "2'li": 1}
-
     def __init__(self):
         super().__init__()
         loadUi(os.path.join("Forms", "salonlar_frame.ui"), self)
@@ -690,10 +687,13 @@ class SalonlarFrame(QFrame):
         self.addButton.setVisible(False)
 
         name, teacherd, hspd, layout = values
+        print(values)
         self.salonNameIn.setText(name)
-        self.yonCombo.setCurrentIndex(self.DICT_YON[teacherd])
         self.Classroom.set_layout(layout)
-        self.kacliCombo.setCurrentIndex(self.DICT_HSPD[hspd])
+        self.yonCombo.setCurrentText(teacherd)
+        self.kacliCombo.setCurrentText(hspd)
+        print("drawed")
+        print()
 
     def draw_list(self):
         self.classroomList.clear()
