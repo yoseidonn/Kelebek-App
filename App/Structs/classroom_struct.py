@@ -1,7 +1,3 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-import os, sys, functools
 
 # CONSTANTS
 SOL = "Solda"
@@ -9,6 +5,10 @@ SAG = "Sağda"
 TEK = "1'li"
 CIFT = "2'li"
 
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+import os, sys, functools
 
 class ClassroomStruct:
     def __init__(self, grid: QGridLayout, leftFrame: QFrame, rightFrame: QFrame, dualCombo: QComboBox, directionCombo: QComboBox, buttons = []):
