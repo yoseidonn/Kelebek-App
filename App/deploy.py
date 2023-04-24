@@ -14,7 +14,14 @@ class Place:
     def __str__(self) -> str:
         return f"{self.columnIndex}, {self.rowIndex}, {self.deskNo}"
     
+class TeacherDesk:
+    def __init__(self, classroomName, holding = None):
+        self.classroomName = classroomName
+        self.holding = holding
 
+    def get_place_infos(self) -> tuple:
+        return self.classroomName, self.holding
+    
 def check_all_desks(algorithm: str, options: list, deskInfos: list) -> bool:
     print()
     print(algorithm)
@@ -32,13 +39,15 @@ def get_students(exams):
 
     return students
         
-def get_places(arr) -> list[Place]:
+def get_places(arr, isOgretmenMasasiChecked, ogretmenMasasi, classroomName) -> list[Place]:
     places = list()
     for columnIndex, column in enumerate(arr):
         for rowIndex, desk in enumerate(column):
             for deskNo, holding in desk.items():
                 place = Place(columnIndex, rowIndex, deskNo, holding)
                 places.append(place)
+    if ogretmenMasasi is None:
+        places.append(TeacherDesk(classroomName=classroomName))
 
     return places
 
@@ -82,35 +91,46 @@ def deploy_students(classrooms: dict, students: list, exam) -> dict:
         for gradeName, gradeStudents in seperatedStudents.items():
             attemptGrade, ended = 2, False
             while attemptGrade and not ended:
-                for classroomName, classroomsDict in classrooms.items():
+                for classroomName, classroomDict in classrooms.items():
                     # Buraya öğretmen masası kontrolü ekle
-                    arr = classroomsDict["oturma_duzeni"]
+                    isKizErkekChecked, isOgretmenMasasiChecked = exam.optionList
+                        
                     # Eğer hala öğrenci varsa ama left sıfır çıkıyorsa öğrenci sayısı salon sayısından azdır.
                     # Bu durumda left için bir yaparsak her sınıfa birer tane olacak şekilde öğrencileri dağıtmayı dener.
                     left = len(gradeStudents) // len(classrooms)
                     if len(gradeStudents) and not left:
                         left = 1
                         
-                    emptyCount = empty_count(arr)
-                    places = get_places(arr)
+                    emptyCount = empty_count(classroomDict["oturma_duzeni"])
+                    ogretmenMasasi = classroomDict["ogretmen_masasi"]
+                    places = get_places(classroomDict["oturma_duzeni"], isOgretmenMasasiChecked, ogretmenMasasi, classroomName)
+                        
                     while emptyCount and left:
                         emptyCount -= 1
+                        student = gradeStudents[-1]
 
                         placeCount = len(places)
                         placeIndex = random.randint(0, placeCount - 1)
                         place = places[placeIndex]
-
-                        columnIndex, rowIndex, deskNo, holding = place.get_place_infos()
+                        if not isinstance(place, TeacherDesk):
+                            columnIndex, rowIndex, deskNo, holding = place.get_place_infos()
+                        elif place.holding:
+                            continue
+                        elif not place.holding:
+                            classroomDict["ogretmen_masasi"] = student
+                            gradeStudents.pop(-1)
+                            left -= 1
+                            places.remove(place)
+                            
                         if holding:
                             continue
                         
-                        student = gradeStudents[-1]
                         
                         deskInfos = [columnIndex, rowIndex, deskNo, holding]
                         algorithmName = exam.algorithmName
                         options = exam.optionList
                         if check_all_desks(algorithm = algorithmName, options = options, deskInfos = deskInfos):
-                            arr[columnIndex][rowIndex][deskNo] = student
+                            classroomDict["oturma_duzeni"][columnIndex][rowIndex][deskNo] = student
                             gradeStudents.pop(-1)
                             left -= 1
                         

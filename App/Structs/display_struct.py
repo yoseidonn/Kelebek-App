@@ -13,13 +13,14 @@ class Display():
         self.examsList = examsList
         self.filesList = filesList
         self.wev = webEngineView
-        self.downloadBtn = buttons[0]
+        self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.menuBtn, self.downloadBtn = buttons
         
         self.currentMode = 'salon_oturma_duzenleri.html'
-        self.examItems = []
+        self.examItems, self.archiveItems = [], []
 
-        self.set_elw()
-        self.set_flw()
+        self.set_elw() # Exam list widget
+        self.set_alw() # Archive list widget
+        self.set_flw() # File list widget of selected exam
 
         self.set_signals()
         
@@ -33,10 +34,8 @@ class Display():
         savePath = self.save_dialog()
         #HTML yazısını çıkar ve _to_save.html ekle
         modText = self.currentMode[0:-5] + "_to_save.html"
-        print("ModText:", modText)
         saveFilePath = os.path.join('Saved', self.selectedExamName, modText)
-        print("Where to save:", savePath)
-        print("Saving file:", saveFilePath)
+        print(f"[LOG] Saving {saveFilePath} to {savePath}")
         # save the self.selectedFilePath content as pdf file
         
     def save_dialog(self):
@@ -47,6 +46,9 @@ class Display():
         dialog.setFileMode(QFileDialog.Directory)
         if dialog.exec_() == QFileDialog.Accepted:
             return dialog.selectedFiles()[0]
+        
+    def refresh_exams(self):
+        pass
     
     ### Exam List Widget
     def el_item_clicked(self, item: QListWidgetItem):
@@ -55,9 +57,6 @@ class Display():
         with open(filePath, "r", encoding="utf-8") as file:
             htmlContent = file.read()
         self.wev.setHtml(htmlContent)
-        
-    def refresh_exams(self):
-        pass
 
     def set_elw(self):
         # ExamsListWidget settings
@@ -68,6 +67,7 @@ class Display():
                 item = QListWidgetItem(dName)
                 self.examItems.append(item)
                 self.examsList.addItem(item)
+
         if len(self.examItems) != 0:
             lastItem = self.examItems[0]
             lastItem.setSelected(True)
@@ -75,14 +75,12 @@ class Display():
                 
     ### File List Widget
     def fl_item_clicked(self, item: QListWidgetItem):
-        print(f'{item.text()}-Salon oturuma düzenleri')
-        print(item.text() == "Salon oturuma düzenleri")
         if item.text() == "Salon oturma düzenleri":
             self.currentMode = "salon_oturma_duzenleri.html"
-            print("salonlar")
+            print(f'[LOG] {self.selectedExamName}-Salon seçildi.')
         elif item.text() == "Sınıf listeleri":
             self.currentMode = "sinif_listeleri.html"
-            print("siniflar")
+            print(f'[LOG] {self.selectedExamName}-Sınıf seçildi.')
 
         filePath = os.path.join('Saved', self.selectedExamName, self.currentMode)
         with open(filePath, 'r', encoding="utf-8") as file:
@@ -95,3 +93,21 @@ class Display():
         self.filesList.addItem(self.file1)
         self.filesList.addItem(self.file2)
         self.file1.setSelected(True)
+        
+    def al_item_clicked(self, item:QListWidgetItem):
+        ...
+        
+    def set_alw(self):  
+        # ExamsListWidget settings
+        x = [x[0] for x in os.walk('Archived/')]
+        for directory in x:
+            dName = directory.split('Archived/')[1]
+            if len(dName) != 0:
+                item = QListWidgetItem(dName)
+                self.archiveItems.append(item)
+                self.archiveList.addItem(item)
+
+        if len(self.archiveItems) != 0:
+            lastItem = self.archiveItems[0]
+            lastItem.setSelected(True)
+            self.al_item_clicked(lastItem)

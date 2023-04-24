@@ -12,20 +12,34 @@ import os, sys, datetime
 import urllib.request as req
 import urllib.error as err 
 
+#os.environ['QT_DEBUG_PLUGINS']='1'
+#os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--enable-gpu-command-logging"
+LAST_DATE = (2023, 4, 30, 12, 30, 0)
+CHECK_DATE = 1
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         loadUi(os.path.join("Forms", "mainwindow.ui"), self)
         x = self.is_date_over()
-        if x in ["NO_INTERNET", "ENDED"]:
-            print(x)
+        if CHECK_DATE and x == "NO_INTERNET":
+            print("[LOG] Internet bağlantınızı kontrol ediniz...")
+            dialog = NoInternetDialog()
+            exit()
+
+        elif CHECK_DATE and x == "ENDED":
+            print("[LOG] Deneme süresi dolmuş.")
+            dialog = DateIsOverDialog()
             exit()
             
         self.set_signs()
+        self.set_menu_bar()
         self.set_ui()
         self.sws()
 
+    def set_menu_bar(self):
+        self.reset_all.setIcon(QIcon(os.path.join("Images", "icon", "trash-2.svg")))
+        
     def set_signs(self):
         """
         Sets the signals, buttons or etc. which has relationship between them.
@@ -88,25 +102,22 @@ class MainWindow(QMainWindow):
     
     def is_date_over(self):
         try:
+            print("[LOG] 'http://just-the-time.appspot.com/' adresine istek gönderiliyor...")
             res = req.urlopen('http://just-the-time.appspot.com/')
-            print("internet var")
         except:
-            print("internet yok")
-            dialog = NoInternetDialog()
             return "NO_INTERNET"
         
         time_str = res.read().strip().decode()
+        print(f"[LOG] Bağlantı başarılı. Güncel saat: {time_str}")
         date, hour = time_str.split(" ")        
         year, month, day = date.split("-")
         hour, minute, second = hour.split(":")
 
         now = datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))
-
-        endDay = datetime.datetime(2023, 2, 28, 12, 30, 0)
+        
+        endDay = datetime.datetime(*LAST_DATE)
         if endDay >= now:
             return "NOT_ENDED"
-        
-        dialog = DateIsOverDialog()
         return "ENDED"
 
     def okul_frame(self):
@@ -771,7 +782,7 @@ class SinavlarFrame(QFrame):
         loadUi(os.path.join("Forms", "sinavlar_frame.ui"), self)
         from .Structs.display_struct import Display
         
-        buttons = [self.downloadBtn]
+        buttons = [self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.menuBtn, self.downloadBtn]
         
         self.set_ui()
         self.Display = Display(examsList = self.examsList, filesList = self.filesList, webEngineView = self.wev, buttons = buttons)

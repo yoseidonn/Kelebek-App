@@ -1,0 +1,4 @@
+PyQt5==5.15.7
+PyQt5-sip==12.11.0
+PyQtWebEngine==5.15.6
+xlrd==2.0.1

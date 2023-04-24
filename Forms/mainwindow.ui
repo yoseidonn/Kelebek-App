@@ -113,6 +113,37 @@ p, li { white-space: pre-wrap; }
     <bool>false</bool>
    </attribute>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1033</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="veriler">
+    <property name="title">
+     <string>Veri işlemleri</string>
+    </property>
+    <addaction name="reset_all"/>
+   </widget>
+   <addaction name="veriler"/>
+  </widget>
+  <action name="reset_all">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/Images/Images/icon/trash-2.svg</normaloff>:/Images/Images/icon/trash-2.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Tüm bilgileri sıfırla</string>
+   </property>
+  </action>
+  <action name="actionOkul_bilgilerini_s_f_rla">
+   <property name="text">
+    <string>Okul bilgilerini sıfırla</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../resources.qrc"/>

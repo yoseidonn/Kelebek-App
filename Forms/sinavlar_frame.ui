@@ -32,7 +32,7 @@
    <item alignment="Qt::AlignLeft">
     <widget class="QGroupBox" name="leftGroupBox">
      <property name="title">
-      <string>Sınavlar</string>
+      <string>Dosyalar</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
@@ -50,6 +50,79 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
+      <item>
+       <widget class="QToolBox" name="toolbox">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="aktifPage">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>311</width>
+           <height>454</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>Aktif Sınavlar</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QListWidget" name="examsList"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="arsivPage">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>257</width>
+           <height>454</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>Arşivlenmiş Sınavlar</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QListWidget" name="examsList_2"/>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
       <item>
        <widget class="QFrame" name="examsListFrame">
         <property name="frameShape">
@@ -74,24 +147,11 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QListWidget" name="examsList"/>
-         </item>
         </layout>
        </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="buttonsFrame">
-        <item>
-         <widget class="QPushButton" name="arsivMenuBtn">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
         <item>
          <widget class="QPushButton" name="removeBtn">
           <property name="enabled">
@@ -109,6 +169,26 @@
           </property>
           <property name="text">
            <string>Tüm sınavları sil</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="refreshAllBtn">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="menuBtn">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string/>
           </property>
          </widget>
         </item>
@@ -180,6 +260,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="downloadBtn">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Dosyayı indir</string>
            </property>

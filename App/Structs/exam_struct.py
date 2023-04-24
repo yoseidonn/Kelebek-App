@@ -6,7 +6,7 @@ from PyQt5.uic import loadUi
 
 from App import database
 from App.colors import COLOR_PALETTE
-from App.HtmlCreater import classrooms_html, students_html_demo
+from App.HtmlCreater import classrooms_html, students_html
 from App.deploy import deploy_and_get_classrooms
 
 from pathlib import Path
@@ -267,13 +267,13 @@ class ExamStruct():
     def deploy_step(self):
         sonuc = deploy_and_get_classrooms(self.exam)
         if not sonuc:
-            print("Yetersiz yer")
             # Tekrar deneyiniz penceresi ekle
+            print("[LOG] Yetersiz yer.")
             pass
         else:
             # Create files
             con1 = classrooms_html.create(self.examInfos, sonuc, self.exam.exams)
-            con2 = students_html_demo.create(self.examInfos, sonuc, self.exam.exams)
+            con2 = students_html.create(self.examInfos, sonuc, self.exam.exams)
 
             self.show_result_frame(classroomsContainer = con1, studentsContainer = con2)
             self.sinavFrame.reset()
