@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
         actNewExam.triggered.connect(self.yeni_sinav_frame)
         self.toolBar.addAction(actNewExam)
         # ÇIKTILAR
-        actShowExams = QAction(QIcon(os.path.join("Images", "img", "files.png")), "Sınavları göster", self)
+        actShowExams = QAction(QIcon(os.path.join("Images", "icon", "list.svg")), "Sınavları göster", self)
         actShowExams.triggered.connect(self.sinavlar_frame)
         self.toolBar.addAction(actShowExams)
         # GOZETMEN
@@ -698,10 +698,13 @@ class SalonlarFrame(QFrame):
         self.addButton.setVisible(False)
 
         name, teacherd, hspd, layout = values
+        print(values)
         self.salonNameIn.setText(name)
         self.Classroom.set_layout(layout)
         self.yonCombo.setCurrentText(teacherd)
         self.kacliCombo.setCurrentText(hspd)
+        print("drawed")
+        print()
 
     def draw_list(self):
         self.classroomList.clear()

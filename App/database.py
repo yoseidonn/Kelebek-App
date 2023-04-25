@@ -43,8 +43,8 @@ def createTables() -> None:
     # GEÇMİŞ SINAVLAR
     cur.execute("""
         CREATE TABLE IF NOT EXISTS "sinavlar" (
-        	"id"	    INTEGER NOT NULL,
-	        "tarih"	    TEXT NOT NULL,
+        	"id"	INTEGER NOT NULL,
+	        "tarih"	TEXT NOT NULL,
 	        "salonlar"	TEXT NOT NULL,
 	        PRIMARY KEY("id"))
         """)
@@ -220,10 +220,13 @@ def get_all_classrooms(onlyNames = False) -> list or dict:
     # SALON BİLGİLERİ
     salonlar = {}
     salonlarTuples = cur.execute(QUERY_2).fetchall()
+    print('Database query1:', *salonlarTuples)
     
     for salonAdi, salon in zip(salonAdlari, salonlarTuples):
         salonlar.update({salonAdi: list(salon)})
     
+    print('Database query2:', salonlar)
+
     return salonlar
 
 def get_classrooms_counts_per_every_grade() -> list:
