@@ -1,6 +1,17 @@
-/.vscode
-/Env
-/to_do.txt
-/To\ remember/site-packages
-/Temp
-/COMMIT_UPDATES.txt
+Env/
+fordotenv/
+.vscode/
+.github/
+__pycache__/
+App/__pycache__/
+Client/__pycache__/
+
+ATTACHES/
+Archived/
+Saved/
+Logs/
+Temp/
+
+encryption.py
+database.db
+.env
