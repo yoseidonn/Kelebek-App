@@ -1,188 +1,159 @@
-import random, math
-from . import database
+from App.HtmlCreater import classrooms_html
+from App import database
+import random
 
 class Place:
-    def __init__(self, columnIndex, rowIndex, deskNo, holding = None):
+    def __init__(self, columnIndex, rowIndex, placeIndex):
         self.columnIndex = columnIndex
         self.rowIndex = rowIndex
-        self.deskNo = deskNo
-        self.holding = holding
+        self.placeIndex = placeIndex
+
+    def infos(self):
+        return (self.columnIndex, self.rowIndex, self.placeIndex)
     
-    def get_place_infos(self) -> tuple:
-        return self.columnIndex, self.rowIndex, self.deskNo, self.holding
+def distribute_students(exams, classroomsToUse, grades, rules):
+    # Fetch classrooms from the database
+    classrooms = database.get_name_given_classrooms(classroomsToUse)
 
-    def __str__(self) -> str:
-        return f"{self.columnIndex}, {self.rowIndex}, {self.deskNo}"
-    
-class TeacherDesk:
-    def __init__(self, classroomName, holding = None):
-        self.classroomName = classroomName
-        self.holding = holding
+    # Calculate the number of students in each grade
+    grade_counts = {grade: len(students) for grade, students in grades.items()}
 
-    def get_place_infos(self) -> tuple:
-        return self.classroomName, self.holding
-    
-def check_all_desks(algorithm: str, options: list, deskInfos: list) -> bool:
-    print()
-    print(algorithm)
-    print(options)
-    print(deskInfos)
-    print()
-    return True
+    # Calculate the number of students to be placed in each classroom
+    classroom_counts = {}
+    for grade, count in grade_counts.items():
+        classroom_counts[grade] = count // len(classroomsToUse)
 
-def get_students(exams):
-    grades = list()
-    for examName, gradess in exams.items():
-        grades.extend(gradess)
-        
-    students = database.get_grade_given_students(grades)
+    # Calculate the remaining students after distributing equally
+    extra_student_counts = {}
+    for grade, count in grade_counts.items():
+        extra_student_counts[grade] = count % len(classroomsToUse)
 
-    return students
-        
-def get_places(arr, isOgretmenMasasiChecked, ogretmenMasasi, classroomName) -> list[Place]:
-    places = list()
-    for columnIndex, column in enumerate(arr):
-        for rowIndex, desk in enumerate(column):
-            for deskNo, holding in desk.items():
-                place = Place(columnIndex, rowIndex, deskNo, holding)
-                places.append(place)
-    if ogretmenMasasi is None:
-        places.append(TeacherDesk(classroomName=classroomName))
+    for exam in exams:
+        exam_grades = exams[exam]
+        grades = database.get_grade_given_students(exam_grades)
+        for gradeName in grades:
+            students = grades[gradeName]
+            # Bu şube için tüm dersliklere öğrencileri sırayla dağıt.
+            while students:
+                count = classroom_counts[gradeName]
+                for classroomName in classrooms:
+                    teacher_desk_empty = True
+                    for _ in range(count):
+                        if not students:
+                            break
+                        arrangement = classrooms[classroomName]["oturma_duzeni"]
+                        places = get_places(arrangement)
+                        print(f"Ogrenci sayisi: {len(students)}")
+                        random_index = random.randint(0, len(students)) - 1
+                        student = students[-1]
+                        print(student)
+                        
+                        is_placed = False
+                        if teacher_desk_empty and rules[-1]:
+                            if classrooms[classroomName]["ogretmen_masasi"] == None:
+                                classrooms[classroomName]["ogretmen_masasi"] = student
+                                grade_counts[gradeName] -= 1
+                                students.remove(student)
+                                print(f"Placed {student} into OGRETMEN MASASI")
+                                is_placed = True
+                                teacher_desk_empty = False
 
+                        attempt = 5
+                        while not is_placed and attempt:
+                            random.shuffle(places)
+                            placeObject = places[-1]
+                            column_index, row_index, place_index = placeObject.infos()
+                            desk_no = list(arrangement[column_index][row_index].keys())[place_index]
+                            place = arrangement[column_index][row_index][desk_no]
+                            
+                            if is_place_suitable(arrangement, place, student, rules):
+                                classrooms[classroomName]["oturma_duzeni"][column_index][row_index][desk_no] = student
+                                grade_counts[gradeName] -= 1
+                                students.remove(student)
+                                print(f"Placed {student}")
+                                print(f"Ogrenci sayisi: {len(students)}")
+                                is_placed = True
+                            print("===\n")
+                            attempt -= 1
+                     
+    if is_there_any_student_left(grade_counts):
+        return classrooms, False
+    return classrooms
+
+def get_places(oturma_duzeni: list) -> list[Place]:
+    places = []
+    for column_index, column in enumerate(oturma_duzeni):
+        for desk_index, desk in enumerate(column):
+            for place_index, desk_no in enumerate(desk):
+                places.append(Place(column_index, desk_index, place_index))
+    random.shuffle(places) 
     return places
 
-def empty_count(arrangement) -> int:
-    count = 0
-    for columnIndex, column in enumerate(arrangement):
-        for rowIndex, desk in enumerate(column):
-            for deskNo, place in desk.items():
-                if not place:
-                    count += 1
-                    
-    return count
+def is_place_suitable(arrangement: list, place: None or tuple or list, student: tuple or list, rules: list) -> bool:
+    """_summary_
+    Args:
+        arrangement (list): The list that contains all the column objects
+        place (Noneortupleorlist): The selected place which contains a student or None
+        student (tupleorlist): The student that needs to be placed into that place which is a list or tuple
+        rules (list): [
+                        Ayni sinava giren ogrenciler yan yana oturabilir,
+                                “““       ogrenciler arka arkaya oturabilir,
+                                “““       grenciler capraz oturabilir,
+                        Iki farkli cinsiyetten herhangi iki ogrenci yan yana oturabilir,
+                        Kontrol edilen ogrenci ogretmen masasina oturabilir.
+                    ]
+
+    Returns:
+        bool: Ogrencinin oturabilir ise True, oturamaz ise False dondurur
+    """
+    # Returns False if the place is already taken.
     
-def seperate_students(students) -> int:
-    seperatedStudents = dict()
-    lastGrade = ""
-    for student in students:
-        grade = student[4]
-        if grade != lastGrade:
-            lastGrade = grade
-            seperatedStudents.update({grade: list()})
-        
-        seperatedStudents[grade].append(student)
+    if place:
+        return False
+    
+    # Eger tum kurallar 1 ise, ogretmen masasi kurali haric
+    if all(rules[:-1]):
+        return True
+    
+    return True
 
-    for gradeName, students in seperatedStudents.items():
-        random.shuffle(students)
+def is_there_any_student_left(classroomCounts: dict):
+    counts = [count for gradeName, count in classroomCounts.items()]
+    if any(counts):
+        return True
+    return False
 
-    return seperatedStudents
-
-def students_left(seperatedStudents: dict) -> int:
-    studentsLeft = 0
-    for gradeName, students in seperatedStudents.items():
-        studentsLeft += len(students)
-        
-    return studentsLeft
-            
-def deploy_students(classrooms: dict, students: list, exam) -> dict:
-    attempt = 5
-    while attempt:
-        seperatedStudents = seperate_students(students)
-        for gradeName, gradeStudents in seperatedStudents.items():
-            attemptGrade, ended = 2, False
-            while attemptGrade and not ended:
-                for classroomName, classroomDict in classrooms.items():
-                    # Buraya öğretmen masası kontrolü ekle
-                    isKizErkekChecked, isOgretmenMasasiChecked = exam.optionList
-                        
-                    # Eğer hala öğrenci varsa ama left sıfır çıkıyorsa öğrenci sayısı salon sayısından azdır.
-                    # Bu durumda left için bir yaparsak her sınıfa birer tane olacak şekilde öğrencileri dağıtmayı dener.
-                    left = len(gradeStudents) // len(classrooms)
-                    if len(gradeStudents) and not left:
-                        left = 1
-                        
-                    emptyCount = empty_count(classroomDict["oturma_duzeni"])
-                    ogretmenMasasi = classroomDict["ogretmen_masasi"]
-                    places = get_places(classroomDict["oturma_duzeni"], isOgretmenMasasiChecked, ogretmenMasasi, classroomName)
-                        
-                    while emptyCount and left:
-                        emptyCount -= 1
-                        student = gradeStudents[-1]
-
-                        placeCount = len(places)
-                        placeIndex = random.randint(0, placeCount - 1)
-                        place = places[placeIndex]
-                        if not isinstance(place, TeacherDesk):
-                            columnIndex, rowIndex, deskNo, holding = place.get_place_infos()
-                        elif place.holding:
-                            continue
-                        elif not place.holding:
-                            classroomDict["ogretmen_masasi"] = student
-                            gradeStudents.pop(-1)
-                            left -= 1
-                            places.remove(place)
-                            
-                        if holding:
-                            continue
-                        
-                        
-                        deskInfos = [columnIndex, rowIndex, deskNo, holding]
-                        algorithmName = exam.algorithmName
-                        options = exam.optionList
-                        if check_all_desks(algorithm = algorithmName, options = options, deskInfos = deskInfos):
-                            classroomDict["oturma_duzeni"][columnIndex][rowIndex][deskNo] = student
-                            gradeStudents.pop(-1)
-                            left -= 1
-                        
-                        places.remove(place) 
-
-                if not gradeStudents:
-                    ended = True
-                attemptGrade -= 1
-                
-        studentsLeftCount = students_left(seperatedStudents)
-        if studentsLeftCount:
-            attempt -= 1
-        else:
-            attempt = 0
-
-    return classrooms
-
-def print_classrooms(classrooms):
-    for classroom_name, columns in classrooms.items():
-        print(f"Classroom: {classroom_name}")
+def print_classrooms(classrooms: dict or tuple):
+    key = 0
+    if isinstance(classrooms, tuple):
+        key = 1
+        classrooms = classrooms[0]
+    
+    for classroomName, classroom in classrooms.items():
+        print(f"{classroomName}:")
+        print(f"\tOgretmen masasi:", classroom["ogretmen_masasi"], "\n")
+        columns = classroom["oturma_duzeni"]
         for column in columns:
-            for row in column:
-                print(row)
-        print("\n")
-
-def print_students(seperatedStudents):
-    for gradeName, students in seperatedStudents.items():
-        print(gradeName)
-        [print(student) for student in students]
+            for desk in column:
+                print(f"\t{desk}")
+            print("\t---")
         print()
+    if key:
+        print("\t\t...Yeterli yer yok...\t\t")
 
-def deploy_and_get_classrooms(exam):
-    students = get_students(exam.exams)
-    classroomNames = exam.classroomNames
-    classrooms = database.get_name_given_classrooms(classroomNames)
-    
-    classrooms = deploy_students(classrooms, students, exam)
-    return classrooms
-
+def distribute(exam) -> dict or bool:
+    exams = exam.exams
+    classroomsToUse = exam.classroomNames
+    grades = database.get_grade_given_students(exams)
+    rules = exam.rules
+    return distribute_students(exams, classroomsToUse, grades, rules)
 
 if __name__ == '__main__':
-    students = [("Yusuf", "11/A"), ("Ali",  "11/A"), ("Veli", "11/A"), ("Deli", "11/B"),
-                ("İsta", "11/B"), ("Ahmet", "11/C"), ("Kemal", "11/C"), ("Mehmet", "11/C")]
-
-    classrooms = {
-                "classroom1": [[{1: None, 2: None}, {3: None, 4: None},  {5: None, 6: None}],
-                               [{7: None, 8: None}, {9: None, 10: None}, {11: None, 12: None}],
-                               [{13: None, 14: None}, {15: None, 16: None}]],
-                            
-                "classroom2": [[{1: None, 2: None}, {3: None, 4: None},  {5: None, 6: None}],
-                               [{7: None, 8: None}, {9: None, 10: None}, {11: None, 12: None}]]
-                }
-
-    classrooms = deploy_students(classrooms, students)
-    print_classrooms(classrooms)
+    #from tests import sample_exams
+    #exam = sample_exams[0]
+    
+    #classrooms_result = distribute(exam)
+    #print_classrooms(classrooms_result)
+    
+    #classrooms_html.create(exam_infos, classrooms_result, exam.exams)
+    pass

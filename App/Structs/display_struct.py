@@ -23,19 +23,30 @@ class Display():
         self.set_flw() # File list widget of selected exam
 
         self.set_signals()
+        self.set_ui()
         
     def set_signals(self):
-        self.downloadBtn.setEnabled(False)
         self.examsList.itemClicked.connect(self.el_item_clicked)
         self.filesList.itemClicked.connect(self.fl_item_clicked)
         self.downloadBtn.clicked.connect(self.download)
         
+    def set_ui(self):
+        #self.downloadBtn.setEnabled(False)
+        self.removeBtn.setEnabled(False)
+        self.removeAllBtn.setEnabled(False)
+        self.removeBtn.setIcon(QIcon(os.path.join("Images", "icon", "trash.svg")))
+        self.removeAllBtn.setIcon(QIcon(os.path.join("Images", "icon", "trash.svg")))
+        self.refreshAllBtn.setIcon(QIcon(os.path.join("Images","icon", "refresh-ccw.svg")))
+        self.menuBtn.setIcon(QIcon(os.path.join("Images", "icon", "menu.svg")))
+    
     def download(self):
         savePath = self.save_dialog()
         #HTML yazısını çıkar ve _to_save.html ekle
         modText = self.currentMode[0:-5] + "_to_save.html"
-        saveFilePath = os.path.join('Saved', self.selectedExamName, modText)
-        print(f"[LOG] Saving {saveFilePath} to {savePath}")
+        savedFilePath = os.path.join('Saved', self.selectedExamName, modText)
+        print(f"[LOG] Saving {savedFilePath} to {savePath}")
+        print("[ERROR] Process stopped...")
+        
         # save the self.selectedFilePath content as pdf file
         
     def save_dialog(self):

@@ -149,15 +149,23 @@ def get_all_students(number = False, fullname = False, grade = False, withGrades
 
     return students
 
-def get_grade_given_students(grades: list or tuple) -> list:
+def get_grade_given_students(gradeNames: list or tuple or dict) -> dict:
     """
     Sınıf adı verilen tüm öğrencilerin bulunduğu bir öğrenci havuzu döndürür. -list-
     """
-    students = list()
+    students = dict()
     QUERY = "SELECT * FROM ogrenciler WHERE sinif = ?"
-    for gradeName in grades:
+    
+    # Eğer grades bir sözlük ise
+    if isinstance(gradeNames, dict):
+        grade_names = list()
+        for gradeNameList in gradeNames.values():
+            grade_names.extend(gradeNameList)
+        gradeNames = grade_names
+    
+    for gradeName in gradeNames:
         result = cur.execute(QUERY, (gradeName,)).fetchall()
-        students.extend(result)
+        students.update({gradeName: result})
 
     return students
 
