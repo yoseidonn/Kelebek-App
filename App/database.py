@@ -43,8 +43,8 @@ def createTables() -> None:
     # GEÇMİŞ SINAVLAR
     cur.execute("""
         CREATE TABLE IF NOT EXISTS "sinavlar" (
-        	"id"	INTEGER NOT NULL,
-	        "tarih"	TEXT NOT NULL,
+        	"id"	    INTEGER NOT NULL,
+	        "tarih"	    TEXT NOT NULL,
 	        "salonlar"	TEXT NOT NULL,
 	        PRIMARY KEY("id"))
         """)
@@ -149,15 +149,23 @@ def get_all_students(number = False, fullname = False, grade = False, withGrades
 
     return students
 
-def get_grade_given_students(grades: list or tuple) -> list:
+def get_grade_given_students(gradeNames: list or tuple or dict) -> dict:
     """
     Sınıf adı verilen tüm öğrencilerin bulunduğu bir öğrenci havuzu döndürür. -list-
     """
-    students = list()
+    students = dict()
     QUERY = "SELECT * FROM ogrenciler WHERE sinif = ?"
-    for gradeName in grades:
+    
+    # Eğer grades bir sözlük ise
+    if isinstance(gradeNames, dict):
+        grade_names = list()
+        for gradeNameList in gradeNames.values():
+            grade_names.extend(gradeNameList)
+        gradeNames = grade_names
+    
+    for gradeName in gradeNames:
         result = cur.execute(QUERY, (gradeName,)).fetchall()
-        students.extend(result)
+        students.update({gradeName: result})
 
     return students
 
@@ -220,13 +228,10 @@ def get_all_classrooms(onlyNames = False) -> list or dict:
     # SALON BİLGİLERİ
     salonlar = {}
     salonlarTuples = cur.execute(QUERY_2).fetchall()
-    print('Database query1:', *salonlarTuples)
     
     for salonAdi, salon in zip(salonAdlari, salonlarTuples):
         salonlar.update({salonAdi: list(salon)})
     
-    print('Database query2:', salonlar)
-
     return salonlar
 
 def get_classrooms_counts_per_every_grade() -> list:

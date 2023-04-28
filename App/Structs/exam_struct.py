@@ -7,7 +7,7 @@ from PyQt5.uic import loadUi
 from App import database
 from App.colors import COLOR_PALETTE
 from App.HtmlCreater import classrooms_html, students_html
-from App.deploy import deploy_and_get_classrooms
+from App.deploy import distribute
 
 from pathlib import Path
 import os, sys, random, time
@@ -28,9 +28,11 @@ class ExamStruct():
                 removeButton: QPushButton,      # Seçili sınavı sil
                 removeAllButton: QPushButton,   # Tüm sınavları sil
                 createButton: QPushButton,      # Sınavı oluştur
-                algorithmCombo: QComboBox,      # Kalan özellikleri ekle ve ardından butona tıklanınca exami oluşturup dene
-                kizErkCheck: QCheckBox,         # Kız Erkek Yan Yana Oturmasın
-                omyCheck: QCheckBox,            # Öğretmen Masasına Yerleştir
+                sidebyside_sitting: QCheckBox,
+                backtoback_sitting: QCheckBox,
+                crossbycross_sitting: QCheckBox,
+                kizErkek: QCheckBox,         # Kız Erkek Yan Yana Oturmasın
+                ogretmenMasasi: QCheckBox,            # Öğretmen Masasına Yerleştir
                 sinavFrame):                    # YeniSinavFrame
 
         self.examTableWidget = examTable
@@ -41,9 +43,11 @@ class ExamStruct():
         self.removeButton = removeButton
         self.removeAllButton = removeAllButton
         self.createButton = createButton
-        self.algorithmCombo = algorithmCombo
-        self.kizErkCheck = kizErkCheck
-        self.omyCheck = omyCheck
+        self.sidebyside_sitting = sidebyside_sitting
+        self.backtoback_sitting = backtoback_sitting
+        self.crossbycross_sitting = crossbycross_sitting
+        self.kizErkek = kizErkek
+        self.ogretmenMasasi = ogretmenMasasi
         self.sinavFrame = sinavFrame
 
         # DATAS FROM DATABASE
@@ -258,18 +262,16 @@ class ExamStruct():
         self.inputPlace.setStyleSheet(f"background-color: rgb(255, 128, 128);")
     
     def create(self):
-        algorithm = self.algorithmCombo.currentText()
-        options = [self.kizErkCheck.isChecked(), self.omyCheck.isChecked()]
-        self.exam = Exam(exams = self.exams, classroomNames = self.classroomNames, algorithmName = algorithm, optionList = options)
+        rules = [self.sidebyside_sitting, self.backtoback_sitting, self.crossbycross_sitting, self.kizErkek.isChecked(), self.ogretmenMasasi.isChecked()]
+        self.exam = Exam(exams = self.exams, classroomNames = self.classroomNames, rules = rules)
 
         self.deploy_step()
         
     def deploy_step(self):
-        sonuc = deploy_and_get_classrooms(self.exam)
+        sonuc = distribute(self.exam)
         if not sonuc:
             # Tekrar deneyiniz penceresi ekle
             print("[LOG] Yetersiz yer.")
-            pass
         else:
             # Create files
             con1 = classrooms_html.create(self.examInfos, sonuc, self.exam.exams)
@@ -304,11 +306,10 @@ class ExamStruct():
         os.rmdir(os.path.join('Temp', examPath))
     
 class Exam():
-    def __init__(self, exams: dict, classroomNames: list, algorithmName: str, optionList: list):
+    def __init__(self, exams: dict, classroomNames: list, rules: list):
         self.exams = exams
         self.classroomNames = classroomNames
-        self.algorithmName = algorithmName
-        self.optionList = optionList
+        self.rules = rules
 
         self.restore_exams()
         
@@ -324,7 +325,7 @@ class Exam():
         self.exams = exams
                    
     def __str__(self):
-        string = f"Sınavlar: {self.exams}\n\n{self.classrooms}\n\nÖğrenciler {self.algorithmName} ile karılacaktır.\n\nSeçenekler: {self.optionList}"
+        string = f"Sınavlar: {self.exams}\n\n{self.classrooms}\n\n\Kurallar: {self.rules}"
         return string
 
         
@@ -381,7 +382,7 @@ if __name__ == '__main__':
         def __init__(self):
             super().__init__()
             loadUi(os.path.join("Forms", "yeni_sinav_frame_demo.ui"), self)
-            self.examStruct = ExamStruct(self.examTable, self.gradeList, self.classroomList, self.examNameIn, self.addButton, self.removeButton, self.removeAllButton, self.createButton, self.algCombo, self.kizErkCheck, self.omyCheck, self)
+            self.examStruct = ExamStruct(self.examTable, self.gradeList, self.classroomList, self.examNameIn, self.addButton, self.removeButton, self.removeAllButton, self.createButton, self.sidebyside_sitting, self.backtoback_sitting, self.crossbycross_sitting, self.kizErkek, self.ogretmenMasasi, self)
             self.show()
         
     app = QApplication(sys.argv)

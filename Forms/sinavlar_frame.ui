@@ -60,7 +60,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>311</width>
+           <width>375</width>
            <height>454</height>
           </rect>
          </property>
@@ -93,7 +93,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>257</width>
+           <width>375</width>
            <height>454</height>
           </rect>
          </property>
@@ -155,7 +155,7 @@
         <item>
          <widget class="QPushButton" name="removeBtn">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="text">
            <string>Sınavı Sil</string>
@@ -165,7 +165,7 @@
         <item>
          <widget class="QPushButton" name="removeAllBtn">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="text">
            <string>Tüm sınavları sil</string>
@@ -175,20 +175,20 @@
         <item>
          <widget class="QPushButton" name="refreshAllBtn">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="text">
-           <string/>
+           <string>Yenile</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="menuBtn">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="text">
-           <string/>
+           <string>Menu</string>
           </property>
          </widget>
         </item>
@@ -261,7 +261,7 @@
          <item>
           <widget class="QPushButton" name="downloadBtn">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>Dosyayı indir</string>

@@ -15,7 +15,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QFrame{
-border: transparent;
+border: none;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -23,16 +23,16 @@ border: transparent;
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>5</number>
+    <number>0</number>
    </property>
    <item>
     <widget class="QFrame" name="main">
@@ -67,6 +67,21 @@ border: transparent;
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QGroupBox" name="bilgiler">
            <property name="title">
@@ -89,190 +104,6 @@ border: transparent;
              <number>0</number>
             </property>
             <item>
-             <widget class="QFrame" name="frame_7">
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_3">
-               <property name="spacing">
-                <number>5</number>
-               </property>
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <item>
-<<<<<<< HEAD
-                <widget class="QFrame" name="frame_6">
-                 <property name="frameShape">
-                  <enum>QFrame::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Raised</enum>
-                 </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_5">
-                  <item>
-                   <widget class="QFrame" name="frame_14">
-                    <property name="frameShape">
-                     <enum>QFrame::StyledPanel</enum>
-                    </property>
-                    <property name="frameShadow">
-                     <enum>QFrame::Raised</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="nameText">
-                    <property name="text">
-                     <string>Okul adı</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QFrame" name="frame_13">
-                    <property name="frameShape">
-                     <enum>QFrame::StyledPanel</enum>
-                    </property>
-                    <property name="frameShadow">
-                     <enum>QFrame::Raised</enum>
-                    </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout_3">
-                     <item>
-                      <widget class="QPushButton" name="schoolNameSaveBtn">
-                       <property name="text">
-                        <string>Kaydet</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="schoolNameDiscardBtn">
-                       <property name="text">
-                        <string>İptal</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QFrame" name="frame_4">
-                 <property name="frameShape">
-                  <enum>QFrame::StyledPanel</enum>
-=======
-                <widget class="QLineEdit" name="schoolNameIn">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="placeholderText">
-                  <string/>
->>>>>>> parent of 13a1c0d (Merge remote-tracking branch 'origin/BETA-0.8.4')
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Raised</enum>
-                 </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_8">
-                  <item>
-                   <widget class="QLabel" name="manNameText">
-                    <property name="text">
-                     <string>Okul müdürü</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QFrame" name="frame_12">
-                    <property name="frameShape">
-                     <enum>QFrame::StyledPanel</enum>
-                    </property>
-                    <property name="frameShadow">
-                     <enum>QFrame::Raised</enum>
-                    </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout_2">
-                     <item>
-                      <widget class="QPushButton" name="managerNameSaveBtn">
-                       <property name="text">
-                        <string>Kaydet</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="managerNameDiscardBtn">
-                       <property name="text">
-                        <string>İptal</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QFrame" name="frame_5">
-                 <property name="frameShape">
-                  <enum>QFrame::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Raised</enum>
-                 </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_7">
-                  <item>
-                   <widget class="QLabel" name="typeText">
-                    <property name="text">
-                     <string>Okul türü</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QFrame" name="frame_11">
-                    <property name="frameShape">
-                     <enum>QFrame::StyledPanel</enum>
-                    </property>
-                    <property name="frameShadow">
-                     <enum>QFrame::Raised</enum>
-                    </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout">
-                     <item>
-                      <widget class="QPushButton" name="typeNameSaveBtn">
-                       <property name="text">
-                        <string>Kaydet</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="typeNameDiscardBtn">
-                       <property name="text">
-                        <string>İptal</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
              <widget class="QFrame" name="frame_3">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -288,7 +119,7 @@ border: transparent;
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
                <property name="spacing">
-                <number>5</number>
+                <number>20</number>
                </property>
                <property name="leftMargin">
                 <number>0</number>
@@ -303,29 +134,14 @@ border: transparent;
                 <number>0</number>
                </property>
                <item>
-<<<<<<< HEAD
-                <widget class="QFrame" name="frame_10">
+                <widget class="QFrame" name="frame_9">
                  <property name="frameShape">
                   <enum>QFrame::StyledPanel</enum>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Raised</enum>
-=======
-                <widget class="QLineEdit" name="managerNameIn">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
                  </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="placeholderText">
-                  <string/>
->>>>>>> parent of 13a1c0d (Merge remote-tracking branch 'origin/BETA-0.8.4')
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                 <layout class="QVBoxLayout" name="verticalLayout_5">
                   <property name="spacing">
                    <number>0</number>
                   </property>
@@ -342,7 +158,14 @@ border: transparent;
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QLineEdit" name="schoolNameIn">
+                   <widget class="QLabel" name="typeText_3">
+                    <property name="text">
+                     <string>Okul müdürü</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="managerNameIn">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -355,6 +178,15 @@ border: transparent;
                       <height>0</height>
                      </size>
                     </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>167000</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
                     <property name="placeholderText">
                      <string/>
                     </property>
@@ -364,14 +196,14 @@ border: transparent;
                 </widget>
                </item>
                <item>
-                <widget class="QFrame" name="frame_9">
+                <widget class="QFrame" name="frame_12">
                  <property name="frameShape">
                   <enum>QFrame::StyledPanel</enum>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Raised</enum>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                 <layout class="QVBoxLayout" name="verticalLayout_8">
                   <property name="spacing">
                    <number>0</number>
                   </property>
@@ -388,7 +220,14 @@ border: transparent;
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QLineEdit" name="managerNameIn">
+                   <widget class="QLabel" name="typeText_2">
+                    <property name="text">
+                     <string>Okul adı</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="schoolNameIn">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -426,7 +265,7 @@ border: transparent;
                  <property name="frameShadow">
                   <enum>QFrame::Raised</enum>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <layout class="QVBoxLayout" name="verticalLayout_11">
                   <property name="spacing">
                    <number>0</number>
                   </property>
@@ -442,7 +281,14 @@ border: transparent;
                   <property name="bottomMargin">
                    <number>0</number>
                   </property>
-                  <item alignment="Qt::AlignLeft">
+                  <item>
+                   <widget class="QLabel" name="typeText">
+                    <property name="text">
+                     <string>Okul türü</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <widget class="QComboBox" name="typeCombo">
                     <property name="enabled">
                      <bool>false</bool>
@@ -463,6 +309,147 @@ border: transparent;
                       <string>Ortaokul</string>
                      </property>
                     </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="frame_7">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_3">
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QFrame" name="frame_6">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_9">
+                  <item>
+                   <widget class="QFrame" name="frame_13">
+                    <property name="frameShape">
+                     <enum>QFrame::StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_3">
+                     <item>
+                      <widget class="QPushButton" name="managerNameSaveBtn">
+                       <property name="text">
+                        <string>Kaydet</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="managerNameDiscardBtn">
+                       <property name="text">
+                        <string>İptal</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QFrame" name="frame_10">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_10">
+                  <item>
+                   <widget class="QFrame" name="frame_14">
+                    <property name="frameShape">
+                     <enum>QFrame::StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_9">
+                     <item>
+                      <widget class="QPushButton" name="schoolNameSaveBtn">
+                       <property name="text">
+                        <string>Kaydet</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="schoolNameDiscardBtn">
+                       <property name="text">
+                        <string>İptal</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QFrame" name="frame_5">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_7">
+                  <item>
+                   <widget class="QFrame" name="frame_11">
+                    <property name="frameShape">
+                     <enum>QFrame::StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout">
+                     <item>
+                      <widget class="QPushButton" name="typeNameSaveBtn">
+                       <property name="text">
+                        <string>Kaydet</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="typeNameDiscardBtn">
+                       <property name="text">
+                        <string>İptal</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </widget>
                   </item>
                  </layout>

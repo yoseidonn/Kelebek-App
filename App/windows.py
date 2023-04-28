@@ -5,8 +5,10 @@ from PyQt5.QtGui import *
 from PyQt5.uic import loadUi
 from PyQt5.QtTest import QTest
 
+from . import database
+
 from .HtmlCreater import classrooms_html, students_html
-from . import database, excel_reader
+from . import excel_reader
 from pathlib import Path
 import os, sys, datetime
 import urllib.request as req
@@ -14,7 +16,7 @@ import urllib.error as err
 
 #os.environ['QT_DEBUG_PLUGINS']='1'
 #os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--enable-gpu-command-logging"
-LAST_DATE = (2023, 4, 30, 12, 30, 0)
+LAST_DATE = (2023, 4, 28, 13, 20) # Year month day hour minute
 CHECK_DATE = 1
 
 class MainWindow(QMainWindow):
@@ -27,7 +29,7 @@ class MainWindow(QMainWindow):
             dialog = NoInternetDialog()
             exit()
 
-        elif CHECK_DATE and x == "ENDED":
+        if CHECK_DATE and x == "ENDED":
             print("[LOG] Deneme süresi dolmuş.")
             dialog = DateIsOverDialog()
             exit()
@@ -107,9 +109,9 @@ class MainWindow(QMainWindow):
         except:
             return "NO_INTERNET"
         
-        time_str = res.read().strip().decode()
+        time_str = res.read().strip().decode("utf-8")
         print(f"[LOG] Bağlantı başarılı. Güncel saat: {time_str}")
-        date, hour = time_str.split(" ")        
+        date, hour = time_str.split(" ")        # hour yani o anki saat -> 12:30:00
         year, month, day = date.split("-")
         hour, minute, second = hour.split(":")
 
@@ -726,9 +728,11 @@ class YeniSinavFrame(QFrame):
                                     addButton = self.addButton,
                                     removeButton = self.removeButton,
                                     removeAllButton = self.removeAllButton,
-                                    algorithmCombo = self.algCombo,
-                                    kizErkCheck = self.kizErkCheck,
-                                    omyCheck = self.omyCheck,
+                                    sidebyside_sitting = self.sidebyside_sitting,
+                                    backtoback_sitting = self.backtoback_sitting,
+                                    crossbycross_sitting = self.crossbycross_sitting,
+                                    kizErkek = self.kizErkek,
+                                    ogretmenMasasi = self.ogretmenMasasi,
                                     createButton = self.createButton,
                                     sinavFrame = self)
 

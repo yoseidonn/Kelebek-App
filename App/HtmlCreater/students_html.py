@@ -59,13 +59,14 @@ def create_html_table(grades):
     html = "<body>\n"
     for grade_name, students in grades.items():
         html += f"<table>\n<caption>{grade_name} Listesi</caption>\n"
-        html += "<tr>\n<th>Name</th>\n<th>Sınav yeri</th>\n</tr>\n"
+        html += "<tr>\n<th>Öğrenci</th>\n<th>Sınav yeri</th>\n</tr>\n"
         for student in students:
-            nameSurname, place= student[1][1:3], student[2]
+            nameSurname, classroom, deskNo = student[1][1:3], student[2], student[3]
+            print(f"{classroom} - {deskNo}")
             nameSurname = f"{nameSurname[0]} {nameSurname[1]}"
             html += "<tr>\n"
             html += f"<td>{nameSurname}</td>\n"
-            html += f"<td>{place}</td>\n"
+            html += f"<td>{classroom} - {deskNo}</td>\n"
             html += "</tr>\n"
         html += "</table>\n"
     html += "</body>"
