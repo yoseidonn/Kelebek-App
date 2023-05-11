@@ -17,7 +17,7 @@ import urllib.error as err
 #os.environ['QT_DEBUG_PLUGINS']='1'
 #os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--enable-gpu-command-logging"
 LAST_DATE = (2023, 4, 28, 13, 20) # Year month day hour minute
-CHECK_DATE = 1
+CHECK_DATE = 0
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -454,7 +454,7 @@ class OgrencilerFrame(QFrame):
 
     def remove_student(self, removeBy = False, all = False):
         if all:
-            onaydialog = OnayDialog()
+            onaydialog = OgrencilerSilmeOnayDialog()
             if onaydialog.result:
                 database.remove_all_students()
 
@@ -571,10 +571,10 @@ class EkleDuzenleDialog(QDialog):
         self.exec_()
 
 
-class OnayDialog(QDialog):
+class OgrencilerSilmeOnayDialog(QDialog):
     def __init__(self):
         super().__init__()
-        loadUi(os.path.join("Forms", "onay_dialog.ui"), self)
+        loadUi(os.path.join("Forms", "ogrenciler_silme_onay_dialog.ui"), self)
         self.checkk()
 
         self.okayButton.clicked.connect(self.closee)
@@ -792,7 +792,7 @@ class SinavlarFrame(QFrame):
         buttons = [self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.menuBtn, self.downloadBtn]
         
         self.set_ui()
-        self.Display = Display(examsList = self.examsList, filesList = self.filesList, webEngineView = self.wev, buttons = buttons)
+        self.Display = Display(toolbox = self.toolbox, examsList = self.examsList, archiveList = self.archiveList, filesList = self.filesList, webEngineView = self.wev, displayTitle = self.displayTitle, buttons = buttons, buttonsFrame = self.buttonsFrame)
         
     def set_ui(self):
         self.wev = QWebEngineView()

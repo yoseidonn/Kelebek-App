@@ -108,6 +108,7 @@ def get_html(classrooms, student_exam, headerInfos):
         ogretmenMasasiItem = ogretmenMasasiBosItem
         ogretmenMasasiItemDouble = ogretmenMasasiBosDoubleItem
         if ogretmenMasasiOgrenci is not None:
+            print(f'OgretmenMasasiOgrenci: ')
             ogrenci = ogretmenMasasiOgrenci[1]
             sinavAdi = ogretmenMasasiOgrenci[0]
             sinif, no, cinsiyet, full_ad = ogrenci[4], ogrenci[0], ogrenci[3], ogrenci[1:3]
@@ -231,7 +232,4 @@ def get_row_style(classroom):
                 
                     
 if __name__ == '__main__':
-    import shuffle
-    classroom = database.get_all_classrooms("10/A")
-    exam = {}
-    shuffle.shuffle_and_get_classrooms()
+    ...
