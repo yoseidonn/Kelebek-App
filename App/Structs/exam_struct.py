@@ -10,7 +10,7 @@ from App.HtmlCreater import classrooms_html, students_html
 from App.deploy import distribute
 
 from pathlib import Path
-import os, sys, random, time
+import os, sys, random
 
 COLORS = list(COLOR_PALETTE.values())
 random.shuffle(COLORS)

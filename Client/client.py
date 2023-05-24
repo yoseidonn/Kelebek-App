@@ -1,7 +1,17 @@
-import requests, json, threading
-import os, sys
+import requests, json
+import os, sys, dotenv
+dotenv.load_dotenv()
 
-SERVER = "http://185.87.252.226:5002/"
+"""
+CODES:
+900 Licence verified
+910 Licence has expired
+920 Invalid licence
+1000 Network error
+1001 No internet
+"""
+
+SERVER = os.getenv("SERVER_IP")
 
 def create_tables():
     headers = {"Content-Type": "application/json"}
@@ -25,33 +35,44 @@ def create_licence_key() -> str:
         print(f"Is Accepted: {isAccepted}")
         return response_json
 
-    else: # Lisans dogrulanamadi, False ve durum kodu geri dondurulur
-        return False, response.status_code
+    else: # Lisans dogrulanamadi
+        return {"status_code": response.status_code}
     
 def accept_licence_key(new_licence_key: str, secret_key: str):
     headers = {"Content-Type": "application/json"}
     data = json.dumps({"licence_key": new_licence_key, "secret_key": secret_key})
 
-    response = requests.get(SERVER+"accept_licence_key", headers=headers, data=data)
+    try:
+        response = requests.get(SERVER+"accept_licence_key", headers=headers, data=data)
+    except Exception as e:
+        print(f"\n[ERROR]\n{e}\n\n")
+        return {"status_code": 1000}
+    
     if response.status_code == 200:  # 200 - Basarili durum kodu
         response_json = response.json()
         return response_json
 
     else: # Lisans dogrulanamadi, False ve durum kodu geri dondurulur
-        return False, response.status_code
+        return {"status_code": response.status_code}
 
 
-def check_licence(licence_key: str):
+def check_licence_key(licence_key: str):
     headers = {"Content-Type": "application/json"}
     data = json.dumps({"licence_key": licence_key})
 
-    response = requests.post(SERVER+"check_licence", headers=headers, data=data)
+    try:
+        response = requests.get(SERVER+"check_licence_key", headers=headers, data=data)
+    except Exception as e:
+        return {"status_code": 1000, "error": e}
+    
     if response.status_code == 200:  # 200 - Basarili durum kodu
         response_json = response.json()
         return response_json
     
     else: # Lisans dogrulanamadi, False ve durum kodu geri dondurulur
-        return False, response.status_code
+        return {"status_code": response.status_code, "content": response.content.decode()[:20]}
+    
 
 if __name__ == "__main__":
-    print(create_licence_key())
+    print("[LOG] Creating licence key...")
+    print(f"[LOG] Response: {create_licence_key()}\n")

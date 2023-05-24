@@ -1,11 +1,14 @@
+import typing
+from PyQt5 import QtCore
 from PyQt5.QtWebEngineWidgets import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QWidget
 from PyQt5.uic import loadUi
 from PyQt5.QtTest import QTest
 
-import os, sys, shutil
+import os, sys, shutil, pathlib
 
 
 class Display():
@@ -27,8 +30,8 @@ class Display():
         self.set_signals()
         self.set_ui()
         
-        self.set_elw() # Exam list widget
         self.set_alw() # Archive list widget
+        self.set_elw() # Exam list widget
         self.set_flw() # File list widget of selected exam
         
     def set_signals(self):
@@ -39,38 +42,102 @@ class Display():
         
         self.removeBtn.clicked.connect(self.remove_exam)
         self.removeAllBtn.clicked.connect(lambda: self.remove_exam(all = True))
+        self.refreshAllBtn.clicked.connect(self.refresh_exams)
+        self.menuBtn
         self.downloadBtn.clicked.connect(self.download)
         
     def set_ui(self):
         self.toolbox.setCurrentIndex(0)
-        self.removeBtn.setEnabled(False)
-        self.removeAllBtn.setEnabled(False)
         self.removeBtn.setIcon(QIcon(os.path.join("Images", "icon", "trash.svg")))
         self.removeAllBtn.setIcon(QIcon(os.path.join("Images", "icon", "trash.svg")))
         self.refreshAllBtn.setIcon(QIcon(os.path.join("Images","icon", "refresh-ccw.svg")))
         self.menuBtn.setIcon(QIcon(os.path.join("Images", "icon", "menu.svg")))
 
         self.menu = QMenu()
-        actArchive = QAction("Arsivle", self.buttonsFrame)
-        artDeArchive = QAction("Arsivden cikar", self.buttonsFrame)
-        actRemoveArchive = QAction("Arsivi temizle", self.buttonsFrame)
-        QAction()
+        actArchive = QAction("Arşivle", self.buttonsFrame)
+        actDeArchive = QAction("Arşivden çıkar", self.buttonsFrame)
+        actRemoveArchive = QAction("Arşivi temizle", self.buttonsFrame)
         self.menu.addAction(actArchive)
-        self.menu.addAction(artDeArchive)
+        self.menu.addAction(actDeArchive)
         self.menu.addAction(actRemoveArchive)
         self.menuBtn.setMenu(self.menu)
     
+        actArchive.triggered.connect(self.archive_exam)
+        actDeArchive.triggered.connect(self.de_archive_exam)
+        actRemoveArchive.triggered.connect(self.remove_exam_from_archive)
+        
+    def archive_exam(self):
+        mod = self.toolbox.currentIndex()
+        print(mod)
+        if mod:
+            print("[ERROR] You can't archive an exam which is already archived.")
+            return
+        else:
+            for item in self.examItems:
+                if item.text() == self.selectedExamName:
+                    Item = item
+                    break
+
+        modText = "Saved"
+        filePath = os.path.join(modText, Item.text())
+        
+        # Create new folder and move files
+        os.mkdir(os.path.join("Archived", Item.text()))
+        pathlib.Path(os.path.join(filePath, "salon_oturma_duzenleri.html")).rename(os.path.join('Archived', Item.text(), 'salon_oturma_duzenleri.html'))
+        pathlib.Path(os.path.join(filePath, "sinif_listeleri.html")).rename(os.path.join('Archived', Item.text(), 'sinif_listeleri.html'))
+        print(f"[FILES TRANSFER] Moved both files into Archived/{Item.text()}")
+        
+        # Remove old folder
+        shutil.rmtree(filePath)
+        print(f"[REMOVE] Removing {filePath}.")
+        
+        # Refresh exams
+        self.refresh_exams()
+    
+    def de_archive_exam(self):
+        mod = self.toolbox.currentIndex()
+        print(mod)
+        if not mod:
+            print("[ERROR] You can't de archive an exam which is not archived.")
+            return
+        else:
+            for item in self.archiveItems:
+                if item.text() == self.selectedExamName:
+                    Item = item
+                    break
+                
+        modText = "Archived"
+        filePath = os.path.join(modText, Item.text())
+        
+        # Create new folder and move files
+        os.mkdir(os.path.join("Saved", Item.text()))
+        pathlib.Path(os.path.join(filePath, "salon_oturma_duzenleri.html")).rename(os.path.join('Saved', Item.text(), 'salon_oturma_duzenleri.html'))
+        pathlib.Path(os.path.join(filePath, "sinif_listeleri.html")).rename(os.path.join('Saved', Item.text(), 'sinif_listeleri.html'))
+        print(f"[FILES TRANSFER] Moved both files into Saved/{item.text()}")
+        
+        # Remove old folder
+        shutil.rmtree(filePath)
+        print(f"[REMOVE] Removing {filePath}.")
+        
+        # Refresh exams
+        self.refresh_exams()
+    
+    def remove_exam_from_archive(self):
+        pass
+    
     def remove_exam(self, all = False):
-        dialog = ConfirmRemoveArchivedExam()
         base_dir = "Saved" if self.toolbox.currentIndex() == 0 else "Archived"
         if all:
+            dialog = SelectWhichToRemove()
             shutil.rmtree(os.path.join("Saved"))
             os.mkdir("Saved")
             return
         try:
             if self.isArchived:
-                dialog = QDialog()
-            if not self.isArchived or dialog.confirmed:
+                print("[REMOVE] Unable to remove an archived exam.")
+                return
+                dialog = ConfirmRemoveArchivedExam()
+            elif not self.isArchived:
                 print(f"[LOG] Removing {os.path.join(base_dir, self.selectedExamName)}")
                 print(f"[LOG] Archived: {self.isArchived}")
                 shutil.rmtree(os.path.join(base_dir, self.selectedExamName))
@@ -101,20 +168,32 @@ class Display():
             return dialog.selectedFiles()[0]
         
     def refresh_exams(self):
-        pass
+        self.examsList.clear()
+        self.archiveList.clear()
+        self.examItems: list[QListWidgetItem] = []
+        self.archiveItems: list[QListWidgetItem] = []
+        if self.toolbox.currentIndex():
+            self.set_elw()
+            self.set_alw()
+        else:
+            self.set_alw()
+            self.set_elw()
+            
+        print("[REFRESH] Refreshing Exams and Archived Exams.")
     
     def toolbox_changed(self, index: int):
         print(f"[MOD CHANGED] Index {index}")
-        self.al_item_clicked(self.archiveItems[0]) if index else self.el_item_clicked(self.examItems[0])
+        try:
+            self.al_item_clicked(self.archiveItems[0]) if index else self.el_item_clicked(self.examItems[0])
+        except:
+            pass
         
     ### Exam List Widget
     def el_item_clicked(self, item: QListWidgetItem):
         self.isArchived = False
         item.setSelected(True)
         self.selectedExamName = item.text()
-        print(f"[ITEM SELECTED] {item.text()}")
-        base_dir = "Saved" if self.toolbox.currentIndex() == 0 else "Archived"
-        filePath = os.path.join(f'{base_dir}', self.selectedExamName, self.currentMode)
+        filePath = os.path.join(f'Saved', self.selectedExamName, self.currentMode)
         with open(filePath, "r", encoding="utf-8") as file:
             htmlContent = file.read()
         self.wev.setHtml(htmlContent)
@@ -133,17 +212,15 @@ class Display():
                 self.examsList.addItem(item)
 
         if len(self.examItems) != 0:
-            lastItem = self.examItems[0]
-            lastItem.setSelected(True)
-            self.el_item_clicked(lastItem)
+            firstItem = self.examItems[0]
+            firstItem.setSelected(True)
+            self.el_item_clicked(firstItem)
                 
     def al_item_clicked(self, item:QListWidgetItem):
         self.isArchived = True
         item.setSelected(True)
         self.selectedExamName = item.text()
-        print(f"[ITEM SELECTED] {item.text()}")
-        base_dir = "Saved" if self.toolbox.currentIndex() == 0 else "Archived"
-        filePath = os.path.join(f'{base_dir}', self.selectedExamName, self.currentMode)
+        filePath = os.path.join(f'Archived', self.selectedExamName, self.currentMode)
         with open(filePath, "r", encoding="utf-8") as file:
             htmlContent = file.read()
         self.wev.setHtml(htmlContent)
@@ -161,19 +238,19 @@ class Display():
                 self.archiveItems.append(item)
                 self.archiveList.addItem(item)
 
-        if len(self.examItems) != 0:
-            lastItem = self.examItems[0]
-            lastItem.setSelected(True)
-            self.el_item_clicked(lastItem)
+        if len(self.archiveItems) != 0:
+            firstItem = self.archiveItems[0]
+            firstItem.setSelected(True)
+            self.al_item_clicked(firstItem)
             
     ### File List Widget
     def fl_item_clicked(self, item: QListWidgetItem):
         if item.text() == "Salon oturma düzenleri":
             self.currentMode = "salon_oturma_duzenleri.html"
-            print(f'[ITEM SELECTED] {self.selectedExamName} - Salon seçildi.')
+            #print(f'[ITEM SELECTED] {self.selectedExamName} - Salon seçildi.')
         elif item.text() == "Sınıf listeleri":
             self.currentMode = "sinif_listeleri.html"
-            print(f'[ITEM SELECTED] {self.selectedExamName} - Sınıf seçildi.')
+            #print(f'[ITEM SELECTED] {self.selectedExamName} - Sınıf seçildi.')
 
         base_dir = "Saved" if self.toolbox.currentIndex() == 0 else "Archived"
         filePath = os.path.join(base_dir, self.selectedExamName, self.currentMode)
@@ -195,4 +272,9 @@ class Display():
 class ConfirmRemoveArchivedExam(QDialog):
     def __init__(self, single = True, all = False, normal = True, archived = False):
         super().__init__()
-        loadUi(os.path.join("Forms", "sinav_silme_onay_dialog.ui"))
+        loadUi(os.path.join("Forms", "arsiv_silme_onay_dialog.ui"))
+    
+class SelectWhichToRemove(QDialog):
+    def __init__(self):
+        super().__init__()
+        loadUi

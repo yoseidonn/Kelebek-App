@@ -5,14 +5,13 @@ from PyQt5.QtGui import *
 from PyQt5.uic import loadUi
 from PyQt5.QtTest import QTest
 
-from . import database
-
+from Client.client import *
 from .HtmlCreater import classrooms_html, students_html
-from . import excel_reader
+from . import excel_reader, database, licence_dialogs
+
+from dotenv import load_dotenv
 from pathlib import Path
 import os, sys, datetime
-import urllib.request as req
-import urllib.error as err 
 
 #os.environ['QT_DEBUG_PLUGINS']='1'
 #os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--enable-gpu-command-logging"
@@ -23,22 +22,58 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         loadUi(os.path.join("Forms", "mainwindow.ui"), self)
-        x = self.is_date_over()
-        if CHECK_DATE and x == "NO_INTERNET":
-            print("[LOG] Internet bağlantınızı kontrol ediniz...")
-            dialog = NoInternetDialog()
-            exit()
-
-        if CHECK_DATE and x == "ENDED":
-            print("[LOG] Deneme süresi dolmuş.")
-            dialog = DateIsOverDialog()
-            exit()
             
+        self.check_licence()
         self.set_signs()
         self.set_menu_bar()
         self.set_ui()
         self.sws()
 
+    def licence_dialog(self, h1: str = "Kelebek lisansı bulunamadı", h2: str = "Eğer sahipseniz anahtarınızı girin ya da yeni bir anahtar alın."):
+        dialog = licence_dialogs.LisansDialog(h1=h1, h2=h2)
+        if not dialog.passed:
+            exit()
+        return dialog.key
+        
+    def check_licence(self):
+        self.licenceText.setText("Lisans dogrulama basarisiz.")
+        
+        key = self.get_licence_key()
+        print(f"[VALIDATION] Found local key: {key}")
+        if not key:
+            key = self.licence_dialog()
+
+        response = Client.check_licence_key(key)
+        status_code = response['status_code']
+        print(f"[VALIDATION] Response: {response}")
+        
+        
+        if status_code == 900:
+            print("[VERIFIED] Licence key is valid. Application is starting.")
+            
+        elif status_code == 910:
+            print("[EXPIRED] Licence key is expired.")
+            self.licence_dialog()
+            
+        elif status_code == 920:
+            print("[INVALID] Invalid key.")
+            self.licence_dialog(h1="Kelebek lisans geçersiz", h2="Cihazınızda bulunan Kelebek lisansı doğrulayamıyoruz.")
+        
+        elif status_code == 1000:
+            print(f"[VALIDATION] Network error. Status code: {status_code}")
+            self.licence_dialog(h1="Kelebek lisans doğrulanamadı", h2="Lütfen internet bağlantınızı kontrol edin.")
+            
+        else:
+            print(f"[ERROR] Unknown error occured. Status code: {status_code}")
+            self.licence_dialog(h1="Kelebek lisans doğrulanamadı", h2="Lütfen internet bağlantınızı kontrol edin.")
+            
+        print("[VERIFIED] App is starting...")
+            
+    def get_licence_key(self):
+        load_dotenv()
+        key = os.getenv("LICENCE_KEY")
+        return key
+    
     def set_menu_bar(self):
         self.reset_all.setIcon(QIcon(os.path.join("Images", "icon", "trash-2.svg")))
         
@@ -77,8 +112,8 @@ class MainWindow(QMainWindow):
         """
         This function, adds custom widgets and waits for signals comes from buttons.
         """
-        self.textBrowser.setReadOnly(True)
-        self.textBrowser2.setReadOnly(True)
+        self.welcomeText.setReadOnly(True)
+        self.licenceText.setReadOnly(True)
         
         self.okulBilgileriFrame = OkulBilgileriFrame()
         self.ogrencilerFrame = OgrencilerFrame()
@@ -102,26 +137,6 @@ class MainWindow(QMainWindow):
         }
         [self.MainLayout.addWidget(self.frames[key]) for key in self.frames]
     
-    def is_date_over(self):
-        try:
-            print("[LOG] 'http://just-the-time.appspot.com/' adresine istek gönderiliyor...")
-            res = req.urlopen('http://just-the-time.appspot.com/')
-        except:
-            return "NO_INTERNET"
-        
-        time_str = res.read().strip().decode("utf-8")
-        print(f"[LOG] Bağlantı başarılı. Güncel saat: {time_str}")
-        date, hour = time_str.split(" ")        # hour yani o anki saat -> 12:30:00
-        year, month, day = date.split("-")
-        hour, minute, second = hour.split(":")
-
-        now = datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))
-        
-        endDay = datetime.datetime(*LAST_DATE)
-        if endDay >= now:
-            return "NOT_ENDED"
-        return "ENDED"
-
     def okul_frame(self):
         if self.frames["okulBilgileriFrame"].isVisible():
             [self.frames[key].setVisible(False) for key in self.frames]
