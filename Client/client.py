@@ -28,7 +28,7 @@ SERVER = "http://localhost:5000/"
 def create_key_tables():
     headers = {"Content-Type": "application/json"}
 
-    response = requests.get(SERVER+"create_key_tables", headers=headers)
+    response = requests.get(SERVER+"/create_key_tables", headers=headers)
     if response.status_code == 200:  # 200 - Basarili durum kodu
         response_json = response.json()
         return response_json
@@ -39,7 +39,7 @@ def create_key_tables():
 def drop_key_tables():
     headers = {"Content-Type": "application/json"}
     
-    response = requests.get(SERVER+"drop_key_tables", headers=headers)
+    response = requests.get(SERVER+"/drop_key_tables", headers=headers)
     if response.status_code == 200:  # 200 - Basarili durum kodu
         response_json = response.json()
         return response_json
@@ -50,7 +50,7 @@ def drop_key_tables():
 def get_activated_keys():
     headers = {"Content-Type": "application/json"}
     
-    response = requests.get(SERVER+"get_activated_keys", headers=headers)
+    response = requests.get(SERVER+"/get_activated_keys", headers=headers)
     if response.status_code == 200:  # 200 - Basarili durum kodu
         response_json = response.json()
         return response_json
@@ -61,7 +61,7 @@ def get_activated_keys():
 def get_registered_keys():
     headers = {"Content-Type": "application/json"}
     
-    response = requests.get(SERVER+"get_registered_keys", headers=headers)
+    response = requests.get(SERVER+"/get_registered_keys", headers=headers)
     if response.status_code == 200:  # 200 - Basarili durum kodu
         response_json = response.json()
         return response_json
@@ -75,7 +75,7 @@ def activate_licence_key(key: str):
     headers = {"Content-Type": "application/json"}
     data = json.dumps({"Key": key})
     
-    response = requests.get(SERVER+"activate_licence_key", headers=headers, data=data)
+    response = requests.get(SERVER+"/activate_licence_key", headers=headers, data=data)
     if response.status_code == 200:  # 200 - Basarili durum kodu
         response_json = response.json()
         return response_json
@@ -90,7 +90,7 @@ def register_new_licence_key_and_get(licence_duration: str) -> str:
     headers = {"Content-Type": "application/json"}
     data = json.dumps({"Licence-Duration": licence_duration})
     
-    response = requests.get(SERVER+"register_new_licence_key_and_get", headers=headers, data=data)
+    response = requests.get(SERVER+"/register_new_licence_key_and_get", headers=headers, data=data)
     if response.status_code == 200:  # 200 - Basarili durum kodu
         response_json = response.json()
         return response_json
@@ -106,9 +106,9 @@ def validate_licence_key(licence_key: str):
     data = json.dumps({"Key": licence_key})
 
     try:
-        response = requests.get(SERVER+"validate_licence_key", headers=headers, data=data)
+        response = requests.get(SERVER+"/validate_licence_key", headers=headers, data=data)
     except Exception as e:
-        return {"Status-Code": 1000, "error": e}
+        return {"Status-Code": 1000, "Error-Message": e}
     
     if response.status_code == 200:  # 200 - Basarili durum kodu
         response_json = response.json()

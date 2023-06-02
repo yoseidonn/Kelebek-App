@@ -5,7 +5,7 @@ from PyQt5.QtGui import *
 from PyQt5.uic import loadUi
 from PyQt5.QtTest import QTest
 
-from Client.client import *
+from Client import client
 from .HtmlCreater import classrooms_html, students_html
 from . import excel_reader, database, licence_dialogs
 
@@ -29,46 +29,19 @@ class MainWindow(QMainWindow):
         self.set_ui()
         self.sws()
 
-    def licence_dialog(self, h1: str = "Kelebek lisansı bulunamadı", h2: str = "Eğer sahipseniz anahtarınızı girin ya da yeni bir anahtar alın."):
-        dialog = licence_dialogs.LisansDialog(h1=h1, h2=h2)
-        if not dialog.passed:
-            exit()
-        return dialog.key
-        
     def check_licence(self):
         self.licenceText.setText("Lisans dogrulama basarisiz.")
         
         key = self.get_licence_key()
         print(f"[VALIDATION] Found local key: {key}")
-        if not key:
-            key = self.licence_dialog()
 
-        response = Client.check_licence_key(key)
-        status_code = response['status_code']
-        print(f"[VALIDATION] Response: {response}")
+        h1, h2 = "Kelebek lisansı bulunamadı", "Eğer sahipseniz anahtarınızı girin ya da yeni bir anahtar alın."
+        dialog = licence_dialogs.LisansDialog(header_text=h1, subheader_text=h2, found_key=key)
+        if not dialog.exec():
+            print("[LOG] Validation refused. Exiting the application.")
+            exit()
+        print("[LOG] Validation succeed. Starting the application.")
         
-        
-        if status_code == 900:
-            print("[VERIFIED] Licence key is valid. Application is starting.")
-            
-        elif status_code == 910:
-            print("[EXPIRED] Licence key is expired.")
-            self.licence_dialog()
-            
-        elif status_code == 920:
-            print("[INVALID] Invalid key.")
-            self.licence_dialog(h1="Kelebek lisans geçersiz", h2="Cihazınızda bulunan Kelebek lisansı doğrulayamıyoruz.")
-        
-        elif status_code == 1000:
-            print(f"[VALIDATION] Network error. Status code: {status_code}")
-            self.licence_dialog(h1="Kelebek lisans doğrulanamadı", h2="Lütfen internet bağlantınızı kontrol edin.")
-            
-        else:
-            print(f"[ERROR] Unknown error occured. Status code: {status_code}")
-            self.licence_dialog(h1="Kelebek lisans doğrulanamadı", h2="Lütfen internet bağlantınızı kontrol edin.")
-            
-        print("[VERIFIED] App is starting...")
-            
     def get_licence_key(self):
         load_dotenv()
         key = os.getenv("LICENCE_KEY")
