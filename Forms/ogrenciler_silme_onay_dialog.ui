@@ -87,6 +87,9 @@
            <property name="enabled">
             <bool>true</bool>
            </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(143, 240, 164)</string>
+           </property>
            <property name="text">
             <string>Onay</string>
            </property>
