@@ -1,10 +1,6 @@
-import requests, json
-import os, sys, dotenv, platform, pyudev, subprocess
-
-
-dotenv.load_dotenv()
-#SERVER = os.getenv("SERVER_IP")
-SERVER = "http://localhost:8000/rest_api/validate/"
+import platform
+import pyudev
+import subprocess
 
 def get_disk_serial_number():
     system = platform.system()
@@ -38,45 +34,10 @@ def get_disk_serial_number_linux():
 def get_disk_serial_number_mac():
     # Add macOS-specific method to retrieve disk serial number here
     return None
-        
-def validate_licence_key(uuid: str = get_disk_serial_number(), key: str = "BLANK"):
-    url = SERVER + f"{uuid}/{key}"
-    print(url)
-    try:
-        response = requests.get(url)
-        content = response.content.decode()
 
-        data = json.loads(content)
-        return data
-    
-    except Exception as e:
-        data = {"Status-Code": 1000, "Error-Message": str(e)}
-        return data
-
-
-"""
-CODES:
-123 Not implemented
-
-700 Succesfully created tables
-701 Error occured while creating tables
-702 Table not found
-
-800 Key successfully registed
-801 Error occured while registering key
-
-900 Licence verified
-901 Wrong UUID to licence
-904 Error occured
-
-910 Licence has expired
-911 Licence key is used in another computer
-920 Invalid licence
-
-1000 Network error
-1001 No internet
-"""
-
-if __name__ == "__main__":
-    data = validate_licence_key(uuid=get_disk_serial_number(),key="1234-5678-9012-3456")
-    print(data)
+# Example usage
+serial_number = get_disk_serial_number()
+if serial_number:
+    print("Disk Serial Number:", serial_number)
+else:
+    print("Failed to retrieve the disk serial number.")

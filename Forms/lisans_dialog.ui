@@ -322,7 +322,7 @@ font-weight:600;</string>
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>10</number>
             </property>
             <property name="topMargin">
              <number>0</number>
@@ -333,6 +333,13 @@ font-weight:600;</string>
             <property name="bottomMargin">
              <number>10</number>
             </property>
+            <item alignment="Qt::AlignLeft">
+             <widget class="QPushButton" name="skipBtn">
+              <property name="text">
+               <string>Aktifleştirmeden kullanmak istiyorum</string>
+              </property>
+             </widget>
+            </item>
             <item alignment="Qt::AlignRight">
              <widget class="QPushButton" name="closeWindowBtn">
               <property name="text">

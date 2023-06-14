@@ -10,6 +10,7 @@ from .HtmlCreater import classrooms_html, students_html
 from . import excel_reader, database, licence_dialogs
 
 from dotenv import load_dotenv
+load_dotenv()
 from pathlib import Path
 import os, sys, datetime
 
@@ -22,7 +23,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         loadUi(os.path.join("Forms", "mainwindow.ui"), self)
-            
+        self.licenced = False
+
         self.check_licence()
         self.set_signs()
         self.set_menu_bar()
@@ -30,22 +32,27 @@ class MainWindow(QMainWindow):
         self.sws()
 
     def check_licence(self):
-        self.licenceText.setText("Lisans dogrulama basarisiz.")
-        
-        key = self.get_licence_key()
+        key = os.getenv("LICENCE_KEY")
+        key = 'BLANK' if not key else key
         print(f"[VALIDATION] Found local key: {key}")
-
         h1, h2 = "Kelebek lisansı bulunamadı", "Eğer sahipseniz anahtarınızı girin ya da yeni bir anahtar alın."
         dialog = licence_dialogs.LisansDialog(header_text=h1, subheader_text=h2, found_key=key)
-        if not dialog.exec():
+
+        print(dialog.code)
+        if not dialog.code:
             print("[LOG] Validation refused. Exiting the application.")
             exit()
-        print("[LOG] Validation succeed. Starting the application.")
-        
-    def get_licence_key(self):
-        load_dotenv()
-        key = os.getenv("LICENCE_KEY")
-        return key
+            
+        elif dialog.code == 1:
+            self.enable_licence_features()
+            print("[LOG] Validation succeed. Starting the application.")
+            
+        else:
+            print("[LOG] Skipping licence validation. Starting the application.")
+    
+    def enable_licence_features(self):
+        self.licenced = True
+        pass
     
     def set_menu_bar(self):
         self.reset_all.setIcon(QIcon(os.path.join("Images", "icon", "trash-2.svg")))
@@ -167,31 +174,12 @@ class MainWindow(QMainWindow):
         """
         Adjust the window settings
         """
-        self.setWindowTitle("Kelebek sistemi")
+        if self.licenced:
+            self.setWindowTitle("Kelebek sistemi")
+        else:
+            self.setWindowTitle("Kelebek Sistemi - Lisanslanmamış") 
         self.setWindowIcon(QIcon(os.path.join("Images", "img", "butterfly.png")))
         self.show()
-
-class DateIsOverDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        loadUi(os.path.join("Forms", "date_is_over_dialog.ui"), self)
-
-        self.exitBtn.clicked.connect(self.close)
-        self.textBrowser.setReadOnly(True)
-
-        self.exec_()
-
-
-class NoInternetDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        loadUi(os.path.join("Forms", "no_internet_dialog.ui"), self)
-
-        self.exitBtn.clicked.connect(self.close)
-        self.textBrowser.setReadOnly(True)
-        
-        self.exec_()
-
 
 class OkulBilgileriFrame(QFrame):
     def __init__(self):

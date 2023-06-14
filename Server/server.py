@@ -180,13 +180,10 @@ def validate_licence():
             else:
                 not_in_activated_keys = True
                 
-            print("1")
             year, month, day, hour, minute, second = [int(i) for i in activation_date.split(",")]
-            print("2")
             new_year = year + (month + licence_duration) // 12
             new_month = (month + licence_duration) % 12
             new_day, new_hour, new_minute, new_second = [int(i) for i in datetime.datetime(1,2,3).now().strftime("%d,%H,%M,%S").split(",")]
-            print("3")
             
             end_date = datetime.datetime(new_year, new_month, new_day, new_hour, new_minute, new_second)
             now = datetime.datetime.now()

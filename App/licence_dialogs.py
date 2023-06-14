@@ -14,20 +14,21 @@ class LisansDialog(QDialog):
         self.header_text = header_text
         self.subheader_text = subheader_text
         self.found_key = found_key
+        self.code = 0
         
         self.set_ui()
         self.set_signals()
+        if self.found_key != "BLANK":
+            self.validate_key(self.found_key, init=True)
         self.set_ws()
-        self.validate_key(self.found_key, init=True)
         
     def set_ui(self):
-        self.header.setText(self.header_text)
-        self.subheader.setText(self.subheader_text)
         self.header.setAlignment(Qt.AlignCenter)
         self.subheader.setAlignment(Qt.AlignCenter)
         self.okBtn.setIcon(QIcon(os.path.join("Images", "icon", "check.svg")))
     
     def set_signals(self):
+        self.skipBtn.clicked.connect(self.skip)
         self.closeWindowBtn.clicked.connect(self.close)
         self.okBtn.clicked.connect(lambda: self.validate_key(self.keyInput.text()))
         self.keyInput.textEdited.connect(self.text_changed)
@@ -57,30 +58,36 @@ class LisansDialog(QDialog):
             self.keyInput.setStyleSheet("background-color: rgba(245, 102, 66, 175);")
             self.okBtn.setStyleSheet("background-color: rgba(245, 102, 66, 175);")
             return
-
-        response = client.validate_licence_key(key)
+        
+        response = client.validate_licence_key(key=key)
         status_code = response["Status-Code"]
         print(f"[LOG] Response: {response}")
 
         if status_code == 900:
-            print("[VERIFIED] Licence key is valid.")
+            print("[LICENCE] Verified.")
+            self.code = 1
             self.write_key(key)
             QTimer.singleShot(0, lambda: self.done(1))
             return
             
         elif status_code == 901:
-            print("[VERIFIED] Licence key is valid and activated.")
-            self.write_key(key)
-            QTimer.singleShot(0, lambda: self.done(1))
-            return
+            print("[LICENCE] Invalid serial number.")
+            self.header_text = "Çok fazla cihaz"
+            self.subheader_text = "Girdiğiniz lisansı izin verdiğinden fazla cihazda kullanamazsınız."
+            self.write_key('')
             
         elif status_code == 910:
-            print("[EXPIRED] Licence key is expired.")
-            
-        elif status_code == 920:
-            print("[INVALID] Invalid key.")
+            print("[LICENCE] Expired.")
+            self.write_key('')
             self.header_text = "Kelebek lisans geçersiz"
-            self.subheader_text = "Cihazınızda bulunan Kelebek lisansı doğrulayamıyoruz."
+            self.subheader_text = "Girdiğiniz lisansın süresi dolmuş."
+
+        elif status_code == 904:
+            print(4)
+            print("[LICENCE] Invalid.")
+            self.write_key('')
+            self.header_text = "Kelebek lisans geçersiz"
+            self.subheader_text = "Cihazınızda bulunan Kelebek lisans geçersiz."
 
         elif status_code == 1000:
             print(f"[VALIDATION] Network error. Status code: {status_code}")
@@ -92,13 +99,19 @@ class LisansDialog(QDialog):
             self.header_text = "Kelebek lisans doğrulanamadı"
             self.subheader_text = "Lütfen internet bağlantınızı kontrol edin."
         
+        self.header.setText(self.header_text)
+        self.subheader.setText(self.subheader_text)
         self.keyInput.setStyleSheet("background-color: rgba(245, 102, 66, 175);")
         self.okBtn.setStyleSheet("background-color: rgba(245, 102, 66, 175);")
         
     def set_ws(self):
         self.setWindowFlag(Qt.FramelessWindowHint)
-        self.show()
+        self.exec_()
         
     def write_key(self, key: str):
         with open(".env", "w", encoding="utf-8") as file:
             file.write(f"LICENCE_KEY={key}\nSERVER_IP=http://185.87.252.226")
+            
+    def skip(self):
+        self.code = -1
+        self.close()
