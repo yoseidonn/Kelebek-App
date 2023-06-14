@@ -16,8 +16,7 @@ import os, sys, datetime
 
 #os.environ['QT_DEBUG_PLUGINS']='1'
 #os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--enable-gpu-command-logging"
-LAST_DATE = (2023, 4, 28, 13, 20) # Year month day hour minute
-CHECK_DATE = 0
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -33,10 +32,12 @@ class MainWindow(QMainWindow):
 
     def check_licence(self):
         key = os.getenv("LICENCE_KEY")
+        end_date = os.getenv("END_DATE")
         key = 'BLANK' if not key else key
-        print(f"[VALIDATION] Found local key: {key}")
+        end_date = 'BLANK' if not end_date else end_date
+        print(f"[LICENCE] Found saved key: {key}\t Ending date: {end_date}")
         h1, h2 = "Kelebek lisansı bulunamadı", "Eğer sahipseniz anahtarınızı girin ya da yeni bir anahtar alın."
-        dialog = licence_dialogs.LisansDialog(header_text=h1, subheader_text=h2, found_key=key)
+        dialog = licence_dialogs.LisansDialog(header_text=h1, subheader_text=h2, found_key=key, found_date=end_date)
 
         print(dialog.code)
         if not dialog.code:

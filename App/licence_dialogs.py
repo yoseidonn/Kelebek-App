@@ -3,23 +3,36 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.uic import loadUi
-import os, sys, time
+import os, sys, datetime
 from Client import client
 
 
 class LisansDialog(QDialog):
-    def __init__(self, header_text: str, subheader_text: str, found_key: str) -> None:
+    def __init__(self, header_text: str, subheader_text: str, found_key: str, found_date: str) -> None:
         super().__init__()
         loadUi(os.path.join("Forms", "lisans_dialog.ui"), self)
         self.header_text = header_text
         self.subheader_text = subheader_text
         self.found_key = found_key
+        self.found_date = found_date
         self.code = 0
         
         self.set_ui()
         self.set_signals()
-        if self.found_key != "BLANK":
-            self.validate_key(self.found_key, init=True)
+        if self.found_date != "BLANK":
+            year, month, day = [int(i) for i in self.found_date.split("-")]
+            end_date = datetime.datetime(year, month, day)
+            now = datetime.datetime.now()
+            if end_date < now:
+                self.header_text = "Kelebek lisans geçersiz"
+                self.subheader_text = "Girdiğiniz lisansın süresi dolmuş."
+                self.header.setText(self.header_text)
+                self.subheader.setText(self.subheader_text)
+            else:
+                print("[LOG] Date is not over. Verified.")
+                self.code = 1
+                QTimer.singleShot(0, lambda: self.done(1))
+
         self.set_ws()
         
     def set_ui(self):
@@ -61,12 +74,13 @@ class LisansDialog(QDialog):
         
         response = client.validate_licence_key(key=key)
         status_code = response["Status-Code"]
+        end_date = response["End-Date"]
         print(f"[LOG] Response: {response}")
 
         if status_code == 900:
             print("[LICENCE] Verified.")
             self.code = 1
-            self.write_key(key)
+            self.write_key_date(key, end_date)
             QTimer.singleShot(0, lambda: self.done(1))
             return
             
@@ -74,7 +88,6 @@ class LisansDialog(QDialog):
             print("[LICENCE] Invalid serial number.")
             self.header_text = "Çok fazla cihaz"
             self.subheader_text = "Girdiğiniz lisansı izin verdiğinden fazla cihazda kullanamazsınız."
-            self.write_key('')
             
         elif status_code == 910:
             print("[LICENCE] Expired.")
@@ -83,9 +96,7 @@ class LisansDialog(QDialog):
             self.subheader_text = "Girdiğiniz lisansın süresi dolmuş."
 
         elif status_code == 904:
-            print(4)
             print("[LICENCE] Invalid.")
-            self.write_key('')
             self.header_text = "Kelebek lisans geçersiz"
             self.subheader_text = "Cihazınızda bulunan Kelebek lisans geçersiz."
 
@@ -108,10 +119,10 @@ class LisansDialog(QDialog):
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.exec_()
         
-    def write_key(self, key: str):
+    def write_key_date(self, key: str, end_date: str):
         with open(".env", "w", encoding="utf-8") as file:
-            file.write(f"LICENCE_KEY={key}\nSERVER_IP=http://185.87.252.226")
+            file.write(f"LICENCE_KEY={key}\nEND_DATE={end_date}\nSERVER_IP=http://185.87.252.226")
             
     def skip(self):
         self.code = -1
-        self.close()
+        QTimer.singleShot(0, lambda: self.done(1))
