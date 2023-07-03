@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import os, sys, functools
 
+BASE_DIR = os.environ["BASE_DIR"]
 # CONSTANTS
 SOL = "Solda"
 SAG = "Sağda"
@@ -212,7 +213,7 @@ class Desk(QLabel):
                 print()
 
     def set_double(self):
-        self.setStyleSheet(f'border-image: url({os.path.join("Images", "img", "double_student_desk.png")})')
+        self.setStyleSheet(f'border-image: url({os.path.join(BASE_DIR, "Images", "img", "double_student_desk.png")})')
 
     def set_single(self):
-        self.setStyleSheet(f'border-image: url({os.path.join("Images", "img", "single_student_desk.png")})')
+        self.setStyleSheet(f'border-image: url({os.path.join(BASE_DIR, "Images", "img", "single_student_desk.png")})')

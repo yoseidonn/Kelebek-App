@@ -1,6 +1,67 @@
-import requests, json
-import os, sys, dotenv
+import requests, json, datetime
+import os, sys, dotenv, platform, pyudev, subprocess
+from App import logs
+from App.logs import logger
+
 dotenv.load_dotenv()
+BASE_DIR = os.environ["BASE_DIR"]
+#SERVER = os.getenv("SERVER_IP")
+SERVER = "http://localhost:8000/rest_api/validate/"
+
+def get_disk_serial_number():
+    system = platform.system()
+    if system == 'Windows':
+        return get_disk_serial_number_windows()
+    elif system == 'Linux':
+        return get_disk_serial_number_linux()
+    elif system == 'Darwin':
+        return get_disk_serial_number_mac()
+    else:
+        return None
+
+def get_disk_serial_number_windows():
+    command = 'wmic diskdrive get serialnumber'
+    output = subprocess.check_output(command, shell=True, text=True)
+    serial_numbers = [line.strip() for line in output.split('\n') if line.strip()]
+    return serial_numbers[1] if len(serial_numbers) > 1 else None
+
+def get_disk_serial_number_linux():
+    context = pyudev.Context()
+    for device in context.list_devices(subsystem='block'):
+        if device.device_type == 'disk':
+            try:
+                serial_number = device.get('ID_SERIAL_SHORT')
+                if serial_number:
+                    return serial_number
+            except Exception as e:
+                logger.error(str(e))
+    return None
+
+def get_disk_serial_number_mac():
+    # Add macOS-specific method to retrieve disk serial number here
+    return None
+        
+def validate_licence_key(key: str = "BLANK"):
+    try:
+        dsn = get_disk_serial_number()
+    except Exception as e:
+        logger.error(str(e))
+            
+    url = SERVER + f"{dsn}/{key}"
+    print(url)
+    try:
+        response = requests.get(url)
+        content = response.content.decode()
+
+        data = json.loads(content)
+        return data
+    
+    except Exception as e:
+        logger.error(str(e))
+                
+        data = {"Status-Code": 1000, "Error-Message": str(e)}
+        return data
+
 
 """
 CODES:
@@ -14,165 +75,17 @@ CODES:
 801 Error occured while registering key
 
 900 Licence verified
+901 Wrong UUID to licence
+904 Error occured
+
 910 Licence has expired
+911 Licence key is used in another computer
 920 Invalid licence
 
 1000 Network error
 1001 No internet
 """
 
-#SERVER = os.getenv("SERVER_IP")
-SERVER = "http://localhost:5000/"
-
-# Development functions
-def create_key_tables():
-    headers = {"Content-Type": "application/json"}
-
-    response = requests.get(SERVER+"/create_key_tables", headers=headers)
-    if response.status_code == 200:  # 200 - Basarili durum kodu
-        response_json = response.json()
-        return response_json
-
-    else: # Ağ hatası, Durum kodu geri dondurulur
-        return {"Status-Code": response.status_code}
-
-def drop_key_tables():
-    headers = {"Content-Type": "application/json"}
-    
-    response = requests.get(SERVER+"/drop_key_tables", headers=headers)
-    if response.status_code == 200:  # 200 - Basarili durum kodu
-        response_json = response.json()
-        return response_json
-
-    else: # Ağ hatası, Durum kodu geri dondurulur
-        return {"Status-Code": response.status_code}
-
-def get_activated_keys():
-    headers = {"Content-Type": "application/json"}
-    
-    response = requests.get(SERVER+"/get_activated_keys", headers=headers)
-    if response.status_code == 200:  # 200 - Basarili durum kodu
-        response_json = response.json()
-        return response_json
-
-    else: # Ağ hatası, Durum kodu geri dondurulur
-        return {"Status-Code": response.status_code}
-
-def get_registered_keys():
-    headers = {"Content-Type": "application/json"}
-    
-    response = requests.get(SERVER+"/get_registered_keys", headers=headers)
-    if response.status_code == 200:  # 200 - Basarili durum kodu
-        response_json = response.json()
-        return response_json
-
-    else: # Ağ hatası, Durum kodu geri dondurulur
-        return json.dumps({"Status-Code": response.status_code})
-    
-#######################################################################
-
-def activate_licence_key(key: str):
-    headers = {"Content-Type": "application/json"}
-    data = json.dumps({"Key": key})
-    
-    response = requests.get(SERVER+"/activate_licence_key", headers=headers, data=data)
-    if response.status_code == 200:  # 200 - Basarili durum kodu
-        response_json = response.json()
-        return response_json
-
-    else: # Ağ hatası, Durum kodu geri dondurulur
-        return json.dumps({"Status-Code": response.status_code})
-
-def register_new_licence_key_and_get(licence_duration: str) -> str:
-    """
-    Key seller api will use this to create a new key and send it to customer
-    """
-    headers = {"Content-Type": "application/json"}
-    data = json.dumps({"Licence-Duration": licence_duration})
-    
-    response = requests.get(SERVER+"/register_new_licence_key_and_get", headers=headers, data=data)
-    if response.status_code == 200:  # 200 - Basarili durum kodu
-        response_json = response.json()
-        return response_json
-
-    else: # Ağ hatası, Durum kodu geri dondurulur
-        return json.dumps({"Status-Code": response.status_code})
-
-def validate_licence_key(licence_key: str):
-    """
-    Desktop application will use this to validate user's licence key
-    """
-    headers = {"Content-Type": "application/json"}
-    data = json.dumps({"Key": licence_key})
-
-    try:
-        response = requests.get(SERVER+"/validate_licence_key", headers=headers, data=data)
-    except Exception as e:
-        return {"Status-Code": 1000, "Error-Message": e}
-    
-    if response.status_code == 200:  # 200 - Basarili durum kodu
-        response_json = response.json()
-        return response_json
-    
-    else: #  Ağ hatası, Durum kodu geri dondurulur
-        return json.dumps({"Status-Code": response.status_code})
-    
-
 if __name__ == "__main__":
-    text = """Bir işlem seçin:
-    a - Tabloları oluştur
-    b - Tabloları sil
-    c - Aktif   anahtarları getir
-    d - Kayıtlı anahtarları getir
-    
-    1 - Anahtar kayıtla ve al
-    2 - Anahtar aktifleştir
-    3 - Anahtar doğrula
-    
-    q - Çıkış
-    -> """
-    while True:
-        islem = input(text)
-        print()
-
-        if islem == "q":
-            break
-        
-        elif islem == "a":
-            response = create_key_tables()
-            print(f"[LOG] {response}\n")
-
-        elif islem == "b":
-            response = drop_key_tables()
-            print(f"[LOG] {response}\n")
-        
-        elif islem == "c":
-            response = get_activated_keys()
-            print(f"[LOG] {response}\n")
-        
-        elif islem == "d":
-            response = get_registered_keys()
-            print(f"[LOG] {response}\n")
-        
-        #######################################
-        
-        elif islem == "1":
-            licence_duration = input("Enter the duration for your key (months): ")
-            response = register_new_licence_key_and_get(licence_duration)
-            print(f"[LOG] {response}\n")
-        
-        elif islem == "2":
-            key = input("Enter the key you want to activate: ")
-            response = activate_licence_key(key)
-            print(f"[LOG] {response}\n")
-
-        elif islem == "3":
-            print(f"[LOG] {response}\n")
-            key = input("Enter the key you want to validate: ")
-            response = validate_licence_key(key)
-            print(f"[LOG] {response}\n")
-            
-        else:
-            print("Invalid operation...")
-            
-    print("[LOG] Çıkış yapılıyor.")
+    data = validate_licence_key(uuid=get_disk_serial_number(),key="1234-5678-9012-3456")
+    print(data)

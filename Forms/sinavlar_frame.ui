@@ -44,17 +44,17 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
-      <item>
-       <widget class="QFrame" name="leftofleftFrame">
+      <item alignment="Qt::AlignLeft">
+       <widget class="QFrame" name="examsFrame">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <property name="spacing">
-          <number>0</number>
+          <number>10</number>
          </property>
          <property name="leftMargin">
           <number>0</number>
@@ -69,9 +69,9 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QToolBox" name="toolbox">
+          <widget class="QToolBox" name="examsToolBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -85,7 +85,7 @@
               <x>0</x>
               <y>0</y>
               <width>375</width>
-              <height>460</height>
+              <height>452</height>
              </rect>
             </property>
             <attribute name="label">
@@ -108,7 +108,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QListWidget" name="examsList"/>
+              <widget class="QListWidget" name="activeList"/>
              </item>
             </layout>
            </widget>
@@ -117,8 +117,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>375</width>
-              <height>460</height>
+              <width>343</width>
+              <height>452</height>
              </rect>
             </property>
             <attribute name="label">
@@ -145,33 +145,6 @@
              </item>
             </layout>
            </widget>
-          </widget>
-         </item>
-         <item>
-          <widget class="QFrame" name="examsListFrame">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-           </layout>
           </widget>
          </item>
          <item>
@@ -221,20 +194,17 @@
         </layout>
        </widget>
       </item>
-      <item>
-       <widget class="QGroupBox" name="filesGroupBox">
+      <item alignment="Qt::AlignLeft">
+       <widget class="QFrame" name="contentFrame">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="title">
-         <string>İçerik</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <layout class="QVBoxLayout" name="contentLayout">
          <property name="spacing">
-          <number>0</number>
+          <number>10</number>
          </property>
          <property name="leftMargin">
           <number>0</number>
@@ -249,22 +219,106 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QListWidget" name="filesList">
-           <property name="maximumSize">
-            <size>
-             <width>150</width>
-             <height>16777215</height>
-            </size>
+          <widget class="QToolBox" name="filesToolBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
+           <widget class="QWidget" name="classroomTab">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>256</width>
+              <height>454</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>Salon oturma düzeni ön izlemeleri</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QListWidget" name="classroomList">
+               <property name="maximumSize">
+                <size>
+                 <width>16000</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="gradeTab">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>256</width>
+              <height>454</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>Sınıf listesi ön izlemeleri</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QListWidget" name="gradeList">
+               <property name="maximumSize">
+                <size>
+                 <width>160000</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="downloadBtn">
+          <widget class="QPushButton" name="downloadsBtn">
            <property name="enabled">
             <bool>true</bool>
            </property>
            <property name="text">
-            <string>Dosyayı indir</string>
+            <string>İndirme seçenekleri</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources.qrc">
+             <normaloff>:/Images/Images/icon/download.svg</normaloff>:/Images/Images/icon/download.svg</iconset>
            </property>
           </widget>
          </item>
@@ -299,7 +353,7 @@
        <number>0</number>
       </property>
       <item alignment="Qt::AlignLeft|Qt::AlignTop">
-       <widget class="QFrame" name="labelFrame">
+       <widget class="QFrame" name="titleFrame">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>

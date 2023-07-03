@@ -6,23 +6,25 @@ from PyQt5.uic import loadUi
 from PyQt5.QtTest import QTest
 
 from Client import client
-from .HtmlCreater import classrooms_html, students_html
-from . import excel_reader, database, licence_dialogs
+from .HtmlCreater import classrooms_html, grades_html
+from . import excel_reader, database, licence_dialogs, logs
+from .logs import logger
 
 from dotenv import load_dotenv
+load_dotenv()
 from pathlib import Path
-import os, sys, datetime
+import os, sys, datetime, logging
 
 #os.environ['QT_DEBUG_PLUGINS']='1'
 #os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--enable-gpu-command-logging"
-LAST_DATE = (2023, 4, 28, 13, 20) # Year month day hour minute
-CHECK_DATE = 0
+BASE_DIR = os.environ["BASE_DIR"]
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        loadUi(os.path.join("Forms", "mainwindow.ui"), self)
-            
+        loadUi(os.path.join(BASE_DIR, "Forms", "mainwindow.ui"), self)
+        self.licenced = False
+
         self.check_licence()
         self.set_signs()
         self.set_menu_bar()
@@ -30,48 +32,126 @@ class MainWindow(QMainWindow):
         self.sws()
 
     def check_licence(self):
-        self.licenceText.setText("Lisans dogrulama basarisiz.")
+        key = os.getenv("LICENCE_KEY")
+        end_date = os.getenv("END_DATE")
+        skip_date = os.getenv("SKIP_DATE")
+
+        key = 'BLANK' if not key else key
+        end_date = 'BLANK' if not end_date else end_date
+        skip_date = 'BLANK' if not skip_date else skip_date
         
-        key = self.get_licence_key()
-        print(f"[VALIDATION] Found local key: {key}")
+        logger.info(f"[LICENCE] Saved key: {key}\t Ending date: {end_date}\t Skip date: {skip_date}")
+        result = self.validate_env_vars(key, end_date, skip_date)
+        logger.info(result)
 
         h1, h2 = "Kelebek lisansı bulunamadı", "Eğer sahipseniz anahtarınızı girin ya da yeni bir anahtar alın."
-        dialog = licence_dialogs.LisansDialog(header_text=h1, subheader_text=h2, found_key=key)
-        if not dialog.exec():
-            print("[LOG] Validation refused. Exiting the application.")
-            exit()
-        print("[LOG] Validation succeed. Starting the application.")
+
+        # Bozuk .env DOSYASI
+        if result == -1:
+            with open(".env", "w", encoding="utf-8") as file:
+                file.write(f"LICENCE_KEY=\nEND_DATE=\nSKIP_DATE=\nSERVER_IP=http://185.87.252.226")
+                
+        # Daha önce geçilmiş
+        elif result == 0:
+            year, month, day = [int(i) for i in skip_date.split("-")]
+            skip_date = datetime.datetime(year, month, day)
+            two_days_later = skip_date + datetime.timedelta(days=2)
+            now = datetime.datetime.now()
+            if two_days_later > now:
+                # İki gün geçmemiş, doğrulamayı atla
+                logger.info("It's not been too much after last validation skip.")
+                return
+            else:
+                # İki gün geçmiş, tekrar doğrulama iste
+                logger.info("It's been two days after last validation skip.")
+                with open(".env", "w", encoding="utf-8") as file:
+                    file.write(f"LICENCE_KEY=\nEND_DATE=\nSKIP_DATE=\nSERVER_IP=http://185.87.252.226")    
+            
+        # Hiç giriş yapılmamış
+        elif result == 1:
+            pass
         
-    def get_licence_key(self):
-        load_dotenv()
-        key = os.getenv("LICENCE_KEY")
-        return key
+        # Daha önce giriş yapılmış
+        elif result == 2:
+            year, month, day = [int(i) for i in self.found_date.split("-")]
+            end_date = datetime.datetime(year, month, day)
+            now = datetime.datetime.now()
+            if end_date < now:
+                h1 = "Kelebek lisans geçersiz"
+                h2 = "Girdiğiniz lisansın süresi dolmuş."
+            else:
+                logger.info("Date is not over. Verified.")
+                self.enable_licence_features()
+                return
+            
+        dialog = licence_dialogs.LisansDialog(header_text=h1, subheader_text=h2, found_key=key, found_date=end_date)
+
+        if not dialog.code:
+            logger.info("Validation refused. Exiting the application.")
+            exit()
+            
+        elif dialog.code == 1:
+            self.enable_licence_features()
+            logger.info("Validation succeed. Starting the application.")
+            
+        elif dialog.code == -1:
+            logger.info("Skipping licence validation. Starting the application.")
+    
+    def validate_env_vars(self, key, end_date, skip_date):
+        is_key = key != "BLANK"
+        is_end_date = end_date != "BLANK"
+        is_skip_date = skip_date != "BLANK"
+        isses = [is_key, is_end_date, is_skip_date]
+
+        # BOZULMUŞ .env DOSYASI
+        if all(isses):
+            return -1
+        elif not is_key and is_end_date:
+            return -1
+        elif is_key and not is_end_date:
+            return -1
+
+        # NORMAL DURUMLAR        
+        elif not is_key and not is_end_date and is_skip_date:
+            # Daha önce geçilmiş
+            return 0
+        elif not is_key and not is_end_date:
+            # Daha önce hiç giriş yapılmamış
+            return 1
+        elif is_key and is_end_date:
+            # Daha önce giriş yapılmış
+            return 2
+        
+        
+    def enable_licence_features(self):
+        # TODO MAKE A LOGIC TO ENABLE SOME CONSTANT VALUES WHICH ARE ENABLING SPESIFIC FEATURES
+        self.licenced = True
     
     def set_menu_bar(self):
-        self.reset_all.setIcon(QIcon(os.path.join("Images", "icon", "trash-2.svg")))
+        self.reset_all.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "trash-2.svg")))
         
     def set_signs(self):
         """
         Sets the signals, buttons or etc. which has relationship between them.
         """
         # OKUL BILGILERI
-        actSchool = QAction(QIcon(os.path.join("Images","img", "school.png")), "Okul bilgileri", self)
+        actSchool = QAction(QIcon(os.path.join(BASE_DIR, "Images","img", "school.png")), "Okul bilgileri", self)
         actSchool.triggered.connect(self.okul_frame)
         self.toolBar.addAction(actSchool)
         # OGRENCILER
-        actOgrenciler = QAction(QIcon(os.path.join("Images","img", "student.png")), "Öğrenciler", self)
+        actOgrenciler = QAction(QIcon(os.path.join(BASE_DIR, "Images","img", "student.png")), "Öğrenciler", self)
         actOgrenciler.triggered.connect(self.ogrenciler_frame)
         self.toolBar.addAction(actOgrenciler)
         # SALONLAR
-        actSalonlar = QAction(QIcon(os.path.join("Images","img", "classroom.png")), "Salonlar", self)
+        actSalonlar = QAction(QIcon(os.path.join(BASE_DIR, "Images","img", "classroom.png")), "Salonlar", self)
         actSalonlar.triggered.connect(self.salonlar_frame)
         self.toolBar.addAction(actSalonlar)
         # SINAV OLUŞTUR
-        actNewExam = QAction(QIcon(os.path.join("Images","img", "test.png")), "Yeni sınav oluştur", self)
+        actNewExam = QAction(QIcon(os.path.join(BASE_DIR, "Images","img", "test.png")), "Yeni sınav oluştur", self)
         actNewExam.triggered.connect(self.yeni_sinav_frame)
         self.toolBar.addAction(actNewExam)
         # ÇIKTILAR
-        actShowExams = QAction(QIcon(os.path.join("Images", "icon", "list.svg")), "Sınavları göster", self)
+        actShowExams = QAction(QIcon(os.path.join(BASE_DIR, "Images", "icon", "list.svg")), "Sınavları göster", self)
         actShowExams.triggered.connect(self.sinavlar_frame)
         self.toolBar.addAction(actShowExams)
         # GOZETMEN
@@ -167,36 +247,17 @@ class MainWindow(QMainWindow):
         """
         Adjust the window settings
         """
-        self.setWindowTitle("Kelebek sistemi")
-        self.setWindowIcon(QIcon(os.path.join("Images", "img", "butterfly.png")))
+        if self.licenced:
+            self.setWindowTitle("Kelebek sistemi")
+        else:
+            self.setWindowTitle("Kelebek Sistemi - Lisanslanmamış") 
+        self.setWindowIcon(QIcon(os.path.join(BASE_DIR, "Images", "img", "butterfly.png")))
         self.show()
-
-class DateIsOverDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        loadUi(os.path.join("Forms", "date_is_over_dialog.ui"), self)
-
-        self.exitBtn.clicked.connect(self.close)
-        self.textBrowser.setReadOnly(True)
-
-        self.exec_()
-
-
-class NoInternetDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        loadUi(os.path.join("Forms", "no_internet_dialog.ui"), self)
-
-        self.exitBtn.clicked.connect(self.close)
-        self.textBrowser.setReadOnly(True)
-        
-        self.exec_()
-
 
 class OkulBilgileriFrame(QFrame):
     def __init__(self):
         super().__init__()
-        loadUi(os.path.join("Forms", "okul_bilgileri_frame.ui"), self)
+        loadUi(os.path.join(BASE_DIR, "Forms", "okul_bilgileri_frame.ui"), self)
 
         self.set_signals()
         self.set_ui()
@@ -295,7 +356,6 @@ class OkulBilgileriFrame(QFrame):
         
     def draw_table(self):
         infos = database.get_table_infos()
-        #gradeCounts, studentCounts, classroomCounts = infos
                 
         for rowIndex in range(len(infos)):
             values = infos[rowIndex].split(",")
@@ -322,7 +382,7 @@ class OkulBilgileriFrame(QFrame):
 class OgrencilerFrame(QFrame):
     def __init__(self):
         super().__init__()    
-        loadUi(os.path.join("Forms", "ogrenciler_frame.ui"), self)
+        loadUi(os.path.join(BASE_DIR, "Forms", "ogrenciler_frame.ui"), self)
         
         self.ogrencilerList = database.get_all_students()
 
@@ -363,8 +423,6 @@ class OgrencilerFrame(QFrame):
         elif sectionIndex == 4:
             self.draw_table(order=True, sectionIndex=sectionIndex)
             
-        print("sort")
-
     def draw_table(self, searchBy = False, order = False, sectionIndex = 0):
         BY_NO = "Numaraya göre"
         BY_FULLNAME = "Tam ada göre"
@@ -497,7 +555,7 @@ class OgrencilerFrame(QFrame):
 class EkleDuzenleDialog(QDialog):
     def __init__(self, ogrenci = False):
         super().__init__()
-        loadUi(os.path.join("Forms", "ekle_duzenle_dialog.ui"), self)
+        loadUi(os.path.join(BASE_DIR, "Forms", "ekle_duzenle_dialog.ui"), self)
         self.lineEditItems = [self.noIn, self.nameIn, self.surnameIn]
         self.comboBoxItems = [self.gradeCombo, self.classCombo]
         self.student = ogrenci
@@ -562,7 +620,7 @@ class EkleDuzenleDialog(QDialog):
 class OgrencilerSilmeOnayDialog(QDialog):
     def __init__(self):
         super().__init__()
-        loadUi(os.path.join("Forms", "ogrenciler_silme_onay_dialog.ui"), self)
+        loadUi(os.path.join(BASE_DIR, "Forms", "ogrenciler_silme_onay_dialog.ui"), self)
         self.checkk()
 
         self.okayButton.clicked.connect(self.closee)
@@ -591,7 +649,7 @@ class OgrencilerSilmeOnayDialog(QDialog):
 class SalonlarFrame(QFrame):
     def __init__(self):
         super().__init__()
-        loadUi(os.path.join("Forms", "salonlar_frame.ui"), self)
+        loadUi(os.path.join(BASE_DIR, "Forms", "salonlar_frame.ui"), self)
         from .Structs.classroom_struct import ClassroomStruct
         buttons = [self.addColumn, self.removeColumn, self.addRow, self.removeRow]
         self.Classroom = ClassroomStruct(self.grid, self.ogretmenSolFrame, self.ogretmenSagFrame, self.kacliCombo, self.yonCombo, buttons = buttons)
@@ -605,14 +663,14 @@ class SalonlarFrame(QFrame):
         self.draw_list()
 
     def set_ui(self):
-        self.solGraphic.setStyleSheet(f"border-image: url(./{os.path.join('Images','img', 'teacher_desk.png')})")
-        self.sagGraphic.setStyleSheet(f"border-image: url(./{os.path.join('Images','img', 'teacher_desk.png')})")
-        self.cancelButton.setIcon(QIcon(os.path.join('Images','icon', 'x.svg')))
+        self.solGraphic.setStyleSheet(f"border-image: url({os.path.join(BASE_DIR, 'Images','img', 'teacher_desk.png')})")
+        self.sagGraphic.setStyleSheet(f"border-image: url({os.path.join(BASE_DIR, 'Images','img', 'teacher_desk.png')})")
+        self.cancelButton.setIcon(QIcon(os.path.join(BASE_DIR, 'Images','icon', 'x.svg')))
 
-        self.addColumn.setIcon(QIcon(os.path.join("Images", "icon", "plus.svg")))
-        self.addRow.setIcon(QIcon(os.path.join("Images", "icon", "plus.svg")))
-        self.removeColumn.setIcon(QIcon(os.path.join("Images", "icon", "minus.svg")))
-        self.removeRow.setIcon(QIcon(os.path.join("Images", "icon", "minus.svg")))
+        self.addColumn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "plus.svg")))
+        self.addRow.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "plus.svg")))
+        self.removeColumn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "minus.svg")))
+        self.removeRow.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "minus.svg")))
         [button.setVisible(False) for button in self.buttons if button is not self.addButton]
         self.salonNameIn.setPlaceholderText("Salon adı")
 
@@ -630,22 +688,6 @@ class SalonlarFrame(QFrame):
         self.removeName = classroomName
 
     def add_button_clicked(self):
-        """# Salonu ekle
-        salonAdi = self.salonNameIn.text().strip().upper()
-        ogretmenY = self.yonCombo.currentText()
-        kacli = self.kacliCombo.currentText()
-        duzen = ",".join([str(column.deskCount) for column in self.Classroom.columns])
-        database.remove_classroom(classroomName = self.removeName)
-
-        database.add_new_classroom(salonAdi, ogretmenY, kacli, duzen)
-
-        # Ana haline döndür
-        self.cancel_button_clicked()
-
-        # Listeyi bir daha çiz
-        self.classrooms = database.get_all_classrooms()
-        self.classroomNames = database.get_all_classrooms(onlyNames = True)
-        self.draw_list()"""
         self.save_button_clicked(add = True)
         
     def save_button_clicked(self, add = False):
@@ -688,14 +730,11 @@ class SalonlarFrame(QFrame):
         self.addButton.setVisible(False)
 
         name, teacherd, hspd, layout = values
-        print(values)
         self.salonNameIn.setText(name)
         self.Classroom.set_layout(layout)
         self.yonCombo.setCurrentText(teacherd)
         self.kacliCombo.setCurrentText(hspd)
-        print("drawed")
-        print()
-
+        
     def draw_list(self):
         self.classroomList.clear()
         self.classroomList.addItems(self.classroomNames)
@@ -707,22 +746,23 @@ class YeniSinavFrame(QFrame):
         
     def __init__(self):
         super().__init__()
-        loadUi(os.path.join("Forms", "yeni_sinav_frame.ui"), self)
+        loadUi(os.path.join(BASE_DIR, "Forms", "yeni_sinav_frame.ui"), self)
         from .Structs.exam_struct import ExamStruct
-        self.ExamStruct = ExamStruct(examTable = self.examTable,
-                                    gradeList = self.gradeList,
-                                    classroomList = self.classroomList,
-                                    inputPlace = self.examNameIn,
-                                    addButton = self.addButton,
-                                    removeButton = self.removeButton,
-                                    removeAllButton = self.removeAllButton,
-                                    sidebyside_sitting = self.sidebyside_sitting,
-                                    backtoback_sitting = self.backtoback_sitting,
-                                    crossbycross_sitting = self.crossbycross_sitting,
-                                    kizErkek = self.kizErkek,
-                                    ogretmenMasasi = self.ogretmenMasasi,
-                                    createButton = self.createButton,
-                                    sinavFrame = self)
+        self.ExamStruct = ExamStruct(
+            examTable = self.examTable,
+            gradeList = self.gradeList,
+            classroomList = self.classroomList,
+            inputPlace = self.examNameIn,
+            addButton = self.addButton,
+            removeButton = self.removeButton,
+            removeAllButton = self.removeAllButton,
+            sidebyside_sitting = self.sidebyside_sitting,
+            backtoback_sitting = self.backtoback_sitting,
+            crossbycross_sitting = self.crossbycross_sitting,
+            kizErkek = self.kizErkek,
+            ogretmenMasasi = self.ogretmenMasasi,
+            createButton = self.createButton,
+            sinavFrame = self)
 
         self.isStarted = False
 
@@ -753,7 +793,7 @@ class YeniSinavFrame(QFrame):
         self.kacinciYazili = self.doneminKacinciCombo.currentText().upper()
         self.tarih = tarih
         self.kacinciDers = self.dersSaatiCombo.currentText().upper()
-        self.examInfos = [self.egitimOgretimYili, self.donem, self.kacinciYazili, self.tarih, self.kacinciDers, self.masterExamName]
+        self.examInfos = [self.egitimOgretimYili.strip(), self.donem.strip(), self.kacinciYazili.strip(), self.tarih.strip(), self.kacinciDers.strip(), self.masterExamName.strip()]
         self.ExamStruct.examInfos = self.examInfos
         self.upperOfExamInfos.setVisible(False)
         self.mainFrame.setVisible(True)
@@ -774,13 +814,15 @@ class YeniSinavFrame(QFrame):
 class SinavlarFrame(QFrame):
     def __init__(self):
         super().__init__()
-        loadUi(os.path.join("Forms", "sinavlar_frame.ui"), self)
-        from .Structs.display_struct import Display
+        loadUi(os.path.join(BASE_DIR, "Forms", "sinavlar_frame.ui"), self)
+        from .Structs.display_struct_beta import Display
         
-        buttons = [self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.menuBtn, self.downloadBtn]
+        buttons = [self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.menuBtn, self.downloadsBtn]
         
         self.set_ui()
-        self.Display = Display(toolbox = self.toolbox, examsList = self.examsList, archiveList = self.archiveList, filesList = self.filesList, webEngineView = self.wev, displayTitle = self.displayTitle, buttons = buttons, buttonsFrame = self.buttonsFrame)
+        toolBoxes = [self.examsToolBox, self.filesToolBox]
+        listWidgets = [self.activeList, self.archiveList, self.classroomList, self.gradeList]
+        self.Display = Display(toolBoxes=toolBoxes, listWidgets=listWidgets, webEngineView = self.wev, displayTitle = self.displayTitle, buttons = buttons, buttonsFrame = self.buttonsFrame)
         
     def set_ui(self):
         self.wev = QWebEngineView()
