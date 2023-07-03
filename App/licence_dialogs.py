@@ -5,7 +5,10 @@ from PyQt5.QtGui import *
 from PyQt5.uic import loadUi
 import os, sys, datetime
 from Client import client
+from . import logs
+from .logs import logger
 
+BASE_DIR = os.environ["BASE_DIR"]
 
 class LisansDialog(QDialog):
     def __init__(self, header_text: str, subheader_text: str, found_key: str, found_date: str) -> None:
@@ -19,20 +22,21 @@ class LisansDialog(QDialog):
         
         self.set_ui()
         self.set_signals()
-        if self.found_date != "BLANK":
-            year, month, day = [int(i) for i in self.found_date.split("-")]
-            end_date = datetime.datetime(year, month, day)
-            now = datetime.datetime.now()
-            if end_date < now:
-                self.header_text = "Kelebek lisans geçersiz"
-                self.subheader_text = "Girdiğiniz lisansın süresi dolmuş."
-                self.header.setText(self.header_text)
-                self.subheader.setText(self.subheader_text)
-            else:
-                print("[LOG] Date is not over. Verified.")
-                self.code = 1
-                QTimer.singleShot(0, lambda: self.done(1))
-
+        
+        try:
+            with open(os.path.join(BASE_DIR, "kelebek.conf"), "r", encoding="utf-8") as f:
+                content = f.readline()[:-1]
+                key, value = content.split("=")
+                logger.debug(key, value)
+                if key == "CLEAR_DATE_CACHE" and value == "True":
+                    self.write_key_date(key=self.found_key, end_date="", skip_date="")
+                    os.remove(os.path.join(BASE_DIR, "kelebek.conf"))
+                    logger.info("Clearing date cache")  
+                    self.validate_key(key=self.found_key, init=True)
+                    
+        except Exception as e:
+            logger.info(str(e))
+            
         self.set_ws()
         
     def set_ui(self):
@@ -74,39 +78,39 @@ class LisansDialog(QDialog):
         
         response = client.validate_licence_key(key=key)
         status_code = response["Status-Code"]
-        end_date = response["End-Date"]
-        print(f"[LOG] Response: {response}")
+        if status_code in [900, 901, 910, 904]:
+            end_date = response["End-Date"]
+        logger.debug(f"Response: {response}")
 
         if status_code == 900:
-            print("[LICENCE] Verified.")
+            logger.debug("Verified.")
             self.code = 1
             self.write_key_date(key, end_date)
             QTimer.singleShot(0, lambda: self.done(1))
             return
             
         elif status_code == 901:
-            print("[LICENCE] Invalid serial number.")
+            logger.debug("Invalid serial number.")
             self.header_text = "Çok fazla cihaz"
             self.subheader_text = "Girdiğiniz lisansı izin verdiğinden fazla cihazda kullanamazsınız."
             
         elif status_code == 910:
-            print("[LICENCE] Expired.")
-            self.write_key('')
+            logger.debug("Expired.")
             self.header_text = "Kelebek lisans geçersiz"
             self.subheader_text = "Girdiğiniz lisansın süresi dolmuş."
 
         elif status_code == 904:
-            print("[LICENCE] Invalid.")
+            logger.debug("Invalid.")
             self.header_text = "Kelebek lisans geçersiz"
             self.subheader_text = "Cihazınızda bulunan Kelebek lisans geçersiz."
 
         elif status_code == 1000:
-            print(f"[VALIDATION] Network error. Status code: {status_code}")
+            logger.debug(f"Network error. Status code: {status_code}")
             self.header_text = "Kelebek lisans doğrulanamadı"
             self.subheader_text = "Lütfen internet bağlantınızı kontrol edin."
             
         else:
-            print(f"[ERROR] Unknown error occured. Status code: {status_code}")
+            logger.debug(f"Unknown error occured. Status code: {status_code}")
             self.header_text = "Kelebek lisans doğrulanamadı"
             self.subheader_text = "Lütfen internet bağlantınızı kontrol edin."
         
@@ -119,10 +123,16 @@ class LisansDialog(QDialog):
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.exec_()
         
-    def write_key_date(self, key: str, end_date: str):
-        with open(".env", "w", encoding="utf-8") as file:
-            file.write(f"LICENCE_KEY={key}\nEND_DATE={end_date}\nSERVER_IP=http://185.87.252.226")
+    def write_key_date(self, key: str, end_date: str, skip_date: str):
+        try:
+            with open(".env", "w", encoding="utf-8") as file:
+                file.write(f"LICENCE_KEY={key}\nEND_DATE={end_date}\nSKIP_DATE={skip_date}\nSERVER_IP=http://185.87.252.226")
+        except Exception as e:
+            logger.error(str(e))
             
     def skip(self):
         self.code = -1
+        skip_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        with open(".env", "w", encoding="utf-8") as file:
+            file.write(f"LICENCE_KEY=\nEND_DATE=\nSKIP_DATE={skip_date}\nSERVER_IP=http://185.87.252.226")
         QTimer.singleShot(0, lambda: self.done(1))

@@ -1,5 +1,7 @@
 from App.HtmlCreater import classrooms_html
-from App import database
+from App import database, logs
+from App.logs import logger
+
 import random
 
 class Place:
@@ -9,7 +11,7 @@ class Place:
         self.placeIndex = placeIndex
 
     def infos(self):
-        return (self.columnIndex, self.rowIndex, self.placeIndex)
+        return [self.columnIndex, self.rowIndex, self.placeIndex]
     
 def distribute_students(exams, classroomsToUse, grades, rules):
     # Fetch classrooms from the database
@@ -23,13 +25,8 @@ def distribute_students(exams, classroomsToUse, grades, rules):
     for grade, count in grade_counts.items():
         classroom_counts[grade] = count // len(classroomsToUse)
 
-    # Calculate the remaining students after distributing equally
-    extra_student_counts = {}
-    for grade, count in grade_counts.items():
-        extra_student_counts[grade] = count % len(classroomsToUse)
-
-    for exam in exams:
-        exam_grades = exams[exam]
+    for examName in exams:
+        exam_grades = exams[examName]
         grades = database.get_grade_given_students(exam_grades)
         for gradeName in grades:
             students = grades[gradeName]
@@ -45,7 +42,7 @@ def distribute_students(exams, classroomsToUse, grades, rules):
                         places = get_places(arrangement)
                         print(f"Ogrenci sayisi: {len(students)}")
                         random_index = random.randint(0, len(students)) - 1
-                        student = students[-1]
+                        student = students[random_index]
                         print(student)
                         
                         is_placed = False
@@ -58,7 +55,7 @@ def distribute_students(exams, classroomsToUse, grades, rules):
                                 is_placed = True
                                 teacher_desk_empty = False
 
-                        attempt = 5
+                        attempt = 20
                         while not is_placed and attempt:
                             random.shuffle(places)
                             placeObject = places[-1]
@@ -66,7 +63,8 @@ def distribute_students(exams, classroomsToUse, grades, rules):
                             desk_no = list(arrangement[column_index][row_index].keys())[place_index]
                             place = arrangement[column_index][row_index][desk_no]
                             
-                            if is_place_suitable(arrangement, place, student, rules):
+                            suitable = is_place_suitable(arrangement, place, placeObject, student, rules)
+                            if suitable:
                                 classrooms[classroomName]["oturma_duzeni"][column_index][row_index][desk_no] = student
                                 grade_counts[gradeName] -= 1
                                 students.remove(student)
@@ -89,11 +87,11 @@ def get_places(oturma_duzeni: list) -> list[Place]:
     random.shuffle(places) 
     return places
 
-def is_place_suitable(arrangement: list, place: None or tuple or list, student: tuple or list, rules: list) -> bool:
+def is_place_suitable(arrangement: list, place, placeObject: Place, student: tuple or list, rules: list) -> bool:
     """_summary_
     Args:
         arrangement (list): The list that contains all the column objects
-        place (Noneortupleorlist): The selected place which contains a student or None
+        place (Noneortupleorlist): The selected place object
         student (tupleorlist): The student that needs to be placed into that place which is a list or tuple
         rules (list): [
                         Ayni sinava giren ogrenciler yan yana oturabilir,
@@ -104,16 +102,120 @@ def is_place_suitable(arrangement: list, place: None or tuple or list, student: 
                     ]
 
     Returns:
-        bool: Ogrencinin oturabilir ise True, oturamaz ise False dondurur
+        bool: Ogrenci oturabilir ise True, oturamaz ise False dondurur
     """
-    # Returns False if the place is already taken.
-    
+    return True
     if place:
         return False
     
     # Eger tum kurallar 1 ise, ogretmen masasi kurali haric
     if all(rules[:-1]):
         return True
+    
+    side_by_side, back_to_back, cross_by_cross, different_genders = rules[:-1]
+    current_col, current_row, current_placeindex = placeObject.infos()
+    current_side = "RIGHT" if list(arrangement[current_col][current_row].keys())[current_placeindex] else "LEFT"
+    current_gender, current_grade = student[3], student[4].split("/")[0]
+
+    if not side_by_side:
+        if current_side == "LEFT":
+            try:
+                left_student = list(arrangement[current_col-1][current_row].values())[1]
+                if not left_student:
+                    print(1)
+                    return True
+                left_student_grade = left_student[4].split("/")[0]
+                if current_grade == left_student_grade:
+                    print(2)
+                    return False
+            except Exception as e:
+                print(e)
+        
+        elif current_side == "RIGHT":
+            try:
+                left_student = list(arrangement[current_col][current_row].values())[0]
+                if not left_student:
+                    print(3)
+                    return True
+                left_student_grade = left_student[4].split("/")[0]
+                if current_grade == left_student_grade:
+                    print(4)
+                    return False
+            except Exception as e:
+                print(e)
+            
+    if not back_to_back:
+        if current_side == "LEFT":
+            try:
+                fore_student = list(arrangement[current_col][current_row+1].values())[0]
+                if not fore_student:
+                    print(5)
+                    return True
+                fore_student_grade = fore_student[4].split("/")[0]
+                if current_grade == fore_student_grade:
+                    print(6)
+                    return False
+            except Exception as e:
+                print(e)
+            
+        elif current_side == "RIGHT":
+            try:
+                fore_student = list(arrangement[current_col][current_row+1].values())[1]
+                if not fore_student:
+                    return True
+                fore_student_grade = fore_student[4].split("/")[0]
+                if current_grade == fore_student_grade:
+                    return False
+            except Exception as e:
+                print(e)
+
+    # Capraz 
+    if not cross_by_cross:
+        if current_side == "LEFT":
+            try:
+                fore_left_student = list(arrangement[current_col-1][current_row+1].values())[1]
+                if not fore_left_student:
+                    return True
+                fore_left_student_grade = fore_left_student[4].split("/")[0]
+                if current_grade == fore_left_student_grade:
+                    return False
+            except Exception as e:
+                print(e)
+        
+        elif current_side == "RIGHT":
+            try:
+                fore_left_student = list(arrangement[current_col][current_row+1].values())[1]
+                if not fore_left_student:
+                    return True
+                fore_left_student_grade = fore_left_student[4].split("/")[0]
+                if current_grade == fore_left_student_grade:
+                    return False
+            except Exception as e:
+                print(e)
+        
+    # Cinsiyet
+    if not different_genders:
+        if current_side == "LEFT":
+            try:
+                right_student = list(arrangement[current_col][current_row].values())[1]
+                if not right_student:
+                    return True
+                right_student_gender = right_student[3]
+                if current_gender == right_student_gender:
+                    return False
+            except Exception as e:
+                print(e)
+        
+        elif current_side == "RIGHT":
+            try:
+                left_student = list(arrangement[current_col][current_row+1].values())[0]
+                if not left_student:
+                    return True
+                left_student_gender = left_student[3]
+                if current_gender == left_student_gender:
+                    return False
+            except Exception as e:
+                print(e)
     
     return True
 
@@ -139,7 +241,7 @@ def print_classrooms(classrooms: dict or tuple):
             print("\t---")
         print()
     if key:
-        print("\t\t...Yeterli yer yok...\t\t")
+        logger.error("\t\t...Yeterli yer yok...\t\t")
 
 def distribute(exam) -> dict or bool:
     exams = exam.exams

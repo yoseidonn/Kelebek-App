@@ -4,14 +4,16 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.uic import loadUi
 
-from App import database
+from App import database, logs
 from App.colors import COLOR_PALETTE
-from App.HtmlCreater import classrooms_html, students_html
+from App.HtmlCreater import classrooms_html, grades_html
 from App.deploy import distribute
+from App.logs import logger
 
 from pathlib import Path
-import os, sys, random
+import os, sys, random, datetime, shutil
 
+BASE_DIR = os.environ["BASE_DIR"]
 COLORS = list(COLOR_PALETTE.values())
 random.shuffle(COLORS)
 
@@ -20,20 +22,20 @@ class ExamStruct():
     # et_.. Exam Table
     # gl_.. Grade List
     def __init__(self,
-                examTable: QTableWidget,        # Sınavlar
-                gradeList: QListWidget,   # Sınıflar
-                classroomList: QListWidget,     # Salonlar
-                inputPlace: QLineEdit,          # Sınav adı
-                addButton: QPushButton,         # Sınavı ekle
-                removeButton: QPushButton,      # Seçili sınavı sil
-                removeAllButton: QPushButton,   # Tüm sınavları sil
-                createButton: QPushButton,      # Sınavı oluştur
-                sidebyside_sitting: QCheckBox,
-                backtoback_sitting: QCheckBox,
-                crossbycross_sitting: QCheckBox,
-                kizErkek: QCheckBox,         # Kız Erkek Yan Yana Oturmasın
-                ogretmenMasasi: QCheckBox,            # Öğretmen Masasına Yerleştir
-                sinavFrame):                    # YeniSinavFrame
+            examTable: QTableWidget,        # Sınavlar
+            gradeList: QListWidget,         # Sınıflar
+            classroomList: QListWidget,     # Salonlar
+            inputPlace: QLineEdit,          # Sınav adı
+            addButton: QPushButton,         # Sınavı ekle
+            removeButton: QPushButton,      # Seçili sınavı sil
+            removeAllButton: QPushButton,   # Tüm sınavları sil
+            createButton: QPushButton,      # Sınavı oluştur
+            sidebyside_sitting: QCheckBox,
+            backtoback_sitting: QCheckBox,
+            crossbycross_sitting: QCheckBox,
+            kizErkek: QCheckBox,            # Kız Erkek Yan Yana Oturmasın
+            ogretmenMasasi: QCheckBox,      # Öğretmen Masasına Yerleştir
+            sinavFrame):                    # YeniSinavFrame
 
         self.examTableWidget = examTable
         self.gradeListWidget = gradeList
@@ -106,9 +108,22 @@ class ExamStruct():
             self.set_red()       # Input place
 
     def remove_exam(self):
-        del self.exams[self.selectedExamName]
+        checkboxes = self.exams[self.selectedExamName]["checkBoxes"]
+        print(len(checkboxes))
+        for checkbox in checkboxes:
+            print(checkbox.text())
+            checkbox.setStyleSheet("")
+            checkbox.setChecked(False)
+
+        self.exams.pop(self.selectedExamName)
+        for examName in self.exams:
+            for checkbox in self.exams[examName]["checkBoxes"]:
+                color = self.exams[examName]["paletteColor"]
+                r, g, b = color
+                checkbox.setChecked(True)
+                checkbox.setStyleSheet(f"background-color: rgba({r}, {g}, {b}, 100)") 
+        
         self.draw_exam_table()
-        pass
 
     def remove_all_exams(self):
         self.set_start_variables()
@@ -121,11 +136,14 @@ class ExamStruct():
         if item is None:
             return
         rowIndex = item.row()
+
         self.examTableWidget.selectRow(rowIndex)
         print("Row selected.", rowIndex)
 
         # Seçili sınavın rengini palet rengine ata
         keys = list(self.exams.keys())
+        if not keys:
+            return
         examName = keys[rowIndex]
         self.selectedExamName = examName                        # draw_exam_table da kullanılıyor
         examColor = self.exams[examName]["paletteColor"]
@@ -149,7 +167,10 @@ class ExamStruct():
             checkbox.setEnabled(False)
 
     def grade_checkbox_clicked(self, checkbox: QCheckBox):
-        print(f"{checkbox.text()} clicked")
+        self.gradeListWidget.setStyleSheet("")
+        if self.selectedExamName is None:
+            return
+
         examIndex = list(self.exams.keys()).index(self.selectedExamName)
         gradeName = checkbox.text()
         grade = self.grades[gradeName]
@@ -162,7 +183,7 @@ class ExamStruct():
             self.exams[self.selectedExamName]["gradeNames"].remove(gradeName)
             self.examTableWidget.item(examIndex, 1).setText(f"{current - toAdd}")
             # RENGI SIFIRLA
-            checkbox.setStyleSheet("background-color: rgba(0,0,0,0)")
+            checkbox.setStyleSheet("")
             
         #Değeri arttır ve itemi ekle
         else:
@@ -176,6 +197,7 @@ class ExamStruct():
 
     def classroom_checkbox_clicked(self, checkbox: QCheckBox):
         self.classroomNames.append(checkbox.text())
+        self.classroomListWidget.setStyleSheet("")
         
     def draw_exam_table(self):
         self.examTableWidget.setRowCount(len(self.exams))
@@ -256,7 +278,7 @@ class ExamStruct():
         self.draw_classroom_table()
     
     def set_white(self):
-        self.inputPlace.setStyleSheet("background-color: white;")
+        self.inputPlace.setStyleSheet("")
     
     def set_red(self):
         self.inputPlace.setStyleSheet(f"background-color: rgb(255, 128, 128);")
@@ -268,42 +290,66 @@ class ExamStruct():
         self.deploy_step()
         
     def deploy_step(self):
+        flag = False
+        if not len(self.classroomNames):
+            self.classroomListWidget.setStyleSheet(f"background-color: rgb(255, 128, 128);")
+            flag = True
+        all_grades = [value["gradeNames"] for value in self.exams.values()]
+        if not all(all_grades):
+            self.gradeListWidget.setStyleSheet(f"background-color: rgb(255, 128, 128);")
+            flag = True
+        if flag:
+            return True
+        
         sonuc = distribute(self.exam)
         if not sonuc:
             # Tekrar deneyiniz penceresi ekle
-            print("[LOG] Yetersiz yer.")
+            message = """Seçili şubelerdeki öğrencileri dağıtmak için yeterli yer bulunamadı. 
+Lütfen daha fazla salon seçmeyi veya öğretmen masasına öğrenci yerleştirme gibi seçenekleri deneyiniz.
+Tekrar denemek ister misiniz?"""
+            retrieve = QMessageBox.question(QWidget(), "Yetersiz yer", message, QMessageBox.Yes | QMessageBox.No)
+            if retrieve == QMessageBox.Yes:
+                self.deploy_step()
+            else:
+                return
+            logger.info("Yetersiz yer.")
         else:
             # Create files
-            con1 = classrooms_html.create(self.examInfos, sonuc, self.exam.exams)
-            con2 = students_html.create(self.examInfos, sonuc, self.exam.exams)
-
-            self.show_result_frame(classroomsContainer = con1, studentsContainer = con2)
+            classroomPaths = classrooms_html.create(self.examInfos, sonuc, self.exam.exams)
+            gradePaths = grades_html.create(self.examInfos, sonuc, self.exam.exams)
+            logger.error(classroomPaths)
+            logger.error(gradePaths)
+            
+            self.show_result_frame(classroomPaths, gradePaths)
+            # -> TODO CHECK THIS IS NOT WORKING
             self.sinavFrame.reset()
             
-    def show_result_frame(self, classroomsContainer: list, studentsContainer: list):
+    def show_result_frame(self, classroomPaths: dict, gradePaths: dict):
         # Dialog sonucuna göre dosyayı ya kayıtlara taşı ya da sil
-        cFilePath, cContent = classroomsContainer
-        sFilePath, sContent = studentsContainer
+        examName = "_".join([self.examInfos[-1], self.examInfos[3], self.examInfos[4]])
+        
+        dialogSonuc = SonucDialog(classroomPaths, gradePaths).isAccepted
+        try:
+            if dialogSonuc:
+                os.mkdir(os.path.join(BASE_DIR, 'Saved', examName))
+                os.mkdir(os.path.join(BASE_DIR, 'Saved', examName, "Classrooms"))
+                os.mkdir(os.path.join(BASE_DIR, 'Saved', examName, "Grades"))
+                name_template = "{}.html"
+                for cName in classroomPaths:
+                    cNameToPath = "".join(cName.split("/"))
+                    cPath = classroomPaths[cName]
+                    Path(cPath).rename(os.path.join(BASE_DIR, 'Saved', examName, "Classrooms", name_template.format(cNameToPath)))
+                
+                for gName in gradePaths:
+                    gNameToPath= "".join(gName.split("/"))
+                    gPath = gradePaths[gName]
+                    Path(gPath).rename(os.path.join(BASE_DIR, 'Saved', examName, "Grades", name_template.format(gNameToPath)))
 
-        examPath = "_".join([self.examInfos[-1], self.examInfos[3], self.examInfos[4]])
-
-        dialogSonuc = SonucDialog(classroomsHTML = cContent, studentsHTML = sContent).isAccepted
-        if dialogSonuc:
-            try:
-                os.mkdir(os.path.join('Saved', examPath))
-            except FileExistsError:
-                pass
-            Path(cFilePath).rename(os.path.join('Saved', examPath, 'salon_oturma_duzenleri.html'))
-            Path(sFilePath).rename(os.path.join('Saved', examPath, 'sinif_listeleri.html'))
-
-            #print(os.path.join('Saved', examPath, 'salon_oturma_duzenleri.html'))
-            #print(os.path.join('Saved', examPath, 'sinif_listeleri.html'))
+            shutil.rmtree(os.path.join(BASE_DIR, "Temp", examName))
             
-        else:
-            os.remove(cFilePath)
-            os.remove(sFilePath)
-
-        os.rmdir(os.path.join('Temp', examPath))
+        except Exception as e:
+            raise e
+            logger.error(str(e))
     
 class Exam():
     def __init__(self, exams: dict, classroomNames: list, rules: list):
@@ -330,36 +376,48 @@ class Exam():
 
         
 class SonucDialog(QDialog):
-    def __init__(self, classroomsHTML, studentsHTML):
+    def __init__(self, classroomPaths, gradePaths):
         super().__init__()
-        loadUi(os.path.join("Forms", "sonuc_dialog.ui"), self)
+        loadUi(os.path.join(BASE_DIR, "Forms", "sonuc_dialog.ui"), self)
         
-        self.classroomsHTML = classroomsHTML
-        self.studentsHTML = studentsHTML
+        self.classroomPaths = classroomPaths
+        self.gradePaths = gradePaths
         self.isAccepted = False
 
         self.wev = QWebEngineView()
         self.previewLayout.addWidget(self.wev)
 
-        self.set_flw()
+        self.classroomItems = list()
+        self.gradeItems = list()
+        
+        self.set_cl()
+        self.set_gl()
         self.set_signals()
         self.exec_()
     
     def set_signals(self):
-        self.filesList.itemClicked.connect(self.fl_item_clicked)
+        self.classroomList.itemClicked.connect(self.cl_item_clicked)
+        self.gradeList.itemClicked.connect(self.gl_item_clicked)
         self.saveBtn.clicked.connect(lambda: self.close(key = True))
         self.discardBtn.clicked.connect(self.close)
         
-    def fl_item_clicked(self, item: QListWidgetItem):
+    def cl_item_clicked(self, item: QListWidgetItem):
         print(item.text())
-        if item.text() == 'Salon oturma düzenleri':
-            self.wev.setHtml(self.classroomsHTML)
-
-        else:
-            self.wev.setHtml(self.studentsHTML)
+        file_path = self.classroomPaths[item.text()]
+        with open(file_path, "r", encoding="utf-8") as f:
+            html_content = f.read()
+            
+        self.wev.setHtml(html_content)
+        
+    def gl_item_clicked(self, item: QListWidgetItem):
+        print(item.text())
+        file_path = self.gradePaths[item.text()]
+        with open(file_path, "r", encoding="utf-8") as f:
+            html_content = f.read()
+            
+        self.wev.setHtml(html_content)
         
     def close(self, key = False):
-        # self.accept is just for close the window
         if key:
             self.isAccepted = True
             self.accept()
@@ -367,21 +425,37 @@ class SonucDialog(QDialog):
         self.isAccepted = False
         self.accept()
         
-    def set_flw(self):
-        item1 = QListWidgetItem('Salon oturma düzenleri')
-        item2 = QListWidgetItem('Sınıf listeleri')
-        item1.setSelected(True)
-
-        self.filesList.addItem(item1)
-        self.filesList.addItem(item2)
-        self.wev.setHtml(self.classroomsHTML)
+    def set_cl(self):
+        for classroomName in self.classroomPaths:
+            item = QListWidgetItem(classroomName)
+            self.classroomItems.append(item)
+            self.classroomList.addItem(item)
         
+        logger.info(list(self.classroomPaths.items()))
+        logger.info(self.classroomItems)
+        try:
+            first_classroom_item = self.classroomItems[0]
+            first_classroom_item.setSelected(True)
 
+            file_path = self.classroomPaths[first_classroom_item.text()]
+            with open(file_path, "r", encoding="utf-8") as f:
+                html_content = f.read()
+            self.wev.setHtml(html_content)
+        except Exception as e:
+            logger.error(e)
+    
+    def set_gl(self):
+        for gradeName in self.gradePaths:
+            item = QListWidgetItem(gradeName)
+            self.gradeItems.append(item)
+            self.gradeList.addItem(item)
+            
+  
 if __name__ == '__main__':
     class ExamFrame(QFrame):
         def __init__(self):
             super().__init__()
-            loadUi(os.path.join("Forms", "yeni_sinav_frame_demo.ui"), self)
+            loadUi(os.path.join(BASE_DIR, "Forms", "yeni_sinav_frame_demo.ui"), self)
             self.examStruct = ExamStruct(self.examTable, self.gradeList, self.classroomList, self.examNameIn, self.addButton, self.removeButton, self.removeAllButton, self.createButton, self.sidebyside_sitting, self.backtoback_sitting, self.crossbycross_sitting, self.kizErkek, self.ogretmenMasasi, self)
             self.show()
         

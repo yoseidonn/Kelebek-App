@@ -1,10 +1,120 @@
 from App import database
-import os, shutil
+from App import logs
+from App.logs import logger
+from App.database import num_sort, num_sort_dict, num_sort_tuple
+import os, shutil, datetime, re
 
 # PATHS
-BASE = os.path.join('Templates', 'ClassroomsTemplates', 'base.html')
-HEAD = os.path.join('Templates', 'ClassroomsTemplates', 'head.html')
-BODY = os.path.join('Templates', 'ClassroomsTemplates', 'body.html')
+BASE_DIR = os.environ["BASE_DIR"]
+BASE = """<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <link href="styles.css" rel="stylesheet" type="text/css">
+        <style>
+      .wrapper {
+        height: 21cm;
+        width: 29.7cm;
+        max-height: 21cm;
+        max-width: 29.7cm;
+        page-break-inside: avoid;
+        page-break-after: always;
+      }
+      .header {
+        font-size: large;
+        text-align: center;
+        height: 2.5cm;
+        max-height: 2.5cm;
+    }
+        .headerText{
+            text-align: center;
+        }
+
+      .footer {
+        height: 4.5cm;
+      }
+      .row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+      }
+      .between {
+        justify-content: space-between;
+      }
+      .grid2x3 {
+        display: grid;
+        max-height: 2cm;
+        row-gap: 0.3cm;
+        column-gap: 0.1cm;
+        grid-template-rows: 1fr 0.1fr 1fr;
+        grid-template-columns: 1fr 1fr;
+        max-height: 2.2cm;
+      }
+      .grid-bottom {
+        display: grid;
+        max-height: 2cm;
+        row-gap: 0.1cm;
+        column-gap: 0.3cm;
+        grid-template-columns: 3fr 1fr 2fr 2fr 1fr 1fr;
+        grid-template-rows: 2fr 2fr 2fr;
+      }
+      .span2 {
+        grid-column: span 2;
+        display: flex;
+        justify-content: center;
+      }
+
+      .left {
+        display: flex;
+        justify-content: flex-start;
+      }
+
+      .right {
+        display: flex;
+        justify-content: flex-end;
+      }
+      .gap {
+        height: 1cm;
+      }
+      .line {
+        height: 1px;
+        border-bottom: 1px solid black;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-auto-rows: min-content;
+        background-color: green;
+        overflow: hidden;
+        height: 14cm;
+        max-height: 14cm;
+      }
+      .item {
+        background-color: white;
+        border: 2px solid rgba(0, 0, 0, 0.8);
+        padding: 1%;
+        margin: 1%;
+        font-size: x-small;
+        min-height: 60px;
+        max-height: 90px;
+      }
+      .blank {
+        background-color: transparent;
+        border: none;
+      }
+      @media print {
+        .wrapper {
+          size: A4;
+        }
+      }
+    </style>
+    </head>
+    <body>
+        {{}}
+    </body>
+</html>"""
+
 # PRE-DEFINED SEPERATOR FOR HTMLS
 SEPERATOR = "{{}}"
 
@@ -17,52 +127,47 @@ def create(examInfos, classrooms, exams):
             for student in result:
                 student_exam.update({student: eName})
                 
-    head = HEAD
-    with open(head, "r", encoding="utf-8") as headHTML:
-        head = headHTML.read()
-        head = head.split(SEPERATOR)
-        masterExamName = examInfos[-1]
-        tarih, ders = headerInfos[3], headerInfos[4]
-        head.insert(1, f'{masterExamName} ({tarih} - {ders}) Oturma Düzeni')
-        head = "".join(head)
-
-    with open(BODY, "r", encoding="utf-8") as bodyHTML:
-        body = bodyHTML.read()
-        body = body.split(SEPERATOR)
-        innerBodyHTML = get_html(classrooms, student_exam, headerInfos)
-        body.insert(1, innerBodyHTML)
-        body = "".join(body)
-
-    with open(BASE, "r", encoding="utf-8") as baseHTML:
-        base = baseHTML.read()
-        base = base.split(SEPERATOR)
-        base.insert(1, head)
-        base.insert(2, body)
-        fullHtml = "".join(base)
-
-    fileName = "salon_oturma_duzenleri.html"
+    baseStart, baseEnd = BASE.split(SEPERATOR)
     examName = "_".join([examInfos[-1], examInfos[3], examInfos[4]])
+    classroom_htmls = get_htmls(classrooms, student_exam, headerInfos, baseStart, baseEnd)
+    
     try:
-        os.mkdir(os.path.join('Temp', examName))
-    except FileExistsError:
-        shutil.rmtree(os.path.join('Temp', examName))
-        os.mkdir(os.path.join('Temp', examName))
+        os.mkdir(os.path.join(BASE_DIR, 'Temp', examName))
+        os.mkdir(os.path.join(BASE_DIR, 'Temp', examName, "Classrooms"))
+    except Exception as e:
+        logger.error(str(e))
+            
+        shutil.rmtree(os.path.join(BASE_DIR, 'Temp', examName))
+        os.mkdir(os.path.join(BASE_DIR, 'Temp', examName))
+        os.mkdir(os.path.join(BASE_DIR, 'Temp', examName, "Clasrooms"))
 
-    with open(os.path.join('Temp', examName, fileName), 'w', encoding='utf-8') as newFile:
-        newFile.write(fullHtml)
+    name_template = "{}.html"
+    classroomPaths = {}
+    for classroomName in classroom_htmls:
+        classroomNameToPath = "".join(classroomName.split("/"))
+        classroomPath = os.path.join(BASE_DIR, 'Temp', examName, "Classrooms", name_template.format(classroomNameToPath))
+        try:
+            with open(classroomPath, 'w', encoding='utf-8') as newFile:
+                newFile.write(classroom_htmls[classroomName])
+            classroomPaths.update({classroomName: classroomPath})
+        except Exception as e:
+            logger.error(str(e))
     
-    filePath = os.path.join('Temp', examName, fileName)
-    htmlContent = fullHtml
-    
-    return (filePath, htmlContent)
+    sortedClassroomPaths = {}
+    classroomNames = list(classroomPaths.keys())
+    classroomNames = sorted(sorted(classroomNames), key=num_sort)
+    for classroomName in classroomNames:
+        sortedClassroomPaths.update({classroomName: classroomPaths[classroomName]})
+        
+    return sortedClassroomPaths
 
-def get_html(classrooms, student_exam, headerInfos):
+def get_htmls(classrooms, student_exam, headerInfos, baseStart, baseEnd):
     # student_exam = {2949: "11 MATEMATİK",
     #                 2999: "10 FİZİK"
     #                }
     
     wrapperOpener = '<div class="wrapper">'
-    header = '<div class="headerText"> {}  EĞİTİM-ÖĞRETİM YILI {} {} ({} - {})<br> {} ÖĞRENCİ YOKLAMA ÇİZELGESİ <br> <br> </div>'
+    header = '<div class="headerText"> {}  EĞİTİM-ÖĞRETİM YILI <strong>{} {}</strong> ({} - {})<br> <strong>{}</strong> SALONUNUN ÖĞRENCİ YOKLAMA ÇİZELGESİ <br> <br> </div>'
     # egitimOgretimYili, donem, kacinciYazili, tarih, kacinciDers, salonAdi
     footer = '<div class="footer"> Müdür adı: </div>'
     # footer ekle
@@ -82,22 +187,23 @@ def get_html(classrooms, student_exam, headerInfos):
     blank = '<div class="blank"></div>'
     wrapperCloser, containerCloser = '</div>', '</div>'
     
-    text_array = []
+    classroom_htmls = {}
     x = 0
     for cName in classrooms:
+        classroom_array = [baseStart]
         classroom = classrooms[cName]
         oturmaDuzeni = classrooms[cName]["oturma_duzeni"]
         kacli = classrooms[cName]["kacli"]
         yon = classrooms[cName]["ogretmen_yonu"]
         ogretmenMasasiOgrenci = classrooms[cName]["ogretmen_masasi"]
         
-        text_array.append(wrapperOpener)
+        classroom_array.append(wrapperOpener)
         headerText = header.format(*headerInfos, cName)
-        text_array.append(headerText)
+        classroom_array.append(headerText)
         columnStyle, totalCount = get_column_style(classroom)
         rowStyle = get_row_style(classroom)
         container = containerOpener.format(columnStyle)#, rowStyle)
-        text_array.append(container)
+        classroom_array.append(container)
         
         longestRowCount = 0
         for col in oturmaDuzeni:
@@ -119,23 +225,23 @@ def get_html(classrooms, student_exam, headerInfos):
         #### Kutuları yerleştir
         if yon == "Solda":
             if kacli == "2'li":
-                text_array.append(ogretmenMasasiItemDouble)
+                classroom_array.append(ogretmenMasasiItemDouble)
             else:
-                text_array.append(ogretmenMasasiItem)
-                text_array.append(blank)
+                classroom_array.append(ogretmenMasasiItem)
+                classroom_array.append(blank)
 
             for _ in range(totalCount-2):
-                text_array.append(blank)
+                classroom_array.append(blank)
 
         elif yon == "Sağda":
             for _ in range(totalCount-2):
-                text_array.append(blank)
+                classroom_array.append(blank)
 
             if kacli == "2'li":
-                text_array.append(ogretmenMasasiItemDouble)
+                classroom_array.append(ogretmenMasasiItemDouble)
             else:
-                text_array.append(blank)
-                text_array.append(ogretmenMasasiItem)
+                classroom_array.append(blank)
+                classroom_array.append(ogretmenMasasiItem)
         ####
         
         for rowInd in range(longestRowCount):
@@ -147,9 +253,9 @@ def get_html(classrooms, student_exam, headerInfos):
                     # print(e)
                     newItem = blank
                     if kacli == "2'li":
-                        text_array.append(newItem)
-                    text_array.append(newItem)
-                    text_array.append(blank)
+                        classroom_array.append(newItem)
+                    classroom_array.append(newItem)
+                    classroom_array.append(blank)
                     continue
 
                 # Sıra varsa formatla ve yeni divi ekle
@@ -162,21 +268,26 @@ def get_html(classrooms, student_exam, headerInfos):
                         no = chair[0]
                         sinif = chair[4]
                         student = item.format(deskNo, sinavAdi, sinif, no, cinsiyet, fullAd)
-                        text_array.append(student)
+                        classroom_array.append(student)
                     else:
                         # Sırada öğrenci yoksa boş koy
                         siraBos = itemBos.format(deskNo)
-                        text_array.append(siraBos)
+                        classroom_array.append(siraBos)
 
                 # Son kolon değilse sıradan sonra araya boşluk koy
                 if colInd != len(oturmaDuzeni) - 1:
-                    text_array.append(blank)
-        text_array.append(containerCloser)
-        text_array.append(footer)            
-        text_array.append(wrapperCloser)
+                    classroom_array.append(blank)
+        classroom_array.append(containerCloser)
+        get_footer(classroom)
+        classroom_array.append(footer)            
+        classroom_array.append(wrapperCloser)
+        classroom_array.append(baseEnd)
+        classroom_htmls.update({cName: "\n".join(classroom_array)})
         
-    html_text = " ".join(text_array)
-    return html_text
+    return classroom_htmls
+
+def get_footer(classroom):
+    return '<div class="footer"> Müdür adı: </div>'
 
 def get_column_style(classroom):
     oturmaDuzeni = classroom["oturma_duzeni"]
@@ -229,7 +340,7 @@ def get_row_style(classroom):
     
     styleText = "".join(style)
     return styleText                  
-                
-                    
+
+ 
 if __name__ == '__main__':
     ...

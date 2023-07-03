@@ -73,17 +73,32 @@ border: none;
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item alignment="Qt::AlignLeft">
-          <widget class="QFrame" name="verticalFrame">
-           <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <widget class="QGroupBox" name="classroomGroupBox">
+           <property name="title">
+            <string>Salon oturma düzeni ön izlemeleri</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
-             <widget class="QListWidget" name="filesList"/>
+             <widget class="QListWidget" name="classroomList"/>
             </item>
            </layout>
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="verticalFrame">
+          <widget class="QGroupBox" name="gradeGroupBox">
+           <property name="title">
+            <string>Sınıf lisesi ön izlemeleri</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <widget class="QListWidget" name="gradeList"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="previewFrame_2">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>

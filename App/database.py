@@ -1,5 +1,7 @@
 ### database.py
-import sqlite3
+import sqlite3, re
+from . import logs
+from .logs import logger
 
 db = sqlite3.connect("database.db")
 cur = db.cursor()
@@ -62,9 +64,10 @@ def get_all_grade_names() -> list:
     QUERY = "SELECT sinif FROM ogrenciler"
     tumSiniflar = cur.execute(QUERY)
     siniflar = set()
-    [siniflar.add(sinif[0]) for sinif in tumSiniflar] 
+    [siniflar.add(sinif[0]) for sinif in tumSiniflar]
     siniflar = list(siniflar)
-    siniflar.sort()
+    
+    siniflar = sorted(sorted(siniflar), key=num_sort)
     return siniflar
 
 #ÖĞRENCİLER
@@ -217,21 +220,22 @@ def get_all_classrooms(onlyNames = False) -> list or dict:
     QUERY = "SELECT derslik_adi FROM salonlar ORDER BY derslik_adi"
     QUERY_2 = "SELECT derslik_adi, ogretmen_yonu, kacli, oturma_duzeni FROM salonlar ORDER BY derslik_adi"
     
-    salonAdlari = []
-    salonAdlariTuple = cur.execute(QUERY).fetchall()
-    for salonAdi in salonAdlariTuple:
-        salonAdlari.append(salonAdi[0])
-
     if onlyNames: #SADECE ADLAR İSE
-        return salonAdlari
+        salonAdlari = []
+        salonAdlariTuple = cur.execute(QUERY).fetchall()
+        for salonAdi in salonAdlariTuple:
+            salonAdlari.append(salonAdi[0])
+            
+        return sorted(sorted(salonAdlari), key=num_sort)
         
     # SALON BİLGİLERİ
     salonlar = {}
     salonlarTuples = cur.execute(QUERY_2).fetchall()
     
-    for salonAdi, salon in zip(salonAdlari, salonlarTuples):
-        salonlar.update({salonAdi: list(salon)})
-    
+    for salon in salonlarTuples:
+        salonlar.update({salon[0]: list(salon)})
+
+    salonlar = num_sort_dict(salonlar)
     return salonlar
 
 def get_classrooms_counts_per_every_grade() -> list:
@@ -363,6 +367,7 @@ def get_all_infos() -> list:
     try:
         bilgiler = cur.execute(QUERY).fetchall()[0]
     except Exception as e:
+        logger.error(str(e))
         bilgiler = ("", "", "")
         
     return bilgiler
@@ -395,6 +400,19 @@ def get_table_infos() -> list:
     classroomCounts = ",".join(classroomCounts)
     
     return [gradeCounts, studentCounts, classroomCounts]
+
+def num_sort(test_string):
+    return list(map(int, re.findall(r'\d+', test_string)))
+
+def num_sort_tuple(tuple_item):
+    test_string = tuple_item[0]
+    return int(re.findall(r'\d+', test_string)[0])
+
+def num_sort_dict(test_dict: dict):
+    order = sorted(sorted(list(test_dict.keys())), key=num_sort)
+    sorted_dict = dict(sorted(test_dict.items(), key=lambda item: order.index(item[0])))
+    return sorted_dict
+
 
 if __name__ == "__main__":
     #cur.execute("INSERT INTO ogrenciler VALUES (2949, 'Yusuf', 'Kiriş', 'Erkek', '10/A')")

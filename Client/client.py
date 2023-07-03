@@ -1,8 +1,10 @@
-import requests, json
+import requests, json, datetime
 import os, sys, dotenv, platform, pyudev, subprocess
-
+from App import logs
+from App.logs import logger
 
 dotenv.load_dotenv()
+BASE_DIR = os.environ["BASE_DIR"]
 #SERVER = os.getenv("SERVER_IP")
 SERVER = "http://localhost:8000/rest_api/validate/"
 
@@ -31,16 +33,21 @@ def get_disk_serial_number_linux():
                 serial_number = device.get('ID_SERIAL_SHORT')
                 if serial_number:
                     return serial_number
-            except (KeyError, OSError):
-                pass
+            except Exception as e:
+                logger.error(str(e))
     return None
 
 def get_disk_serial_number_mac():
     # Add macOS-specific method to retrieve disk serial number here
     return None
         
-def validate_licence_key(uuid: str = get_disk_serial_number(), key: str = "BLANK"):
-    url = SERVER + f"{uuid}/{key}"
+def validate_licence_key(key: str = "BLANK"):
+    try:
+        dsn = get_disk_serial_number()
+    except Exception as e:
+        logger.error(str(e))
+            
+    url = SERVER + f"{dsn}/{key}"
     print(url)
     try:
         response = requests.get(url)
@@ -50,6 +57,8 @@ def validate_licence_key(uuid: str = get_disk_serial_number(), key: str = "BLANK
         return data
     
     except Exception as e:
+        logger.error(str(e))
+                
         data = {"Status-Code": 1000, "Error-Message": str(e)}
         return data
 
