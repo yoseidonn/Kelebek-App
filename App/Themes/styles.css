@@ -1,4 +1,3 @@
-/* QToolBox styles */
 QToolBox {
     background-color: #ffffff;
     border: 1px solid #cccccc;
@@ -26,7 +25,8 @@ QToolBox::tab:!selected:hover {
     background-color: #cccccc;
 }
 
-/* QToolBar styles */
+
+
 QToolBar {
     background-color: #f0f0f0;
     border: none;
@@ -68,7 +68,8 @@ QToolBar::toolButton:checked {
     color: #ffffff;
 }
 
-/* QWebEngineView styles */
+
+
 QWebEngineView {
     background-color: #ffffff;
     border: 1px solid #cccccc;
@@ -79,7 +80,8 @@ QWebEngineView::hover {
     border: 1px solid #007acc;
 }
 
-/* QTableWidget styles */
+
+
 QTableWidget {
     background-color: #ffffff;
     border: 1px solid #cccccc;
@@ -121,4 +123,80 @@ QTableWidget::header:last:hover {
 QTableWidget::header:last:pressed {
     background-color: #007acc;
     color: #ffffff;
+}
+
+
+QMenu {
+    background-color: white;
+    margin: 2px;
+}
+
+QMenu::item {
+    padding: 2px 25px 2px 20px;
+    border: 1px solid transparent;
+}
+
+QMenu::item:selected {
+    border-color: darkblue;
+    background: rgba(100, 100, 100, 150);
+}
+
+QMenu::icon:checked {
+    background: gray;
+    border: 1px inset gray;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    left: 1px;
+}
+
+QMenu::separator {
+    height: 2px;
+    background: lightblue;
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+QMenu::indicator {
+    width: 13px;
+    height: 13px;
+}
+
+QMenu::indicator:non-exclusive:unchecked {
+    image: url(:/images/checkbox_unchecked.png);
+}
+
+QMenu::indicator:non-exclusive:unchecked:selected {
+    image: url(:/images/checkbox_unchecked_hover.png);
+}
+
+QMenu::indicator:non-exclusive:checked {
+    image: url(:/images/checkbox_checked.png);
+}
+
+QMenu::indicator:non-exclusive:checked:selected {
+    image: url(:/images/checkbox_checked_hover.png);
+}
+
+QMenu::indicator:exclusive:unchecked {
+    image: url(:/images/radiobutton_unchecked.png);
+}
+
+QMenu::indicator:exclusive:unchecked:selected {
+    image: url(:/images/radiobutton_unchecked_hover.png);
+}
+
+QMenu::indicator:exclusive:checked {
+    image: url(:/images/radiobutton_checked.png);
+}
+
+QMenu::indicator:exclusive:checked:selected {
+    image: url(:/images/radiobutton_checked_hover.png);
+}
+
+
+
+QPushButton:hover {
+    background-color : lightskyblue;
 }

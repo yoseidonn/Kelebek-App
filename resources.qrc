@@ -296,8 +296,4 @@
     <file>Images/icon/zoom-in.svg</file>
     <file>Images/icon/zoom-out.svg</file>
   </qresource>
-  <qresource prefix="Icons">
-    <file>../../../../../../İndirilenler/custom_archive.svg</file>
-    <file>../../../../../../İndirilenler/custom_unarchive.svg</file>
-  </qresource>
 </RCC>

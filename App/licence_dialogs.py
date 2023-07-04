@@ -51,8 +51,9 @@ class LisansDialog(QDialog):
         self.keyInput.textEdited.connect(self.text_changed)
 
     def text_changed(self):
-        self.keyInput.setStyleSheet("background-color: white;")
-        self.okBtn.setStyleSheet("background-color: white;")
+        # Empty style sheets meant to make it normal
+        self.keyInput.setStyleSheet("")
+        self.okBtn.setStyleSheet("")
         key = self.keyInput.text()
 
         if not key:

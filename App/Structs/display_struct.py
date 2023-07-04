@@ -15,19 +15,20 @@ from App.database import num_sort
 BASE_DIR = os.environ["BASE_DIR"]
 
 class Display():
-    def __init__(self, toolBoxes: list[QToolBox], listWidgets: list[QListWidget], webEngineView: QWebEngineView, displayTitle: QLabel, buttons: list, buttonsLayout: QFrame):
+    def __init__(self, toolBoxes: list[QToolBox], listWidgets: list[QListWidget], webEngineView: QWebEngineView, displayGroupBox: QGroupBox, buttons: list, frames: list):
         self.examsToolBox, self.filesToolBox = toolBoxes
         self.activeList, self.archiveList, self.classroomList, self.gradeList = listWidgets
         
         self.wev = webEngineView
-        self.displayTitle = displayTitle
+        self.displayGroupBox = displayGroupBox
         self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.archiveBtn, self.downloadsBtn = buttons
-        self.buttonsLayout = buttonsLayout
+        self.buttonsFrame, self.contentFrame = frames
 
         self.init_settings()
         
     def init_settings(self):
         self.set_variables()
+        self.set_downloads_menu()
         self.set_signals()
         self.set_ui()
         
@@ -40,10 +41,13 @@ class Display():
         self.classroomItems: list[QListWidgetItem] = []
         self.gradeItems: list[QListWidgetItem] = []
 
-        self.is_selected_exam_Archive = False
-        self.current_exam_type = "Active"
+        self.is_selected_exam_archived = False
+        self.current_exam_type = "Saved"
         self.selected_exam_name: str = None
         self.last_clicked_item: QListWidgetItem = None
+        
+        self.archive_exam = lambda: self.archive_exam_slot(archiveMode="Archive")
+        self.de_archive_exam = lambda: self.archive_exam_slot(archiveMode="De-Archive")
 
     def set_signals(self):
         self.activeList.itemClicked.connect(self.active_clicked)
@@ -54,9 +58,11 @@ class Display():
         self.examsToolBox.currentChanged.connect(self.exam_type_changed)
         self.filesToolBox.currentChanged.connect(self.file_mode_changed)
 
+        self.removeBtn.clicked.connect(self.remove_exam)
+        self.removeAllBtn.clicked.connect(lambda: self.remove_exam(all=True))
         self.refreshAllBtn.clicked.connect(self.refresh)
-        self.archiveBtn.clicked.connect(lambda: self.archive_exam(mod="Archive"))
-
+        self.archiveBtn.clicked.connect(self.archive_exam)
+        
     def set_ui(self):
         self.removeBtn.setStyleSheet("background-color: rgb(246, 97, 81);")
         self.removeAllBtn.setStyleSheet("background-color: rgb(246, 97, 81);")
@@ -67,44 +73,60 @@ class Display():
         
         self.examsToolBox.setCurrentIndex(0)
         self.removeBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "trash.svg")))
-        self.removeBtn.setIconSize(QSize(32,32))
         self.removeAllBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "trash.svg")))
-        self.removeAllBtn.setIconSize(QSize(32,32))
         self.refreshAllBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images","icon", "refresh-ccw.svg")))
-        self.refreshAllBtn.setIconSize(QSize(32,32))
         self.archiveBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "custom_archive.svg")))
-        self.archiveBtn.setIconSize(QSize(32,32))
         self.downloadsBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "download.svg")))
-        self.downloadsBtn.setIconSize(QSize(32,32))
 
+        self.removeBtn.setIconSize(QSize(24, 24))
+        self.removeAllBtn.setIconSize(QSize(24, 24))
+        self.refreshAllBtn.setIconSize(QSize(24, 24))
+        self.archiveBtn.setIconSize(QSize(24, 24))
+        self.downloadsBtn.setIconSize(QSize(24, 24))
+        
+    def set_downloads_menu(self):
+        self.downloadsMenu = QMenu()
+        self.download_selected_exam = QAction(QIcon(os.path.join(BASE_DIR, "Images", "icon", "download.svg")), "Seçili sınavı indir", self.contentFrame)
+        self.download_selected_exam_classrooms = QAction(QIcon(os.path.join(BASE_DIR, "Images", "icon", "download.svg")), "Seçili sınavın salon görünümlerini indir", self.contentFrame)
+        self.download_selected_exam_grades = QAction(QIcon(os.path.join(BASE_DIR, "Images", "icon", "download.svg")), "Seçili sınavın sınıf listelerini indir", self.contentFrame)
+        self.download_selected_file = QAction(QIcon(os.path.join(BASE_DIR, "Images", "icon", "download.svg")), "Seçili dosyayı indir", self.contentFrame)
+
+        actions = [self.download_selected_exam, self.download_selected_exam_classrooms, self.download_selected_exam_grades, self.download_selected_file]
+        self.downloadsMenu.addActions(actions)
+        
+        self.downloadsBtn.setMenu(self.downloadsMenu)
+        
     # Button functions
-    def archive_exam(self, mod: str = "Archive"):
-        current = "Active" if mod == "Archive" else "Archive"
-        to = "Archive" if mod == "Archive" else "Active"
+    def de_archive_exam_slot(self):
+        self.archive_exam_slot(archiveMode="De-Archive")
 
-        print(f"Current: {current}, To: {to}, mod: {mod}")
-        print(f"Current exam type: {self.current_exam_type}")
-        if self.current_exam_type != current:
-            logger.error("You can't archive an exam which is already Archive.")
-            # TODO ADD WARNING MESSAGE
-            return
-        
+    def archive_exam_slot(self, archiveMode: str = "Archive"):
         if self.last_clicked_item is None:
+            QMessageBox.information(None, "Uyarı", "Lütfen bir sınav seçiniz.")
             return
+
+        current = "Saved" if archiveMode == "Archive" else "Archived"
+        to = "Archived" if archiveMode == "Archive" else "Saved"
+
+        # Start archive/dearchiving
+        logger.info(f'{"Arşivleniyor" if self.current_exam_type == "Saved" else "Arşivden çıkartılıyor"}')
         
-        # Make the process
         classroomDirs = os.listdir(os.path.join(BASE_DIR, current, self.selected_exam_name, "Classrooms"))
         gradeDirs = os.listdir(os.path.join(BASE_DIR, current, self.selected_exam_name, "Grades"))
         classroomDirs = sorted(sorted(classroomDirs), key=num_sort)
         gradeDirs = sorted(sorted(gradeDirs), key=num_sort)
         
-        print(f"Classroom dirs: {', '.join([dir for dir in classroomDirs])}")
-        print(f"Grade dirs: {', '.join([dir for dir in gradeDirs])}")
-        
         try:
             os.mkdir(os.path.join(BASE_DIR, to, self.selected_exam_name))
+        except FileExistsError:
+            exam_type = ("arşivde" if self.current_exam_type == "Saved" else "aktif")
+            reply = QMessageBox.question(None, "Uyarı", f'{self.selected_exam_name} adında {exam_type} bir sınav mevcut, eğer onaylarsanız {exam_type} olan \"{self.selected_exam_name}\" adlı sınav tekrar yazılacaktır.')
+            if reply == QMessageBox.No:
+                QMessageBox.information(None, "Uyarı", f'{self.selected_exam_name} adlı sınavı {("arşivleme" if self.current_exam_type == "Saved" else "arşivden çıkarma")} iptal edildi.')
+                return
         except Exception as e:
             logger.error(f"Yeni dizinleri oluşturma | root dir -> {e}")
+            
         try:
             os.mkdir(os.path.join(BASE_DIR, to, self.selected_exam_name, "Classrooms"))
         except Exception as e:
@@ -135,33 +157,89 @@ class Display():
         except Exception as e:
             logger.error(f"Eski dizini silme -> {e}")
 
-        print("Archive\n")
+        logger.info("Arşivleme tamamlandı")
         self.last_clicked_item = None
-        if mod == "Archive":
+        if archiveMode == "Archive":
             self.set_archive_list_widget()
             self.set_active_list_widget()
         else:
             self.set_active_list_widget()
             self.set_archive_list_widget()
     
-    def remove_exam(self, all = False):
-        if not self.is_selected_exam_Archive:
-            lookingPath = "Active"
+    def remove_exam(self, all=False):
+        if self.last_clicked_item is None:
+            QMessageBox.information(None, "Uyarı", "Lütfen bir sınav seçiniz.")
+            return
+        
+        # Kök dizinler
+        delete_from = self.current_exam_type
+        
+        # Uygun uyarı mesajı
+        if self.current_exam_type == "Saved" and not all:
+            reply = QMessageBox.question(None, "Uyarı", f"Bu, geri alınamayan bir işlemdir. Kabul ediyor musunuz?\nNot: {self.selected_exam_name} adlı sınav siliniyor!")
+
+        elif self.current_exam_type == "Saved" and all:
+            reply = QMessageBox.question(None, "Uyarı", "Bu, geri alınamayan bir işlemdir. Kabul ediyor musunuz?\nNot: Tüm sınavlar siliniyor!")
+
+        elif self.current_exam_type == "Archived" and not all:
+            reply = QMessageBox.question(None, "Uyarı", "Bu, geri alınamayan bir işlemdir. Kabul ediyor musunuz?\nNot: Bu sınavı arşivden siliyorsunuz!")
+
         else:
-            lookingPath = "Archive"
+            reply = QMessageBox.question(None, "Uyarı", "Bu, geri alınamayan bir işlemdir. Kabul ediyor musunuz?\nNot: Tüm arşivlenmiş sınavlar siliniyor!")
+            
+        # Kullanıcı yanıtı
+        if reply == QMessageBox.No:
+                QMessageBox.information(None, "Uyarı", "Sınav silme iptal edildi.")
+                return
+        
+        # Silme işlemi
+        if all:
+            logger.info("Tüm sınavlar siliniyor")
+            for item in (self.activeItems if self.current_exam_type == "Saved" else self.archiveItems):
+                deleting_exam = item.text()
+                self.last_clicked_item = item
+                try:
+                    shutil.rmtree(os.path.join(BASE_DIR, delete_from, deleting_exam))
+                except Exception as e:
+                    logger.error(f"{str(e)} | Sınav silinemedi: {self.selected_exam_name}")
+        else:
+            logger.info(f"{self.selected_exam_name} siliniyor")
+            try:
+                shutil.rmtree(os.path.join(BASE_DIR, delete_from, deleting_exam))
+            except Exception as e:
+                logger.error(f"{str(e)} | Sınav silinemedi: {self.selected_exam_name}")
 
-        self.remove_exam(all=all, lookingPath=lookingPath)
-
-    def remove_exam(self, all = False, lookingPath = "Active"):
-        pass
+        logger.info("Silme tamamlandı")
+        # Dosyaları yenileme
+        self.refresh()
         
     def refresh(self):
-        self.init_settings()
+        self.examsToolBox.setCurrentIndex(0)
+        # Vars
+        self.activeItems: list[QListWidgetItem] = []
+        self.archiveItems: list[QListWidgetItem] = []
+        self.classroomItems: list[QListWidgetItem] = []
+        self.gradeItems: list[QListWidgetItem] = []
+
+        self.is_selected_exam_archived = False
+        self.current_exam_type = "Saved"
+        self.selected_exam_name: str = None
+        self.last_clicked_item: QListWidgetItem = None
+        
+        self.set_archive_list_widget() # Archive list widget
+        self.set_active_list_widget() # Exam list widget
+        
             
     def download(self):
-        pass
+        if self.last_clicked_item is None:
+            QMessageBox.information(None, "Uyarı", "Lütfen bir sınav seçiniz.")
+            return
         
     def download_dialog(self):
+        if self.last_clicked_item is None:
+            QMessageBox.information(None, "Uyarı", "Lütfen bir sınav seçiniz.")
+            return
+
         dialog = QFileDialog()
         dialog.setOption(QFileDialog.ShowDirsOnly, True)
         dialog.setWindowTitle("Kaydetme dizini seçiniz")
@@ -173,12 +251,18 @@ class Display():
     # Signal functions----------------------
     def exam_type_changed(self):
         if self.examsToolBox.currentIndex() == 0:
-            self.current_exam_type = "Active"
+            self.current_exam_type = "Saved"
             
+            self.removeBtn.setStyleSheet("background-color: rgb(246, 97, 81);")
+            self.removeAllBtn.setStyleSheet("background-color: rgb(246, 97, 81);")
+            self.removeBtn.setText("Sınavı sil")
+            self.removeAllBtn.setText("Tüm sınavları sil")
+
             self.archiveBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "custom_archive.svg")))
-            self.archiveBtn.clicked.connect(lambda: self.archive_exam(mod="Archive"))
+            self.archiveBtn.clicked.disconnect(self.de_archive_exam)
+            self.archiveBtn.clicked.connect(self.archive_exam)
             self.archiveBtn.setText("Arşivle")
-            
+
             if self.activeItems:
                 Item = self.activeItems[0]
                 Item.setSelected(True)
@@ -187,10 +271,16 @@ class Display():
                 self.clear_files_and_preview()
 
         else:
-            self.current_exam_type = "Archive"
+            self.current_exam_type = "Archived"
 
+            self.removeBtn.setStyleSheet("background-color: rgb(224, 27, 36);")
+            self.removeAllBtn.setStyleSheet("background-color: rgb(224, 27, 36);")
+            self.removeBtn.setText("Arşivden sil")
+            self.removeAllBtn.setText("Tüm arşivlenmiş sınavları sil")
+            
             self.archiveBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "custom_unarchive.svg")))
-            self.archiveBtn.clicked.connect(lambda: self.archive_exam(mod="De-Archive"))
+            self.archiveBtn.clicked.disconnect(self.archive_exam)
+            self.archiveBtn.clicked.connect(self.de_archive_exam)
             self.archiveBtn.setText("Arşivden çıkar")
 
             if self.archiveItems:
@@ -201,9 +291,6 @@ class Display():
                 self.clear_files_and_preview()
         
     def file_mode_changed(self):
-        print(f"Classroom item texts: {', '.join([item.text() for item in self.classroomItems])}")
-        print(f"Grade item texts: {', '.join([item.text() for item in self.gradeItems])}")
-        print("----")
         if self.filesToolBox.currentIndex() == 0:
             if self.classroomItems:
                 Item = self.classroomItems[0]
@@ -223,8 +310,8 @@ class Display():
     # Exam panel
     def active_clicked(self, item: QListWidgetItem):
         # Set needed vars for next time
-        self.is_selected_exam_Archive = False
-        self.current_exam_type = "Active"
+        self.is_selected_exam_archived = False
+        self.current_exam_type = "Saved"
          
         if self.last_clicked_item is not None:
             self.last_clicked_item.setSelected(False)
@@ -234,7 +321,7 @@ class Display():
         # Item seç ve dosyaları güncelle
         item.setSelected(True)
         self.selected_exam_name = item.text()
-        examPath = os.path.join(BASE_DIR, "Active", self.selected_exam_name)
+        examPath = os.path.join(BASE_DIR, "Saved", self.selected_exam_name)
 
         self.set_classroom_list_widget(examPath=examPath)
         if self.classroomItems:
@@ -248,8 +335,8 @@ class Display():
         
     def archive_clicked(self, item: QListWidgetItem):
         # Set needed vars for next time
-        self.is_selected_exam_Archive = True
-        self.current_exam_type = "Archive"
+        self.is_selected_exam_archived = True
+        self.current_exam_type = "Archived"
         
         if self.last_clicked_item is not None:
             self.last_clicked_item.setSelected(False)
@@ -259,7 +346,7 @@ class Display():
         # Item seç ve dosyaları güncelle
         item.setSelected(True)
         self.selected_exam_name = item.text()
-        examPath = os.path.join(BASE_DIR, "Archive", self.selected_exam_name)
+        examPath = os.path.join(BASE_DIR, "Archived", self.selected_exam_name)
         
         self.set_classroom_list_widget(examPath=examPath)
         if self.classroomItems:
@@ -312,7 +399,7 @@ class Display():
         self.activeList.clear()
         self.activeItems: list = list()
         
-        examDirs = os.listdir(os.path.join(BASE_DIR, "Active"))
+        examDirs = os.listdir(os.path.join(BASE_DIR, "Saved"))
         examDirs = sorted(sorted(examDirs), key=num_sort)
         
         for directory in examDirs:
@@ -321,19 +408,19 @@ class Display():
             self.activeItems.append(item)
             self.activeList.addItem(item)
 
-        if self.current_exam_type == "Active" and len(self.activeItems) != 0:
+        if self.current_exam_type == "Saved" and len(self.activeItems) != 0:
             self.last_clicked_item = self.activeItems[0]
             self.last_clicked_item.setSelected(True)
             self.active_clicked(self.last_clicked_item)
             
-        elif self.current_exam_type == "Active" and len(self.activeItems) == 0:
+        elif self.current_exam_type == "Saved" and len(self.activeItems) == 0:
             self.clear_files_and_preview()
 
     def set_archive_list_widget(self):
         self.archiveList.clear()
         self.archiveItems: list = list()
         
-        examDirs = os.listdir(os.path.join(BASE_DIR, "Archive"))
+        examDirs = os.listdir(os.path.join(BASE_DIR, "Archived"))
         examDirs = sorted(sorted(examDirs), key=num_sort)
 
         for directory in examDirs:
@@ -342,12 +429,12 @@ class Display():
             self.archiveItems.append(item)
             self.archiveList.addItem(item)
         
-        if self.current_exam_type == "Archive" and len(self.archiveItems) != 0:
+        if self.current_exam_type == "Archived" and len(self.archiveItems) != 0:
             self.last_clicked_item = self.archiveItems[0]
             self.last_clicked_item.setSelected(True)
             self.archive_clicked(self.last_clicked_item)
             
-        elif self.current_exam_type == "Archive" and len(self.archiveItems) == 0:
+        elif self.current_exam_type == "Archived" and len(self.archiveItems) == 0:
             self.clear_files_and_preview()
     
     # File panel
