@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         end_date = 'BLANK' if not end_date else end_date
         skip_date = 'BLANK' if not skip_date else skip_date
         
-        logger.info(f"[LICENCE] Saved key: {key}\t Ending date: {end_date}\t Skip date: {skip_date}")
+        logger.info(f"[LICENCE] Active key: {key}\t Ending date: {end_date}\t Skip date: {skip_date}")
         result = self.validate_env_vars(key, end_date, skip_date)
         logger.info(result)
 
@@ -817,12 +817,12 @@ class SinavlarFrame(QFrame):
         loadUi(os.path.join(BASE_DIR, "Forms", "sinavlar_frame.ui"), self)
         from .Structs.display_struct_beta import Display
         
-        buttons = [self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.menuBtn, self.downloadsBtn]
+        buttons = [self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.archiveBtn, self.downloadsBtn]
         
         self.set_ui()
         toolBoxes = [self.examsToolBox, self.filesToolBox]
         listWidgets = [self.activeList, self.archiveList, self.classroomList, self.gradeList]
-        self.Display = Display(toolBoxes=toolBoxes, listWidgets=listWidgets, webEngineView = self.wev, displayTitle = self.displayTitle, buttons = buttons, buttonsFrame = self.buttonsFrame)
+        self.Display = Display(toolBoxes=toolBoxes, listWidgets=listWidgets, webEngineView = self.wev, displayTitle = self.displayTitle, buttons = buttons, buttonsLayout = self.buttonsLayout)
         
     def set_ui(self):
         self.wev = QWebEngineView()

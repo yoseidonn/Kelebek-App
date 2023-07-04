@@ -1,11 +1,11 @@
 import os
 
 BASE_DIR = os.getcwd()
-savedDir = os.path.join(BASE_DIR, "Saved")
+ActiveDir = os.path.join(BASE_DIR, "Active")
 exam_paths = []
 
-for exam_dir in os.listdir(savedDir):
-    exam_path = os.path.join(savedDir, exam_dir)
+for exam_dir in os.listdir(ActiveDir):
+    exam_path = os.path.join(ActiveDir, exam_dir)
     if os.path.isdir(exam_path):
         classroom_files = []
         grade_files = []
@@ -21,4 +21,4 @@ for exam_dir in os.listdir(savedDir):
             exam_paths.append(exam_path)
 
 print(exam_paths)
-print(os.listdir(savedDir))
+print(os.listdir(ActiveDir))

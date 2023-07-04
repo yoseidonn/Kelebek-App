@@ -23,6 +23,18 @@ border: none
    <property name="spacing">
     <number>10</number>
    </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item alignment="Qt::AlignLeft">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">

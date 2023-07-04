@@ -331,19 +331,19 @@ Tekrar denemek ister misiniz?"""
         dialogSonuc = SonucDialog(classroomPaths, gradePaths).isAccepted
         try:
             if dialogSonuc:
-                os.mkdir(os.path.join(BASE_DIR, 'Saved', examName))
-                os.mkdir(os.path.join(BASE_DIR, 'Saved', examName, "Classrooms"))
-                os.mkdir(os.path.join(BASE_DIR, 'Saved', examName, "Grades"))
+                os.mkdir(os.path.join(BASE_DIR, 'Active', examName))
+                os.mkdir(os.path.join(BASE_DIR, 'Active', examName, "Classrooms"))
+                os.mkdir(os.path.join(BASE_DIR, 'Active', examName, "Grades"))
                 name_template = "{}.html"
                 for cName in classroomPaths:
                     cNameToPath = "".join(cName.split("/"))
                     cPath = classroomPaths[cName]
-                    Path(cPath).rename(os.path.join(BASE_DIR, 'Saved', examName, "Classrooms", name_template.format(cNameToPath)))
+                    Path(cPath).rename(os.path.join(BASE_DIR, 'Active', examName, "Classrooms", name_template.format(cNameToPath)))
                 
                 for gName in gradePaths:
                     gNameToPath= "".join(gName.split("/"))
                     gPath = gradePaths[gName]
-                    Path(gPath).rename(os.path.join(BASE_DIR, 'Saved', examName, "Grades", name_template.format(gNameToPath)))
+                    Path(gPath).rename(os.path.join(BASE_DIR, 'Active', examName, "Grades", name_template.format(gNameToPath)))
 
             shutil.rmtree(os.path.join(BASE_DIR, "Temp", examName))
             

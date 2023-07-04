@@ -1,0 +1,27 @@
+/* QToolBox styles */
+QToolBox {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+}
+
+QToolBox::tab {
+    background-color: #f0f0f0;
+    color: #333333;
+    padding: 5px;
+}
+
+QToolBox::tab:selected {
+    background-color: #ffffff;
+    border-bottom: 2px solid #007acc;
+    color: #007acc;
+}
+
+QToolBox::tab:!selected {
+    background-color: #e5e5e5;
+    color: #888888;
+}
+
+QToolBox::tab:!selected:hover {
+    background-color: #cccccc;
+}

@@ -10,207 +10,158 @@ from PyQt5.QtTest import QTest
 import os, sys, shutil, pathlib, datetime
 from App import logs
 from App.logs import logger
+from App.database import num_sort
 
 BASE_DIR = os.environ["BASE_DIR"]
 
 class Display():
-    def __init__(self, toolBoxes: list[QToolBox], listWidgets: list[QListWidget], webEngineView: QWebEngineView, displayTitle: QLabel, buttons: list, buttonsFrame: QFrame):
+    def __init__(self, toolBoxes: list[QToolBox], listWidgets: list[QListWidget], webEngineView: QWebEngineView, displayTitle: QLabel, buttons: list, buttonsLayout: QFrame):
         self.examsToolBox, self.filesToolBox = toolBoxes
         self.activeList, self.archiveList, self.classroomList, self.gradeList = listWidgets
         
         self.wev = webEngineView
         self.displayTitle = displayTitle
-        self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.menuBtn, self.downloadBtn = buttons
-        self.buttonsFrame = buttonsFrame
+        self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.archiveBtn, self.downloadsBtn = buttons
+        self.buttonsLayout = buttonsLayout
 
-        self.activeItems: list[QListWidgetItem] = []
-        self.archiveItems: list[QListWidgetItem] = []
-        self.isArchived = False
+        self.init_settings()
         
+    def init_settings(self):
+        self.set_variables()
         self.set_signals()
         self.set_ui()
         
         self.set_archive_list_widget() # Archive list widget
         self.set_active_list_widget() # Exam list widget
-        self.set_classroom_list_widget() # Classroom list widget of selected exam
-        self.set_grade_list_widget() # Grade list widget of selected exam
         
+    def set_variables(self):
+        self.activeItems: list[QListWidgetItem] = []
+        self.archiveItems: list[QListWidgetItem] = []
+        self.classroomItems: list[QListWidgetItem] = []
+        self.gradeItems: list[QListWidgetItem] = []
+
+        self.is_selected_exam_Archive = False
+        self.current_exam_type = "Active"
+        self.selected_exam_name: str = None
+        self.last_clicked_item: QListWidgetItem = None
+
     def set_signals(self):
-        self.examsList.itemClicked.connect(self.el_item_clicked)
-        self.archiveList.itemClicked.connect(self.al_item_clicked)
-        self.examsToolbox.currentChanged.connect(self.exams_toolbox_changed)
+        self.activeList.itemClicked.connect(self.active_clicked)
+        self.archiveList.itemClicked.connect(self.archive_clicked)
+        self.classroomList.itemClicked.connect(self.classroom_clicked)
+        self.gradeList.itemClicked.connect(self.grade_clicked)
         
-        self.removeBtn.clicked.connect(self.remove_exam)
-        self.removeAllBtn.clicked.connect(lambda: self.remove_exam(all = True))
-        self.refreshAllBtn.clicked.connect(self.refresh_exams)
-        self.downloadBtn.clicked.connect(self.download)
-        
+        self.examsToolBox.currentChanged.connect(self.exam_type_changed)
+        self.filesToolBox.currentChanged.connect(self.file_mode_changed)
+
+        self.refreshAllBtn.clicked.connect(self.refresh)
+        self.archiveBtn.clicked.connect(lambda: self.archive_exam(mod="Archive"))
+
     def set_ui(self):
-        self.examsToolbox.setCurrentIndex(0)
+        self.removeBtn.setStyleSheet("background-color: rgb(246, 97, 81);")
+        self.removeAllBtn.setStyleSheet("background-color: rgb(246, 97, 81);")
+        self.refreshAllBtn.setStyleSheet("background-color: rgb(153, 193, 241);")
+        self.archiveBtn.setStyleSheet("background-color: rgb(153, 193, 241);")
+        self.downloadsBtn.setStyleSheet("background-color: rgb(143, 240, 164);")
+        self.removeAllBtn.setStyleSheet("background-color: rgb(246, 97, 81);")
+        
+        self.examsToolBox.setCurrentIndex(0)
         self.removeBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "trash.svg")))
+        self.removeBtn.setIconSize(QSize(32,32))
         self.removeAllBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "trash.svg")))
+        self.removeAllBtn.setIconSize(QSize(32,32))
         self.refreshAllBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images","icon", "refresh-ccw.svg")))
-        self.menuBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "menu.svg")))
+        self.refreshAllBtn.setIconSize(QSize(32,32))
+        self.archiveBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "custom_archive.svg")))
+        self.archiveBtn.setIconSize(QSize(32,32))
+        self.downloadsBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "download.svg")))
+        self.downloadsBtn.setIconSize(QSize(32,32))
 
-        self.menu = QMenu()
-        actArchive = QAction("Arşivle", self.buttonsFrame)
-        actDeArchive = QAction("Arşivden çıkar", self.buttonsFrame)
-        actRemoveArchive = QAction("Arşivi temizle", self.buttonsFrame)
-        self.menu.addAction(actArchive)
-        self.menu.addAction(actDeArchive)
-        self.menu.addAction(actRemoveArchive)
-        self.menuBtn.setMenu(self.menu)
-    
-        actArchive.triggered.connect(self.archive_exam)
-        actDeArchive.triggered.connect(self.de_archive_exam)
-        actRemoveArchive.triggered.connect(lambda: self.remove_exam_from_archive(all=True))
-        
-    def archive_exam(self):
-        mod = self.examsToolbox.currentIndex()
-        if mod:
-            logger.info("You can't archive an exam which is already archived.")
-            return
-        else:
-            for item in self.examItems:
-                if item.text() == self.selectedExamName:
-                    Item = item
-                    break
+    # Button functions
+    def archive_exam(self, mod: str = "Archive"):
+        current = "Active" if mod == "Archive" else "Archive"
+        to = "Archive" if mod == "Archive" else "Active"
 
-        modText = "Saved"
-        try:
-            filePath = os.path.join(BASE_DIR, modText, Item.text())
-        except Exception as e:
-            logger.error(e)
+        print(f"Current: {current}, To: {to}, mod: {mod}")
+        print(f"Current exam type: {self.current_exam_type}")
+        if self.current_exam_type != current:
+            logger.error("You can't archive an exam which is already Archive.")
+            # TODO ADD WARNING MESSAGE
             return
-        try:
-            # Create new folder and move files
-            os.mkdir(os.path.join("Archived", Item.text()))
-            pathlib.Path(os.path.join(filePath, "salon_oturma_duzenleri.html")).rename(os.path.join(BASE_DIR, 'Archived', Item.text(), 'salon_oturma_duzenleri.html'))
-            pathlib.Path(os.path.join(filePath, "sinif_listeleri.html")).rename(os.path.join(BASE_DIR,'Archived', Item.text(), 'sinif_listeleri.html'))
-            logger.info(f"Moved both files into Archived/{Item.text()}")
-            
-            # Remove old folder
-            shutil.rmtree(filePath)
-            logger.info(f"Removing {filePath}.")
-            
-        except Exception as e:
-            logger.error(str(e))
         
-        # Refresh exams
-        self.refresh_exams()
-    
-    def de_archive_exam(self):
-        mod = self.examsToolbox.currentIndex()
-        if not mod:
-            logger.error("You can't de archive an exam which is not archived.")
+        if self.last_clicked_item is None:
             return
-        else:
-            for item in self.archiveItems:
-                if item.text() == self.selectedExamName:
-                    Item = item
-                    break
-                
-        modText = "Archived"
-        try:
-            filePath = os.path.join(BASE_DIR, modText, Item.text())
-        except Exception as e:
-            logger.info(e)
-            return
-        try:
-            # Create new folder and move files
-            os.mkdir(os.path.join("Saved", Item.text()))
-            pathlib.Path(os.path.join(filePath, "salon_oturma_duzenleri.html")).rename(os.path.join(BASE_DIR, 'Saved', Item.text(), 'salon_oturma_duzenleri.html'))
-            pathlib.Path(os.path.join(filePath, "sinif_listeleri.html")).rename(os.path.join(BASE_DIR, 'Saved', Item.text(), 'sinif_listeleri.html'))
-            logger.info(f"Moved both files into Saved/{item.text()}")
-            
-            # Remove old folder
-            shutil.rmtree(filePath)
-            logger.info(f"Removing {filePath}.")
-            
-        except Exception as e:
-            logger.error(str(e))
-                
-        # Refresh exams
-        self.refresh_exams()
-    
-    def remove_exam_from_archive(self, all=False):
-        base_dir = "Saved" if self.examsToolbox.currentIndex() == 0 else "Archived"
-        if all and self.examItems:
-            result = ConfirmRemoveExam(text="Bu işlem 'tüm arşivlenmiş sınavları' silecektir. Geri alınamaz.").result()
-            if not result:
-                print("Cancelled")
-                return
-            
-            shutil.rmtree(os.path.join(BASE_DIR, "Archived"))
-            os.mkdir(os.path.join(BASE_DIR, "Archived"))
-            
-        else:
-            result = ConfirmRemoveExam(text="Bu işlem 'arşivdeki seçili sınavı' silecektir. Geri alınamaz.").result()
-            if not result:
-                print("Cancelled")
-                return
-            
-            logger.info(f"Removing {os.path.join(BASE_DIR, base_dir, self.selectedExamName)}")
-            logger.info(f"Is archived: {self.isArchived}")
-            try:
-                shutil.rmtree(os.path.join(BASE_DIR, base_dir, self.selectedExamName))
-            except Exception as e:
-                logger.error(str(e))
         
-        self.refresh_exams()
+        # Make the process
+        classroomDirs = os.listdir(os.path.join(BASE_DIR, current, self.selected_exam_name, "Classrooms"))
+        gradeDirs = os.listdir(os.path.join(BASE_DIR, current, self.selected_exam_name, "Grades"))
+        classroomDirs = sorted(sorted(classroomDirs), key=num_sort)
+        gradeDirs = sorted(sorted(gradeDirs), key=num_sort)
+        
+        print(f"Classroom dirs: {', '.join([dir for dir in classroomDirs])}")
+        print(f"Grade dirs: {', '.join([dir for dir in gradeDirs])}")
+        
+        try:
+            os.mkdir(os.path.join(BASE_DIR, to, self.selected_exam_name))
+        except Exception as e:
+            logger.error(f"Yeni dizinleri oluşturma | root dir -> {e}")
+        try:
+            os.mkdir(os.path.join(BASE_DIR, to, self.selected_exam_name, "Classrooms"))
+        except Exception as e:
+            logger.error(f"Yeni dizinleri oluşturma | classrooms dir -> {e}")
+        try:
+            os.mkdir(os.path.join(BASE_DIR, to, self.selected_exam_name, "Grades"))
+        except Exception as e:
+            logger.error(f"Yeni dizinleri oluşturma | grades dir -> {e}")
+        
+        try:
+            for classroomDir in classroomDirs:
+                old_file_dir = os.path.join(BASE_DIR, current, self.selected_exam_name, "Classrooms", classroomDir)
+                new_file_dir = os.path.join(BASE_DIR, to, self.selected_exam_name, "Classrooms", classroomDir)
+                pathlib.Path(old_file_dir).rename(new_file_dir)
+        except Exception as e:
+            logger.error(f"Dosyaları taşıma | classrooms -> {e}")
+
+        try:
+            for gradeDir in gradeDirs:
+                old_file_dir = os.path.join(BASE_DIR, current, self.selected_exam_name, "Grades", gradeDir)
+                new_file_dir = os.path.join(BASE_DIR, to, self.selected_exam_name, "Grades", gradeDir)
+                pathlib.Path(old_file_dir).rename(new_file_dir)
+        except Exception as e:
+            logger.error(f"Dosyaları taşıma | grades -> {e}")
+
+        try:
+            shutil.rmtree(os.path.join(BASE_DIR, current, self.selected_exam_name))
+        except Exception as e:
+            logger.error(f"Eski dizini silme -> {e}")
+
+        print("Archive\n")
+        self.last_clicked_item = None
+        if mod == "Archive":
+            self.set_archive_list_widget()
+            self.set_active_list_widget()
+        else:
+            self.set_active_list_widget()
+            self.set_archive_list_widget()
     
     def remove_exam(self, all = False):
-        base_dir = "Saved" if self.examsToolbox.currentIndex() == 0 else "Archived"
-        if all and self.examItems:
-            result = ConfirmRemoveExam(text="Bu işlem 'tüm aktif sınavları' silecektir. Geri alınamaz.").result()
-            if not result:
-                print("Cancelled")
-                return
-            
-            shutil.rmtree(os.path.join(BASE_DIR, "Saved"))
-            os.mkdir(os.path.join(BASE_DIR, "Saved"))
-            self.refresh_exams()
-            return
-        try:
-            # Arşivden sil
-            if self.isArchived and self.archiveItems:
-                self.remove_exam_from_archive()
+        if not self.is_selected_exam_Archive:
+            lookingPath = "Active"
+        else:
+            lookingPath = "Archive"
 
-            # Kayıtlardan sil
-            elif not self.isArchived and self.examItems:
-                result = ConfirmRemoveExam(text="Bu işlem 'seçili aktif sınavı' silecektir. Geri alınamaz.").result()
-                if not result:
-                    print("Cancelled")
-                    return
-            
-                logger.info(f"Removing {os.path.join(BASE_DIR, base_dir, self.selectedExamName)}")
-                logger.info(f"Is archived: {self.isArchived}")
-                try:
-                    shutil.rmtree(os.path.join(BASE_DIR, base_dir, self.selectedExamName))
-                except Exception as e:
-                    logger.error(str(e))
+        self.remove_exam(all=all, lookingPath=lookingPath)
 
-            # Bilinmeyen dosya
-            else:
-                logger.info("Remove cancelled.")
-
-            self.refresh_exams()
-               
-        except Exception as e:
-            logger.error(str(e))
-            logger.error(f"Can not find exam to remove at: {os.path.join(BASE_DIR, base_dir, self.selectedExamName)}")
+    def remove_exam(self, all = False, lookingPath = "Active"):
+        pass
+        
+    def refresh(self):
+        self.init_settings()
             
     def download(self):
-        savePath = self.save_dialog()
-        #HTML yazısını çıkar ve _to_save.html ekle
-        modText = self.currentMode[0:-5] + "_to_save.html"
-        savedFilePath = os.path.join(BASE_DIR, 'Saved', self.selectedExamName, modText)
-        logger.info(f"Saving {savedFilePath} to {savePath}")
-        logger.error("Process stopped... Not implemented")
+        pass
         
-        # save the self.selectedFilePath content as pdf file
-        
-    def save_dialog(self):
+    def download_dialog(self):
         dialog = QFileDialog()
         dialog.setOption(QFileDialog.ShowDirsOnly, True)
         dialog.setWindowTitle("Kaydetme dizini seçiniz")
@@ -218,162 +169,267 @@ class Display():
         dialog.setFileMode(QFileDialog.Directory)
         if dialog.exec_() == QFileDialog.Accepted:
             return dialog.selectedFiles()[0]
-        
-    def refresh_exams(self):
-        self.examsList.clear()
-        self.archiveList.clear()
-        self.examItems: list[QListWidgetItem] = []
-        self.archiveItems: list[QListWidgetItem] = []
-        if self.examsToolbox.currentIndex():
-            self.set_elw()
-            self.set_alw()
+           
+    # Signal functions----------------------
+    def exam_type_changed(self):
+        if self.examsToolBox.currentIndex() == 0:
+            self.current_exam_type = "Active"
+            
+            self.archiveBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "custom_archive.svg")))
+            self.archiveBtn.clicked.connect(lambda: self.archive_exam(mod="Archive"))
+            self.archiveBtn.setText("Arşivle")
+            
+            if self.activeItems:
+                Item = self.activeItems[0]
+                Item.setSelected(True)
+                self.active_clicked(Item)
+            else:
+                self.clear_files_and_preview()
+
         else:
-            self.set_alw()
-            self.set_elw()
-            
-        logger.info("[REFRESH] Refreshed Exams and Archived Exams.")
-    
-    def exams_toolbox_changed(self, index: int):
-        try:
-            self.al_item_clicked(self.archiveItems[0]) if index else self.el_item_clicked(self.examItems[0])
-        except Exception as e:
-            logger.error(str(e))
-            
-    def set_archive_list_widget(self):
-        # Archive list widget
-        examDirs = [dir[0] for dir in os.walk('Saved/')]
-        for directory in examDirs:
-            directory_name = directory.split('Saved/')[1]
-            if len(directory_name) != 0:
-                item = QListWidgetItem(directory_name)
-                self.activeItems.append(item)
-                self.activeList.addItem(item)
+            self.current_exam_type = "Archive"
 
-        if len(self.activeItems) != 0:
-            firstItem = self.activeItems[0]
-            firstItem.setSelected(True)
-            self.active_list_item_clicked(firstItem)
+            self.archiveBtn.setIcon(QIcon(os.path.join(BASE_DIR, "Images", "icon", "custom_unarchive.svg")))
+            self.archiveBtn.clicked.connect(lambda: self.archive_exam(mod="De-Archive"))
+            self.archiveBtn.setText("Arşivden çıkar")
+
+            if self.archiveItems:
+                Item = self.archiveItems[0]
+                Item.setSelected(True)
+                self.archive_clicked(Item)
+            else:
+                self.clear_files_and_preview()
+        
+    def file_mode_changed(self):
+        print(f"Classroom item texts: {', '.join([item.text() for item in self.classroomItems])}")
+        print(f"Grade item texts: {', '.join([item.text() for item in self.gradeItems])}")
+        print("----")
+        if self.filesToolBox.currentIndex() == 0:
+            if self.classroomItems:
+                Item = self.classroomItems[0]
+                Item.setSelected(True)
+                self.classroom_clicked(Item)
+            else:
+                self.wev.setHtml("")
+
+        else:
+            if self.gradeItems:
+                Item = self.gradeItems[0]
+                Item.setSelected(True)
+                self.grade_clicked(Item)
+            else:
+                self.wev.setHtml("")
+                
+    # Exam panel
+    def active_clicked(self, item: QListWidgetItem):
+        # Set needed vars for next time
+        self.is_selected_exam_Archive = False
+        self.current_exam_type = "Active"
+         
+        if self.last_clicked_item is not None:
+            self.last_clicked_item.setSelected(False)
+        self.last_clicked_item = item
+        self.filesToolBox.setCurrentIndex(0)
+        
+        # Item seç ve dosyaları güncelle
+        item.setSelected(True)
+        self.selected_exam_name = item.text()
+        examPath = os.path.join(BASE_DIR, "Active", self.selected_exam_name)
+
+        self.set_classroom_list_widget(examPath=examPath)
+        if self.classroomItems:
+            Item = self.classroomItems[0]
+            Item.setSelected(True)
+            self.filesToolBox.setCurrentIndex(0)
+            self.classroom_clicked(Item)
+            
+        self.set_grade_list_widget(examPath=examPath)
+        self.file_mode_changed()
+        
+    def archive_clicked(self, item: QListWidgetItem):
+        # Set needed vars for next time
+        self.is_selected_exam_Archive = True
+        self.current_exam_type = "Archive"
+        
+        if self.last_clicked_item is not None:
+            self.last_clicked_item.setSelected(False)
+        self.last_clicked_item = item
+        self.examsToolBox.setCurrentIndex(1)
+
+        # Item seç ve dosyaları güncelle
+        item.setSelected(True)
+        self.selected_exam_name = item.text()
+        examPath = os.path.join(BASE_DIR, "Archive", self.selected_exam_name)
+        
+        self.set_classroom_list_widget(examPath=examPath)
+        if self.classroomItems:
+            Item = self.classroomItems[0]
+            Item.setSelected(True)
+            self.filesToolBox.setCurrentIndex(0)
+            self.classroom_clicked(Item)
+            
+        self.set_grade_list_widget(examPath=examPath)
+        self.file_mode_changed()
+        
+    # File panel
+    def classroom_clicked(self, item: QListWidgetItem):
+        classroom_name = item.text()
+        file_path = os.path.join(BASE_DIR, self.current_exam_type, self.selected_exam_name, "Classrooms", self.get_un_slashed_name(classroom_name, file_format=".html"))
+
+        try:
+            with open(file_path, 'r', encoding="utf-8") as file:
+                content = file.read()
+        except Exception as e:
+            content = f"<h1>Bir hata meydana geldi. Bu dosyayı bulamıyoruz. Kayıt defterine bakmak işinize yarayabilir.</h1><h3><strong>{os.path.join(BASE_DIR, 'kayit_defteri.log')}</strong></h3>"
+            logger.error(e)
+
+        self.wev.setHtml(content)
     
+    def grade_clicked(self, item: QListWidgetItem):
+        grade_name = item.text()
+        file_path = os.path.join(BASE_DIR, self.current_exam_type, self.selected_exam_name, "Grades", self.get_un_slashed_name(grade_name, file_format=".html"))
+        
+        try:
+            with open(file_path, 'r', encoding="utf-8") as file:
+                content = file.read()
+        except Exception as e:
+            content = f"<h1>Bir hata meydana geldi. Bu dosyayı bulamıyoruz. Kayıt defterine bakmak işinize yarayabilir.</h1><h3><strong>{os.path.join(BASE_DIR, 'kayit_defteri.log')}</strong></h3>"
+            logger.error(e)
+
+        self.wev.setHtml(content)
+ 
+    # Adjust functions---------------
+    def clear_files_and_preview(self):
+        self.last_clicked_item = None
+        self.classroomList.clear()
+        self.gradeList.clear()
+        self.classroomItems: list = list()
+        self.gradeItems: list = list()
+        self.wev.setHtml("")
+        
+    # Exam panel
     def set_active_list_widget(self):
-        # Active list widget
-        examDirs = [dir[0] for dir in os.walk('Saved/')]
+        self.activeList.clear()
+        self.activeItems: list = list()
+        
+        examDirs = os.listdir(os.path.join(BASE_DIR, "Active"))
+        examDirs = sorted(sorted(examDirs), key=num_sort)
+        
         for directory in examDirs:
-            dName = directory.split('Saved/')[1]
-            if len(dName) != 0:
-                item = QListWidgetItem(dName)
-                self.examItems.append(item)
-                self.examsList.addItem(item)
+            item = QListWidgetItem(directory)
+            item.setSelected(False)
+            self.activeItems.append(item)
+            self.activeList.addItem(item)
 
-        if len(self.examItems) != 0:
-            firstItem = self.examItems[0]
-            firstItem.setSelected(True)
-            self.el_item_clicked(firstItem)
-
-    def set_classroom_list_widget(self):
-        # Classroom list widget
-        pass
-
-    def set_grade_list_widget(self):
-        # Grade list widget
-        pass
-
-
-    ### Exam List Widget
-    def actives_item_clicked(self, item: QListWidgetItem):
-        self.isArchived = False
-        item.setSelected(True)
-        self.selectedExamName = item.text()
-        filePath = os.path.join(BASE_DIR, 'Saved', self.selectedExamName, self.currentMode)
-        try:
-            with open(filePath, "r", encoding="utf-8") as file:
-                htmlContent = file.read()
-        except Exception as e:
-            logger.error(str(e))
-            htmlContent = "<h1>Bir hata meydana geldi. Bu dosyayı bulamıyoruz. Kayıt defterine bakmak işinize yarayabilir.</h1>"
-        self.wev.setHtml(htmlContent)
-        
-        mod = "Salon oturma düzenleri" if self.currentMode == "salon_oturma_duzenleri.html" else "Sınıf listeleri"
-        self.displayTitle.setText("{0} - {1}".format(self.selectedExamName, mod))
-        
-    # ExamsListWidget settings
-    def set_elw(self):
-        x = [x[0] for x in os.walk('Saved/')]
-        for directory in x:
-            dName = directory.split('Saved/')[1]
-            if len(dName) != 0:
-                item = QListWidgetItem(dName)
-                self.examItems.append(item)
-                self.examsList.addItem(item)
-
-        if len(self.examItems) != 0:
-            firstItem = self.examItems[0]
-            firstItem.setSelected(True)
-            self.el_item_clicked(firstItem)
-                
-    def al_item_clicked(self, item:QListWidgetItem):
-        self.isArchived = True
-        item.setSelected(True)
-        self.selectedExamName = item.text()
-        filePath = os.path.join(BASE_DIR, 'Archived', self.selectedExamName, self.currentMode)
-        try:
-            with open(filePath, "r", encoding="utf-8") as file:
-                htmlContent = file.read()
-                
-        except Exception as e:
-            logger.error(str(e))
-            htmlContent = "<h1>Bir hata meydana geldi. Bu dosyayı bulamıyoruz. Kayıt defterine bakmak işinize yarayabilir.</h1>"
-        self.wev.setHtml(htmlContent)
-        
-        mod = "Salon oturma düzenleri" if self.currentMode == "salon_oturma_duzenleri.html" else "Sınıf listeleri"
-        self.displayTitle.setText("{} - {}".format(self.selectedExamName, mod))
-
-    # ExamsListWidget settings
-    def set_alw(self):
-        x = [x[0] for x in os.walk('Archived/')]
-        for directory in x:
-            dName = directory.split('Archived/')[1]
-            if len(dName) != 0:
-                item = QListWidgetItem(dName)
-                self.archiveItems.append(item)
-                self.archiveList.addItem(item)
-
-        if len(self.archiveItems) != 0:
-            firstItem = self.archiveItems[0]
-            firstItem.setSelected(True)
-            self.al_item_clicked(firstItem)
+        if self.current_exam_type == "Active" and len(self.activeItems) != 0:
+            self.last_clicked_item = self.activeItems[0]
+            self.last_clicked_item.setSelected(True)
+            self.active_clicked(self.last_clicked_item)
             
-    ### File List Widget
-    def fl_item_clicked(self, item: QListWidgetItem):
-        if item.text() == "Salon oturma düzenleri":
-            self.currentMode = "salon_oturma_duzenleri.html"
-            #print(f'[ITEM SELECTED] {self.selectedExamName} - Salon seçildi.')
-        elif item.text() == "Sınıf listeleri":
-            self.currentMode = "sinif_listeleri.html"
-            #print(f'[ITEM SELECTED] {self.selectedExamName} - Sınıf seçildi.')
+        elif self.current_exam_type == "Active" and len(self.activeItems) == 0:
+            self.clear_files_and_preview()
 
-        base_dir = "Saved" if self.examsToolbox.currentIndex() == 0 else "Archived"
-        try:
-            filePath = os.path.join(BASE_DIR, base_dir, self.selectedExamName, self.currentMode)
-        except Exception as e:
-            logger.debug(str(e))
-        try:
-            with open(filePath, 'r', encoding="utf-8") as file:
-                htmlContent = file.read()
-        except Exception as e:
-            logger.error(str(e))
-            htmlContent = "<h1>Bir hata meydana geldi. Bu dosyayı bulamıyoruz. Kayıt defterine bakmak işinize yarayabilir.</h1>"
+    def set_archive_list_widget(self):
+        self.archiveList.clear()
+        self.archiveItems: list = list()
+        
+        examDirs = os.listdir(os.path.join(BASE_DIR, "Archive"))
+        examDirs = sorted(sorted(examDirs), key=num_sort)
 
-        self.wev.setHtml(htmlContent)
+        for directory in examDirs:
+            item = QListWidgetItem(directory)
+            item.setSelected(False)
+            self.archiveItems.append(item)
+            self.archiveList.addItem(item)
         
-        mod = "Salon oturma düzenleri" if self.currentMode == "salon_oturma_duzenleri.html" else "Sınıf listeleri"
-        self.displayTitle.setText("{} - {}".format(self.selectedExamName, mod))
+        if self.current_exam_type == "Archive" and len(self.archiveItems) != 0:
+            self.last_clicked_item = self.archiveItems[0]
+            self.last_clicked_item.setSelected(True)
+            self.archive_clicked(self.last_clicked_item)
+            
+        elif self.current_exam_type == "Archive" and len(self.archiveItems) == 0:
+            self.clear_files_and_preview()
+    
+    # File panel
+    def set_classroom_list_widget(self, examPath: str):
+        # Classroom list widget
+        self.classroomList.clear()
+        self.classroomItems.clear()
+        
+        classroomDirs = os.listdir(os.path.join(BASE_DIR, self.current_exam_type, self.selected_exam_name, "Classrooms"))
+        classroomDirs = sorted(sorted(classroomDirs), key=num_sort)
 
-    def set_flw(self):
-        self.file1 = QListWidgetItem('Salon oturma düzenleri')
-        self.file2 = QListWidgetItem('Sınıf listeleri')
-        self.file1.setSelected(True)
+        for directory in classroomDirs:
+            directory = self.get_slashed_name(directory)
+            if len(directory) != 0:
+                item = QListWidgetItem(directory)
+                self.classroomItems.append(item)
+                self.classroomList.addItem(item)
+
+    def set_grade_list_widget(self, examPath: str):
+        # Grade list widget
+        self.gradeList.clear()
+        self.gradeItems.clear()
+
+        gradeDirs = os.listdir(os.path.join(BASE_DIR, self.current_exam_type , self.selected_exam_name, "Grades"))
+        gradeDirs = sorted(sorted(gradeDirs), key=num_sort)
         
+        for directory in gradeDirs:
+            directory = self.get_slashed_name(directory)
+            if len(directory) != 0:
+                item = QListWidgetItem(directory)
+                self.gradeItems.append(item)
+                self.gradeList.addItem(item)
+    
+    # Extra functions---------------------
+    def get_slashed_name(self, name: str, file_format: str = ""):
+        prefix = []
+        suffix = []
         
+        for letter in name:
+            if letter.isnumeric():
+                prefix.append(letter)  
+            else:
+                suffix.append(letter)  
+
+        prefix = "".join(prefix)
+        
+        if file_format:
+            suffix = "".join(suffix)
+        else:
+            suffix2 = []
+            for letter in suffix:
+                if letter == ".":
+                    break
+                suffix2.append(letter)
+            suffix = "".join(suffix2)
+             
+        return f"{prefix}/{suffix}{file_format}"
+    
+    def get_un_slashed_name(self, name: str, file_format: str = ""):
+        prefix = []
+        suffix = []
+        
+        for letter in name:
+            if letter.isnumeric():
+                prefix.append(letter)  
+            elif letter != "/":
+                suffix.append(letter)  
+
+        prefix = "".join(prefix)
+        
+        if file_format:
+            suffix = "".join(suffix)
+        else:
+            suffix2 = []
+            for letter in suffix:
+                if letter == ".":
+                    break
+                suffix2.append(letter)
+            suffix = "".join(suffix2)
+             
+        return f"{prefix}{suffix}{file_format}"
+
 class ConfirmRemoveExam(QDialog):
     def __init__(self, text: str):
         super().__init__()

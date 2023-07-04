@@ -1,0 +1,124 @@
+/* QToolBox styles */
+QToolBox {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+}
+
+QToolBox::tab {
+    background-color: #f0f0f0;
+    color: #333333;
+    padding: 5px;
+}
+
+QToolBox::tab:selected {
+    background-color: #ffffff;
+    border-bottom: 2px solid #007acc;
+    color: #007acc;
+}
+
+QToolBox::tab:!selected {
+    background-color: #e5e5e5;
+    color: #888888;
+}
+
+QToolBox::tab:!selected:hover {
+    background-color: #cccccc;
+}
+
+/* QToolBar styles */
+QToolBar {
+    background-color: #f0f0f0;
+    border: none;
+    spacing: 3px;
+}
+
+QToolBar::handle {
+    background-color: #007acc;
+    width: 5px;
+}
+
+QToolBar::separator {
+    background-color: #cccccc;
+    width: 1px;
+    height: 20px;
+}
+
+QToolBar::separator:hover {
+    background-color: #999999;
+}
+
+QToolBar::toolButton {
+    background-color: transparent;
+    border: none;
+    padding: 5px;
+    color: #333333;
+}
+
+QToolBar::toolButton:hover {
+    background-color: #e5e5e5;
+}
+
+QToolBar::toolButton:pressed {
+    background-color: #cccccc;
+}
+
+QToolBar::toolButton:checked {
+    background-color: #007acc;
+    color: #ffffff;
+}
+
+/* QWebEngineView styles */
+QWebEngineView {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+}
+
+QWebEngineView::hover {
+    border: 1px solid #007acc;
+}
+
+/* QTableWidget styles */
+QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+}
+
+QTableWidget::item {
+    padding: 5px;
+}
+
+QTableWidget::item:hover {
+    background-color: #e5e5e5;
+}
+
+QTableWidget::item:disabled {
+    color: #888888;
+}
+
+QTableWidget::header {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #cccccc;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+QTableWidget::header:last:selected {
+    background-color: #007acc;
+    color: #ffffff;
+}
+
+QTableWidget::header:last:focus {
+    background-color: #007acc;
+    color: #ffffff;
+}
+
+QTableWidget::header:last:hover {
+    background-color: #cccccc;
+}
+
+QTableWidget::header:last:pressed {
+    background-color: #007acc;
+    color: #ffffff;
+}

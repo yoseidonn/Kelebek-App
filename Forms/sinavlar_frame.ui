@@ -117,7 +117,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>343</width>
+              <width>375</width>
               <height>452</height>
              </rect>
             </property>
@@ -148,7 +148,7 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="buttonsFrame">
+          <layout class="QHBoxLayout" name="buttonsLayout">
            <item>
             <widget class="QPushButton" name="removeBtn">
              <property name="enabled">
@@ -180,12 +180,12 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="menuBtn">
+            <widget class="QPushButton" name="archiveBtn">
              <property name="enabled">
               <bool>true</bool>
              </property>
              <property name="text">
-              <string>Menu</string>
+              <string>Arşivle</string>
              </property>
             </widget>
            </item>
