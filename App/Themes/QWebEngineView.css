@@ -1,0 +1,10 @@
+/* QWebEngineView styles */
+QWebEngineView {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+}
+
+QWebEngineView::hover {
+    border: 1px solid #007acc;
+}

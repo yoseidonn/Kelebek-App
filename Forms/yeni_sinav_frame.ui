@@ -753,19 +753,19 @@ border:none;
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
                <property name="spacing">
-                <number>5</number>
+                <number>10</number>
                </property>
                <property name="leftMargin">
-                <number>0</number>
+                <number>9</number>
                </property>
                <property name="topMargin">
-                <number>0</number>
+                <number>9</number>
                </property>
                <property name="rightMargin">
-                <number>0</number>
+                <number>9</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>9</number>
                </property>
                <item>
                 <widget class="QFrame" name="frame">
@@ -950,16 +950,16 @@ border:none;
                 <number>0</number>
                </property>
                <property name="leftMargin">
-                <number>0</number>
+                <number>9</number>
                </property>
                <property name="topMargin">
-                <number>0</number>
+                <number>9</number>
                </property>
                <property name="rightMargin">
-                <number>0</number>
+                <number>9</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>9</number>
                </property>
                <item>
                 <widget class="QListWidget" name="gradeList"/>
@@ -980,19 +980,19 @@ border:none;
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <property name="spacing">
-             <number>5</number>
+             <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <property name="rightMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <property name="bottomMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <item>
              <widget class="QFrame" name="frame_14">
@@ -1067,16 +1067,16 @@ border:none;
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <property name="rightMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <property name="bottomMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <item alignment="Qt::AlignLeft|Qt::AlignTop">
              <widget class="QFrame" name="frame_2">

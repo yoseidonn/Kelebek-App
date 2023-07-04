@@ -108,10 +108,13 @@ class ExamStruct():
             self.set_red()       # Input place
 
     def remove_exam(self):
-        checkboxes = self.exams[self.selectedExamName]["checkBoxes"]
-        print(len(checkboxes))
+        try:
+            checkboxes = self.exams[self.selectedExamName]["checkBoxes"]
+        except KeyError as e:
+            print(e)
+            return
+
         for checkbox in checkboxes:
-            print(checkbox.text())
             checkbox.setStyleSheet("")
             checkbox.setChecked(False)
 
@@ -126,10 +129,26 @@ class ExamStruct():
         self.draw_exam_table()
 
     def remove_all_exams(self):
-        self.set_start_variables()
-        self.adjust_widget_settings()
-        self.removeButton.setEnabled(False)
-        self.removeAllButton.setEnabled(False)
+        try:
+            checkboxes = self.exams[self.selectedExamName]["checkBoxes"]
+        except KeyError as e:
+            print(e)
+            return
+        
+        for checkbox in checkboxes:
+                checkbox.setStyleSheet("")
+                checkbox.setChecked(False)
+        
+        for examName in list(self.exams.keys()):
+            self.exams.pop(examName)
+            for eName in self.exams:
+                for checkbox in self.exams[eName]["checkBoxes"]:
+                    color = self.exams[eName]["paletteColor"]
+                    r, g, b = color
+                    checkbox.setChecked(True)
+                    checkbox.setStyleSheet(f"background-color: rgba({r}, {g}, {b}, 100)") 
+        
+        self.draw_exam_table()
 
     def on_cell_change(self):
         item = self.examTableWidget.currentItem()
@@ -266,6 +285,7 @@ class ExamStruct():
         self.examTableWidget.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.examTableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         self.examTableWidget.verticalHeader().hide()
+        self.examTableWidget.setItemDelegate(HighlightDelegate())
         # Bir renk paleti ekle
         self.colorPalette = QPalette()
         self.examTableWidget.setPalette(self.colorPalette)
@@ -450,6 +470,23 @@ class SonucDialog(QDialog):
             self.gradeItems.append(item)
             self.gradeList.addItem(item)
             
+  
+class HighlightDelegate(QStyledItemDelegate):
+    def paint(self, painter: QPainter, option: QStyleOptionViewItem, index):
+        # Call the base class paint method to draw the item
+        super().paint(painter, option, index)
+
+        # Check if the item is selected
+        if option.state & QStyle.State_Selected:
+            # Get the selected border color
+            borderColor = QColor(255, 255, 255)  # Black color
+            # Set the selected border color and style
+            pen = QPen(borderColor, 2)  # 2-pixel border width
+            pen.setJoinStyle(Qt.MiterJoin)  # Set the border join style
+            painter.setPen(pen)
+            # Draw the border inside the item rectangle
+            painter.drawRect(option.rect.adjusted(1, 1, -1, -1))
+        
   
 if __name__ == '__main__':
     class ExamFrame(QFrame):

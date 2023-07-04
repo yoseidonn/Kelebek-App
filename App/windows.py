@@ -511,7 +511,7 @@ class OgrencilerFrame(QFrame):
                 if rowIndex != lastIndex:
                     pass
             # TÜM SEÇİLİ SATIRLARIN UZUNLUĞUNU KONTROL ET. EĞER 1 TANE SATIR SEÇİLİ İSE ONUN NUMARASINA BAK VE SİL
-            print(self.table.itemAt(QPoint(0, self.table.selectedItems()[0].row())).text())
+            #print(self.table.itemAt(QPoint(0, self.table.selectedItems()[0].row())).text())
             database.remove_one_student(number = self.table.itemAt(QPoint(0, self.table.selectedItems()[0].row())).text())
 
         self.ogrencilerList = database.get_all_students()
@@ -565,9 +565,10 @@ class EkleDuzenleDialog(QDialog):
         self.set_signals()
         
     def set_signals(self):
-        self.noIn.textChanged.connect(lambda: self.noIn.setStyleSheet("background-color: white;"))
-        self.nameIn.textChanged.connect(lambda: self.nameIn.setStyleSheet("background-color: white;"))
-        self.surnameIn.textChanged.connect(lambda: self.surnameIn.setStyleSheet("background-color: white;"))
+        # Empty style sheets meant to make it normal
+        self.noIn.textChanged.connect(lambda: self.noIn.setStyleSheet(""))
+        self.nameIn.textChanged.connect(lambda: self.nameIn.setStyleSheet(""))
+        self.surnameIn.textChanged.connect(lambda: self.surnameIn.setStyleSheet(""))
         self.saveButton.clicked.connect(self.check)
         self.exitButton.clicked.connect(self.close)
 
@@ -805,7 +806,8 @@ class YeniSinavFrame(QFrame):
         self.isStarted = False
             
     def set_white(self):
-        self.masterExamNameIn.setStyleSheet("background-color: white;")
+        # Empty style sheets meant to make it normal
+        self.masterExamNameIn.setStyleSheet("")
     
     def set_red(self):
         self.masterExamNameIn.setStyleSheet(f"background-color: rgb(255, 128, 128);")
@@ -815,14 +817,16 @@ class SinavlarFrame(QFrame):
     def __init__(self):
         super().__init__()
         loadUi(os.path.join(BASE_DIR, "Forms", "sinavlar_frame.ui"), self)
-        from .Structs.display_struct_beta import Display
-        
-        buttons = [self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.menuBtn, self.downloadsBtn]
+        from .Structs.display_struct import Display
         
         self.set_ui()
+
+        buttons = [self.removeBtn, self.removeAllBtn, self.refreshAllBtn, self.archiveBtn, self.downloadsBtn]
+        frames = [self.buttonsFrame, self.contentFrame]
         toolBoxes = [self.examsToolBox, self.filesToolBox]
         listWidgets = [self.activeList, self.archiveList, self.classroomList, self.gradeList]
-        self.Display = Display(toolBoxes=toolBoxes, listWidgets=listWidgets, webEngineView = self.wev, displayTitle = self.displayTitle, buttons = buttons, buttonsFrame = self.buttonsFrame)
+        
+        self.Display = Display(toolBoxes=toolBoxes, listWidgets=listWidgets, webEngineView = self.wev, displayGroupBox = self.displayGroupBox, buttons = buttons, frames = frames)
         
     def set_ui(self):
         self.wev = QWebEngineView()

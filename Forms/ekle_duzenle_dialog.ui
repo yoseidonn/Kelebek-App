@@ -77,16 +77,16 @@ border: none
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>7</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>7</number>
             </property>
             <property name="rightMargin">
-             <number>0</number>
+             <number>7</number>
             </property>
             <property name="bottomMargin">
-             <number>0</number>
+             <number>7</number>
             </property>
             <item>
              <widget class="QLineEdit" name="noIn"/>
@@ -110,16 +110,16 @@ border: none
              <number>5</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>7</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>7</number>
             </property>
             <property name="rightMargin">
-             <number>0</number>
+             <number>7</number>
             </property>
             <property name="bottomMargin">
-             <number>0</number>
+             <number>7</number>
             </property>
             <item>
              <widget class="QLineEdit" name="nameIn"/>
@@ -145,6 +145,21 @@ border: none
                <string>Öğrenci sınıfı</string>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <property name="leftMargin">
+                <number>7</number>
+               </property>
+               <property name="topMargin">
+                <number>7</number>
+               </property>
+               <property name="rightMargin">
+                <number>7</number>
+               </property>
+               <property name="bottomMargin">
+                <number>7</number>
+               </property>
                <item>
                 <widget class="QComboBox" name="gradeCombo">
                  <item>
@@ -252,6 +267,21 @@ border: none
                <string>Cinsiyeti</string>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>7</number>
+               </property>
+               <property name="topMargin">
+                <number>7</number>
+               </property>
+               <property name="rightMargin">
+                <number>7</number>
+               </property>
+               <property name="bottomMargin">
+                <number>7</number>
+               </property>
                <item>
                 <widget class="QComboBox" name="sexCombo">
                  <item>
@@ -308,7 +338,7 @@ border: none
             <string>Kaydet</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources.qrc">
+            <iconset>
              <normaloff>:/icons/Icons/save.svg</normaloff>:/icons/Icons/save.svg</iconset>
            </property>
           </widget>
@@ -322,7 +352,7 @@ border: none
             <string>İptal</string>
            </property>
            <property name="icon">
-            <iconset resource="../resources.qrc">
+            <iconset>
              <normaloff>:/icons/Icons/x-circle.svg</normaloff>:/icons/Icons/x-circle.svg</iconset>
            </property>
           </widget>

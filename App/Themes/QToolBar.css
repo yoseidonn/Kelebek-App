@@ -1,0 +1,41 @@
+/* QToolBar styles */
+QToolBar {
+    background-color: #f0f0f0;
+    border: none;
+    spacing: 3px;
+}
+
+QToolBar::handle {
+    background-color: #007acc;
+    width: 5px;
+}
+
+QToolBar::separator {
+    background-color: #cccccc;
+    width: 1px;
+    height: 20px;
+}
+
+QToolBar::separator:hover {
+    background-color: #999999;
+}
+
+QToolBar::toolButton {
+    background-color: transparent;
+    border: none;
+    padding: 5px;
+    color: #333333;
+}
+
+QToolBar::toolButton:hover {
+    background-color: #e5e5e5;
+}
+
+QToolBar::toolButton:pressed {
+    background-color: #cccccc;
+}
+
+QToolBar::toolButton:checked {
+    background-color: #007acc;
+    color: #ffffff;
+}
