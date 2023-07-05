@@ -1,8 +1,9 @@
-from PyQt5.QtWidgets import QApplication
-from .windows import MainWindow
+from PyQt5.QtWidgets import QApplication, QMessageBox
 from .logs import logger
-import os, sys
+from .main_window import MainWindow
+from .database import *
 import qdarktheme
+import os, sys
 
 BASE_DIR = os.getenv('BASE_DIR')
 
@@ -24,8 +25,12 @@ except Exception as e:
     styles = ""
     logger.error(f"{str(e)}\nCannot find App/Themes/styles.css")
 
+
 app = QApplication([sys.argv])
 app.setStyleSheet(styles)
-qdarktheme.setup_theme("auto")
+
+theme = get_theme()
+qdarktheme.setup_theme(theme)
+
 window = MainWindow()
-app.exec_()
+sys.exit(app.exec_())

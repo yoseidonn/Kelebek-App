@@ -50,6 +50,14 @@ def createTables() -> None:
 	        "salonlar"	TEXT NOT NULL,
 	        PRIMARY KEY("id"))
         """)
+    
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS "ayarlar" (
+        	"id"	INTEGER,
+	        "ayar"	TEXT,
+	        "deger"	TEXT,
+        	PRIMARY KEY("Field2" AUTOINCREMENT))
+        """)
 
 createTables()   
 
@@ -91,9 +99,12 @@ def add_multiple_students(students: list) -> None:
         db.commit()
 
 def update_student(student):
-    removeNo = student[0]
-    # NUMARAYI BULUP O OGRENCIYI SIL VE YENISINI EKLE YAPABILIRSIN
-    # YA DA NUMARAYI BULUP DIGER DEGERLERINI DEGISTIREBILIRSIN
+    number, name, surname, gender, grade = student
+    QUERY = "UPDATE ogrenciler SET ad = ?, soyad = ?, cinsiyet = ?, sinif = ? WHERE no = ?"
+
+    cur.execute(QUERY, (name, surname, gender, grade, number))
+
+    db.commit()
 
 def get_student_counts_per_every_grade() -> list:
     """
@@ -400,6 +411,40 @@ def get_table_infos() -> list:
     classroomCounts = ",".join(classroomCounts)
     
     return [gradeCounts, studentCounts, classroomCounts]
+
+################### SETTINGS ##############
+
+def get_theme():
+    QUERY = "SELECT COUNT(*) FROM ayarlar WHERE ayar = ?"
+    cur.execute(QUERY, ("theme",))
+    result = cur.fetchone()[0]
+
+    if result == 0:
+        # Satır yok, yeni satır oluştur
+        QUERY = "INSERT INTO ayarlar (ayar, deger) VALUES (?, ?)"
+        cur.execute(QUERY, ("theme", "auto"))
+    
+    QUERY = "SELECT deger FROM ayarlar WHERE ayar = ?"
+    theme = cur.execute(QUERY, ("theme",)).fetchone()[0]
+    return theme
+
+def set_theme(theme: str):
+    QUERY = "SELECT COUNT(*) FROM ayarlar WHERE ayar = ?"
+    cur.execute(QUERY, ("theme",))
+    result = cur.fetchone()[0]
+
+    if result == 0:
+        # Satır yok, yeni satır oluştur
+        QUERY = "INSERT INTO ayarlar (ayar, deger) VALUES (?, ?)"
+        cur.execute(QUERY, ("theme", theme))
+    else:
+        # Satır var, değeri güncelle
+        QUERY = "UPDATE ayarlar SET deger = ? WHERE ayar = ?"
+        cur.execute(QUERY, (theme, "theme"))
+
+    db.commit()
+
+################### EXTRA FUNCS ##############
 
 def num_sort(test_string):
     return list(map(int, re.findall(r'\d+', test_string)))

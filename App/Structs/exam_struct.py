@@ -13,7 +13,7 @@ from App.logs import logger
 from pathlib import Path
 import os, sys, random, datetime, shutil
 
-BASE_DIR = os.environ["BASE_DIR"]
+BASE_DIR = os.getenv("BASE_DIR")
 COLORS = list(COLOR_PALETTE.values())
 random.shuffle(COLORS)
 
