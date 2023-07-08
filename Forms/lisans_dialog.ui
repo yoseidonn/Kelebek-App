@@ -280,7 +280,10 @@ font-weight:600;</string>
                <item alignment="Qt::AlignLeft|Qt::AlignTop">
                 <widget class="QLabel" name="link">
                  <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#3584e4;&quot;&gt;Anahtarın yok mu? Hemen bir tane al!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;a href=&quot;http://kelebeksistemi.com.tr/program/fees/&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#3584e4;&quot;&gt;Anahtarın yok mu? Hemen bir tane al!&lt;/span&gt;&lt;/a&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="openExternalLinks">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>

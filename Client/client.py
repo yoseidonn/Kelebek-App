@@ -4,9 +4,9 @@ from App import logs
 from App.logs import logger
 
 dotenv.load_dotenv()
-BASE_DIR = os.environ["BASE_DIR"]
-#SERVER = os.getenv("SERVER_IP")
-SERVER = "http://localhost:8000/rest_api/validate/"
+BASE_DIR = os.getenv("BASE_DIR")
+SERVER = os.getenv("SERVER_IP")
+#SERVER = "http://localhost:8000/rest_api/validate/"
 
 def get_disk_serial_number():
     system = platform.system()
@@ -47,7 +47,7 @@ def validate_licence_key(key: str = "BLANK"):
     except Exception as e:
         logger.error(str(e))
             
-    url = SERVER + f"{dsn}/{key}"
+    url = SERVER + f"rest_api/validate/{dsn}/{key}"
     print(url)
     try:
         response = requests.get(url)
@@ -57,8 +57,7 @@ def validate_licence_key(key: str = "BLANK"):
         return data
     
     except Exception as e:
-        logger.error(str(e))
-                
+        logger.error(f"{str(e)} | client hatası")        
         data = {"Status-Code": 1000, "Error-Message": str(e)}
         return data
 

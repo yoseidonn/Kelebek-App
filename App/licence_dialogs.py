@@ -8,7 +8,7 @@ from Client import client
 from . import logs
 from .logs import logger
 
-BASE_DIR = os.environ["BASE_DIR"]
+BASE_DIR = os.getenv("BASE_DIR")
 
 class LisansDialog(QDialog):
     def __init__(self, header_text: str, subheader_text: str, found_key: str, found_date: str) -> None:
@@ -35,7 +35,7 @@ class LisansDialog(QDialog):
                     self.validate_key(key=self.found_key, init=True)
                     
         except Exception as e:
-            logger.info(str(e))
+            logger.info(f"{str(e)} | kelebek.conf bulunamadı")
             
         self.set_ws()
         
@@ -86,7 +86,7 @@ class LisansDialog(QDialog):
         if status_code == 900:
             logger.debug("Verified.")
             self.code = 1
-            self.write_key_date(key, end_date)
+            self.write_key_date(key, end_date, "")
             QTimer.singleShot(0, lambda: self.done(1))
             return
             
@@ -113,7 +113,7 @@ class LisansDialog(QDialog):
         else:
             logger.debug(f"Unknown error occured. Status code: {status_code}")
             self.header_text = "Kelebek lisans doğrulanamadı"
-            self.subheader_text = "Lütfen internet bağlantınızı kontrol edin."
+            self.subheader_text = "Bilinmeyen bir hata meydana geldi, lütfen daha sonra tekrar deneyiniz."
         
         self.header.setText(self.header_text)
         self.subheader.setText(self.subheader_text)
@@ -127,7 +127,7 @@ class LisansDialog(QDialog):
     def write_key_date(self, key: str, end_date: str, skip_date: str):
         try:
             with open(".env", "w", encoding="utf-8") as file:
-                file.write(f"LICENCE_KEY={key}\nEND_DATE={end_date}\nSKIP_DATE={skip_date}\nSERVER_IP=http://185.87.252.226")
+                file.write(f"LICENCE_KEY={key}\nEND_DATE={end_date}\nSKIP_DATE={skip_date}\nSERVER_IP=http://kelebeksistemi.com.tr/")
         except Exception as e:
             logger.error(str(e))
             
@@ -135,5 +135,5 @@ class LisansDialog(QDialog):
         self.code = -1
         skip_date = datetime.datetime.now().strftime("%Y-%m-%d")
         with open(".env", "w", encoding="utf-8") as file:
-            file.write(f"LICENCE_KEY=\nEND_DATE=\nSKIP_DATE={skip_date}\nSERVER_IP=http://185.87.252.226")
+            file.write(f"LICENCE_KEY=\nEND_DATE=\nSKIP_DATE={skip_date}\nSERVER_IP=http://kelebeksistemi.com.tr/")
         QTimer.singleShot(0, lambda: self.done(1))

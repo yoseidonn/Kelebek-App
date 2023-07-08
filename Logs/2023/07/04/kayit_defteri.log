@@ -1,0 +1,41 @@
+2023-07-04 21:17:37,725 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-04
+2023-07-04 21:17:37,725 | INFO | Daha önce geçilmiş
+2023-07-04 21:17:37,725 | INFO | It's not been too much after last validation skip.
+2023-07-04 21:17:55,195 | INFO | Arşivleniyor
+2023-07-04 21:17:55,205 | INFO | Arşivleme tamamlandı
+2023-07-04 21:17:55,995 | INFO | Arşivleniyor
+2023-07-04 21:17:55,996 | INFO | Arşivleme tamamlandı
+2023-07-04 21:17:56,237 | INFO | Arşivleniyor
+2023-07-04 21:17:56,240 | INFO | Arşivleme tamamlandı
+2023-07-04 21:17:56,381 | INFO | Arşivleniyor
+2023-07-04 21:17:56,383 | INFO | Arşivleme tamamlandı
+2023-07-04 21:17:59,152 | INFO | Arşivden çıkartılıyor
+2023-07-04 21:17:59,156 | INFO | Arşivleme tamamlandı
+2023-07-04 21:18:00,637 | INFO | Arşivden çıkartılıyor
+2023-07-04 21:18:00,642 | INFO | Arşivleme tamamlandı
+2023-07-04 21:18:02,029 | INFO | Arşivden çıkartılıyor
+2023-07-04 21:18:02,031 | INFO | Arşivleme tamamlandı
+2023-07-04 21:18:03,420 | INFO | Arşivden çıkartılıyor
+2023-07-04 21:18:03,422 | INFO | Arşivleme tamamlandı
+2023-07-04 21:18:10,634 | INFO | Arşivlenmiş 1 siliniyor
+2023-07-04 21:18:10,634 | INFO | Silme tamamlandı
+2023-07-04 21:18:15,420 | INFO | Arşivlenmiş 3 siliniyor
+2023-07-04 21:18:15,420 | INFO | Silme tamamlandı
+2023-07-04 21:18:18,540 | INFO | Tüm sınavlar siliniyor
+2023-07-04 21:18:18,542 | INFO | Silme tamamlandı
+2023-07-04 21:18:23,678 | INFO | Aktif 4 siliniyor
+2023-07-04 21:18:23,680 | INFO | Silme tamamlandı
+2023-07-04 21:18:27,159 | INFO | Aktif 2 siliniyor
+2023-07-04 21:18:27,161 | INFO | Silme tamamlandı
+2023-07-04 21:18:28,649 | INFO | Tüm sınavlar siliniyor
+2023-07-04 21:18:28,651 | INFO | Silme tamamlandı
+2023-07-04 21:18:56,919 | INFO | Arşivleniyor
+2023-07-04 21:18:56,922 | INFO | Arşivleme tamamlandı
+2023-07-04 21:24:50,012 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-04
+2023-07-04 21:24:50,013 | INFO | Daha önce geçilmiş
+2023-07-04 21:24:50,013 | INFO | It's not been too much after last validation skip.
+2023-07-04 21:25:02,484 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: BLANK
+2023-07-04 21:25:02,484 | INFO | Hiç giriş yapılmamış
+2023-07-04 21:25:02,499 | INFO | [Errno 2] Böyle bir dosya ya da dizin yok: '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/kelebek.conf' | kelebek.conf bulunamadı
+2023-07-04 21:25:09,414 | ERROR | Expecting value: line 1 column 1 (char 0) | client hatası
+2023-07-04 21:25:20,696 | INFO | Skipping licence validation. Starting the application.

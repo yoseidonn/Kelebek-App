@@ -5,7 +5,7 @@ from App.database import num_sort, num_sort_dict, num_sort_tuple
 import os, shutil, datetime, re
 
 # PATHS
-BASE_DIR = os.environ["BASE_DIR"]
+BASE_DIR = os.getenv("BASE_DIR")
 BASE = """<!DOCTYPE html>
 <html>
     <head>

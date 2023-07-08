@@ -26,7 +26,7 @@ border: none
    <item alignment="Qt::AlignLeft">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Salonlar</string>
+      <string>Kayıtlı salonlar</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <property name="spacing">

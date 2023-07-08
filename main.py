@@ -3,4 +3,3 @@ if __name__ == "__main__":
     os.environ["BASE_DIR"] = os.getcwd()
     
     import App, sys
-    sys.exit()
