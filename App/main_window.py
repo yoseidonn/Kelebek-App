@@ -170,7 +170,7 @@ class MainWindow(QMainWindow):
         self.schoolInformationsFrame = school_infos_frame.SchoolInformationsFrame()
         self.studentsFrame = students_frame.StudentsFrame()
         self.classroomsFrame = classrooms_frame.ClassroomsFrame()
-        self.createExamFrame = create_exam_frame.CreateExamFrame()
+        self.createExamFrame = create_exam_frame.CreateExamBaseFrame()
         self.savedExamsFrame = saved_exams_frame.SavedExamsFrame()
         
         self.schoolInfosVLayout.addWidget(self.schoolInformationsFrame)

@@ -59,8 +59,7 @@ class LisansDialog(QDialog):
         if not key:
             return
         
-        lastChar: str = key[-1]
-        lastChar = lastChar.upper()
+        lastChar: str = key[-1].upper()
 
         # Eğer boşluk konduysa sil. Eğer dörtlüden sonra gelen bir karakter ise - olmak zorunda.
         if len(key) != 1 and (len(key) == 5 or len(key) == 10 or len(key) == 15):

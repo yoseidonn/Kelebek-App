@@ -52,7 +52,26 @@ class ClassroomsFrame(QFrame):
         self.saveButton.clicked.connect(self.save_button_clicked)
         self.cancelButton.clicked.connect(self.cancel_button_clicked)
         self.removeButton.clicked.connect(self.remove_button_clicked)
+        self.salonNameIn.textChanged.connect(self.validate_text)
 
+    def validate_text(self, new_text):
+        warning_message = "İstenmeyen karakter(ler): {}"
+        un_wanted_chars = [*"!'^+%&=?_\"()[]<>{}.,"]
+        un_wanted_chars2 = []
+        if any([char in new_text for char in un_wanted_chars]):
+            modified_text = new_text
+            for char in un_wanted_chars:
+                if char in new_text:
+                    un_wanted_chars2.append(char)
+                    modified_text = modified_text.replace(char, "")
+
+            self.salonNameIn.setText(modified_text)
+            self.label.setText(warning_message.format(", ".join(un_wanted_chars2)))
+            self.label.setVisible(True)
+
+        else:
+            self.label.setVisible(False)
+    
     def classroom_item_clicked(self, item: QListWidgetItem):
         classroomName = item.text()
         classroom = self.classrooms[classroomName]

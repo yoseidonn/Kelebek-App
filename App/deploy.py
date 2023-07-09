@@ -46,7 +46,7 @@ def distribute_students(exams, classroomsToUse, grades, rules):
                         print(student)
                         
                         is_placed = False
-                        if teacher_desk_empty and rules[-1]:
+                        if teacher_desk_empty and rules["OgretmenMasasineOgrenciOturabilir"]:
                             if classrooms[classroomName]["ogretmen_masasi"] == None:
                                 classrooms[classroomName]["ogretmen_masasi"] = student
                                 grade_counts[gradeName] -= 1
@@ -87,23 +87,24 @@ def get_places(oturma_duzeni: list) -> list[Place]:
     random.shuffle(places) 
     return places
 
-def is_place_suitable(arrangement: list, place, placeObject: Place, student: tuple or list, rules: list) -> bool:
+def is_place_suitable(arrangement: list, place, placeObject: Place, student: tuple or list, rules: dict) -> bool:
     """_summary_
     Args:
         arrangement (list): The list that contains all the column objects
         place (Noneortupleorlist): The selected place object
-        student (tupleorlist): The student that needs to be placed into that place which is a list or tuple
-        rules (list): [
-                        Ayni sinava giren ogrenciler yan yana oturabilir,
-                                “““       ogrenciler arka arkaya oturabilir,
-                                “““       grenciler capraz oturabilir,
-                        Iki farkli cinsiyetten herhangi iki ogrenci yan yana oturabilir,
-                        Kontrol edilen ogrenci ogretmen masasina oturabilir.
-                    ]
+        student (tupleorlist): [] or (0: number, 1: name, 2: surname, 3: gender, 4:grade)
+        rules (dict): {
+                        "SideBySideSitting" -> Ayni sinava giren ogrenciler yan yana oturabilir,
+                        "BackToBackSitting" -> “““ ogrenciler arka arkaya oturabilir,
+                        "CrossByCrossSitting" -> “““ grenciler capraz oturabilir,
+                        "KizErkekYanYanaOturabilir" -> Kız erkek yan yana oturabilir,
+                        "OgretmenMasasineOgrenciOturabilir" -> Ogrenciler ogretmen masasina oturabilir.
+                    }
 
     Returns:
         bool: Ogrenci oturabilir ise True, oturamaz ise False dondurur
     """
+    
     return True
     if place:
         return False
@@ -112,7 +113,7 @@ def is_place_suitable(arrangement: list, place, placeObject: Place, student: tup
     if all(rules[:-1]):
         return True
     
-    side_by_side, back_to_back, cross_by_cross, different_genders = rules[:-1]
+    side_by_side, back_to_back, cross_by_cross, different_genders, teacher_desk = rules.values()
     current_col, current_row, current_placeindex = placeObject.infos()
     current_side = "RIGHT" if list(arrangement[current_col][current_row].keys())[current_placeindex] else "LEFT"
     current_gender, current_grade = student[3], student[4].split("/")[0]
