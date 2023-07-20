@@ -48,11 +48,33 @@ class SchoolInformationsFrame(QFrame):
         self.managerNameDiscardBtn.clicked.connect(lambda: self.update_text_changes(mod="disc", managerName=True))
         self.typeNameDiscardBtn.clicked.connect(lambda: self.update_text_changes(mod="disc", typee=True))
 
+    def validate_text(self, widget, new_text):
+        widget = self.schoolNameIn if not widget else self.managerNameIn
+        label = self.schoolNameLabel if not widget else self.managerNameLabel
+        warning_message = "İstenmeyen karakter(ler): {}"
+        un_wanted_chars = [*"!'^+%&/=?_\"()[]<>{}.,"]
+        un_wanted_chars2 = []
+        if any([char in new_text for char in un_wanted_chars]):
+            modified_text = new_text
+            for char in un_wanted_chars:
+                if char in new_text:
+                    un_wanted_chars2.append(char)
+                    modified_text = modified_text.replace(char, "")
+
+            widget.setText(modified_text)
+            label.setText(warning_message.format(", ".join(un_wanted_chars2)))
+            label.setVisible(True)
+
+        else:
+            label.setVisible(False)
+            
     def update_buttons_visibility(self, schoolName = False, managerName = False, typee = False):
         if schoolName:
+            self.validate_text("1", self.schoolNameIn.text())
             [btn.setVisible(True) for btn in self.schoolNameButtons]
         
         elif managerName:
+            self.validate_text("2", self.managerNameIn.text())
             [btn.setVisible(True) for btn in self.managerNameButtons]
             
         elif typee:

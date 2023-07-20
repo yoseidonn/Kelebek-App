@@ -1,0 +1,120 @@
+2023-07-08 17:34:11,885 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-04
+2023-07-08 17:34:11,885 | INFO | Daha önce geçilmiş
+2023-07-08 17:34:11,885 | INFO | It's been two days after last validation skip.
+2023-07-08 17:34:11,891 | INFO | [Errno 2] Böyle bir dosya ya da dizin yok: '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/kelebek.conf' | kelebek.conf bulunamadı
+2023-07-08 17:34:13,809 | INFO | Skipping licence validation. Starting the application.
+2023-07-08 17:35:12,790 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-04
+2023-07-08 17:35:12,790 | INFO | Daha önce geçilmiş
+2023-07-08 17:35:12,790 | INFO | It's been two days after last validation skip.
+2023-07-08 17:35:12,796 | INFO | [Errno 2] Böyle bir dosya ya da dizin yok: '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/kelebek.conf' | kelebek.conf bulunamadı
+2023-07-08 17:35:13,895 | INFO | Skipping licence validation. Starting the application.
+2023-07-08 17:35:21,459 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 17:35:21,459 | INFO | Daha önce geçilmiş
+2023-07-08 17:35:21,460 | INFO | It's not been too much after last validation skip.
+2023-07-08 17:37:39,354 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 17:37:39,354 | INFO | Daha önce geçilmiş
+2023-07-08 17:37:39,354 | INFO | It's not been too much after last validation skip.
+2023-07-08 17:37:56,654 | INFO | Tüm sınavlar siliniyor
+2023-07-08 17:37:56,657 | INFO | Silme tamamlandı
+2023-07-08 17:38:07,730 | INFO | Arşivden çıkartılıyor
+2023-07-08 17:38:07,733 | INFO | Arşivleme tamamlandı
+2023-07-08 17:42:48,141 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 17:42:48,141 | INFO | Daha önce geçilmiş
+2023-07-08 17:42:48,141 | INFO | It's not been too much after last validation skip.
+2023-07-08 17:43:37,481 | ERROR | {'9/A': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/9A.html', '9/B': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/9B.html', '9/C': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/9C.html', '10/A': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/10A.html', '10/B': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/10B.html', '10/C': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/10C.html', '11/A': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/11A.html', '11/B': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/11B.html', '11/C': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/11C.html'}
+2023-07-08 17:43:37,481 | ERROR | {'9/A': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Grades/9A.html', '9/B': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Grades/9B.html', '9/C': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Grades/9C.html', '10/A': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Grades/10A.html', '10/B': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Grades/10B.html', '10/C': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Grades/10C.html', '11/A': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Grades/11A.html', '11/B': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Grades/11B.html', '11/C': '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Grades/11C.html'}
+2023-07-08 17:43:37,495 | INFO | [('9/A', '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/9A.html'), ('9/B', '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/9B.html'), ('9/C', '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/9C.html'), ('10/A', '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/10A.html'), ('10/B', '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/10B.html'), ('10/C', '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/10C.html'), ('11/A', '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/11A.html'), ('11/B', '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/11B.html'), ('11/C', '/home/yusuf/Belgeler/Projeler/Software/Kelebek/BETA/Application/Temp/sınavadi_2024-03-06_DERS 2/Classrooms/11C.html')]
+2023-07-08 17:43:37,495 | INFO | [<PyQt5.QtWidgets.QListWidgetItem object at 0x7f2fc029bd90>, <PyQt5.QtWidgets.QListWidgetItem object at 0x7f2fc02b0940>, <PyQt5.QtWidgets.QListWidgetItem object at 0x7f2fc02b09d0>, <PyQt5.QtWidgets.QListWidgetItem object at 0x7f2fc02b0a60>, <PyQt5.QtWidgets.QListWidgetItem object at 0x7f2fc02b0af0>, <PyQt5.QtWidgets.QListWidgetItem object at 0x7f2fc02b0b80>, <PyQt5.QtWidgets.QListWidgetItem object at 0x7f2fc02b0c10>, <PyQt5.QtWidgets.QListWidgetItem object at 0x7f2fc02b0ca0>, <PyQt5.QtWidgets.QListWidgetItem object at 0x7f2fc02b0d30>]
+2023-07-08 18:14:24,391 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:14:24,392 | INFO | Daha önce geçilmiş
+2023-07-08 18:14:24,392 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:15:24,496 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:15:24,496 | INFO | Daha önce geçilmiş
+2023-07-08 18:15:24,496 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:24:55,998 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:24:55,998 | INFO | Daha önce geçilmiş
+2023-07-08 18:24:55,998 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:25:17,376 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:25:17,376 | INFO | Daha önce geçilmiş
+2023-07-08 18:25:17,376 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:26:12,172 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:26:12,172 | INFO | Daha önce geçilmiş
+2023-07-08 18:26:12,172 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:26:39,473 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:26:39,473 | INFO | Daha önce geçilmiş
+2023-07-08 18:26:39,473 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:27:02,671 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:27:02,672 | INFO | Daha önce geçilmiş
+2023-07-08 18:27:02,672 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:28:16,413 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:28:16,414 | INFO | Daha önce geçilmiş
+2023-07-08 18:28:16,414 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:28:40,163 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:28:40,163 | INFO | Daha önce geçilmiş
+2023-07-08 18:28:40,163 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:29:15,321 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:29:15,321 | INFO | Daha önce geçilmiş
+2023-07-08 18:29:15,321 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:29:51,950 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:29:51,950 | INFO | Daha önce geçilmiş
+2023-07-08 18:29:51,950 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:30:11,570 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:30:11,570 | INFO | Daha önce geçilmiş
+2023-07-08 18:30:11,570 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:31:23,983 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:31:23,983 | INFO | Daha önce geçilmiş
+2023-07-08 18:31:23,984 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:32:21,759 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:32:21,759 | INFO | Daha önce geçilmiş
+2023-07-08 18:32:21,759 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:32:31,702 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:32:31,702 | INFO | Daha önce geçilmiş
+2023-07-08 18:32:31,702 | INFO | It's not been too much after last validation skip.
+2023-07-08 18:34:34,407 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 18:34:34,407 | INFO | Daha önce geçilmiş
+2023-07-08 18:34:34,408 | INFO | It's not been too much after last validation skip.
+2023-07-08 21:05:17,646 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 21:05:17,647 | INFO | Daha önce geçilmiş
+2023-07-08 21:05:17,647 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:20:46,407 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:20:46,407 | INFO | Daha önce geçilmiş
+2023-07-08 22:20:46,407 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:21:14,089 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:21:14,089 | INFO | Daha önce geçilmiş
+2023-07-08 22:21:14,089 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:21:57,286 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:21:57,286 | INFO | Daha önce geçilmiş
+2023-07-08 22:21:57,286 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:22:19,661 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:22:19,662 | INFO | Daha önce geçilmiş
+2023-07-08 22:22:19,662 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:22:52,787 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:22:52,787 | INFO | Daha önce geçilmiş
+2023-07-08 22:22:52,787 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:23:53,691 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:23:53,691 | INFO | Daha önce geçilmiş
+2023-07-08 22:23:53,691 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:31:46,983 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:31:46,983 | INFO | Daha önce geçilmiş
+2023-07-08 22:31:46,984 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:31:56,630 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:31:56,630 | INFO | Daha önce geçilmiş
+2023-07-08 22:31:56,630 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:32:46,603 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:32:46,603 | INFO | Daha önce geçilmiş
+2023-07-08 22:32:46,603 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:33:24,886 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:33:24,886 | INFO | Daha önce geçilmiş
+2023-07-08 22:33:24,886 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:36:55,860 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:36:55,860 | INFO | Daha önce geçilmiş
+2023-07-08 22:36:55,860 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:38:19,163 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:38:19,163 | INFO | Daha önce geçilmiş
+2023-07-08 22:38:19,164 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:38:44,042 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:38:44,042 | INFO | Daha önce geçilmiş
+2023-07-08 22:38:44,042 | INFO | It's not been too much after last validation skip.
+2023-07-08 22:39:09,984 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-08
+2023-07-08 22:39:09,984 | INFO | Daha önce geçilmiş
+2023-07-08 22:39:09,984 | INFO | It's not been too much after last validation skip.

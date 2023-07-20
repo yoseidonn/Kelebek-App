@@ -167,6 +167,16 @@ border: none;
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_12">
                   <item>
+                   <widget class="QLabel" name="managerNameLabel">
+                    <property name="styleSheet">
+                     <string notr="true">color: rgb(246, 97, 81);</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <widget class="QLineEdit" name="managerNameIn">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -191,6 +201,9 @@ border: none;
                     </property>
                     <property name="placeholderText">
                      <string/>
+                    </property>
+                    <property name="clearButtonEnabled">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -242,6 +255,16 @@ border: none;
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_13">
                   <item>
+                   <widget class="QLabel" name="schoolNameLabel">
+                    <property name="styleSheet">
+                     <string notr="true">color: rgb(246, 97, 81);</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <widget class="QLineEdit" name="schoolNameIn">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -266,6 +289,9 @@ border: none;
                     </property>
                     <property name="placeholderText">
                      <string/>
+                    </property>
+                    <property name="clearButtonEnabled">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
