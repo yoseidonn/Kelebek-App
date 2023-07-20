@@ -138,7 +138,8 @@ class ExamFrame(QFrame):
 
         else:
             checked_grade_names = set([(checkbox if checkbox.isChecked() else None) for checkbox in self.gradeCheckBoxes])
-            checked_grade_names.remove(None)
+            if checked_grade_names:
+                checked_grade_names.remove(None)
 
             if len(checked_grade_names) < len(self.exams.keys()):
                 self.gradeNamesLabel.setVisible(True)
@@ -379,7 +380,7 @@ class ExamFrame(QFrame):
         rules = {"SideBySideSitting": self.sidebyside_sitting,
                  "BackToBackSitting": self.backtoback_sitting,
                  "CrossByCrossSitting": self.crossbycross_sitting,
-                 "KizErkekYanYanaOturabilir": self.kisErkek.isChecked(),
+                 "KizErkekYanYanaOturabilir": self.kizErkek.isChecked(),
                  "OgretmenMasasinaOgrenciOturabilir": self.ogretmenMasasi.isChecked()
                 }
         self.exam = Exam(exams = self.exams, classroomNames = self.classroomNames, rules = rules)
@@ -434,7 +435,7 @@ class ExamFrame(QFrame):
     
     
 class Exam():
-    def __init__(self, exams: dict, classroomNames: list, rules: list):
+    def __init__(self, exams: dict, classroomNames: list, rules: dict):
         self.exams = exams
         self.classroomNames = classroomNames
         self.rules = rules

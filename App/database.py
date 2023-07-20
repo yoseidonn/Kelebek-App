@@ -1,7 +1,6 @@
 ### database.py
+#from .logs import logger
 import sqlite3, re
-from . import logs
-from .logs import logger
 
 db = sqlite3.connect("database.db")
 cur = db.cursor()
@@ -56,7 +55,7 @@ def createTables() -> None:
         	"id"	INTEGER,
 	        "ayar"	TEXT,
 	        "deger"	TEXT,
-        	PRIMARY KEY("Field2" AUTOINCREMENT))
+        	PRIMARY KEY("id" AUTOINCREMENT))
         """)
 
 createTables()   
@@ -163,7 +162,7 @@ def get_all_students(number = False, fullname = False, grade = False, withGrades
 
     return students
 
-def get_grade_given_students(gradeNames: list or tuple or dict) -> dict:
+def get_grade_given_students(gradeNames: list or tuple or dict, returnType: str = "dict") -> dict:
     """
     Sınıf adı verilen tüm öğrencilerin bulunduğu bir öğrenci havuzu döndürür. -list-
     """
@@ -272,18 +271,17 @@ def create_arrangement(kacli: str, ogretmen_yonu: str, oturma_duzeni: str):
     Verilen derslik özelliklerine göre öğrenci dağıtmak için kullanılacak olan bir düzen oluşturur.
     [
         [ 
-            {1: None, 2: None},
-            {3: None, 4: None},
-            {5: None, 6: None},
-            {7: None, 8: None}
+            {1: {"exam_name": None, "student": None}, 2: {"exam_name": None, "student": None}},
+            {3: {"exam_name": None, "student": None}, 4: {"exam_name": None, "student": None}},
+            {5: {"exam_name": None, "student": None}, 6: {"exam_name": None, "student": None}},
+            {7: {"exam_name": None, "student": None}, 8: {"exam_name": None, "student": None}}
         ],
         [ 
-            {9: None, 10: None},
-            {11: None, 12: None},
-            {13: None, 14: None},
+            {9: {"exam_name": None, "student": None}, 10: {"exam_name": None, "student": None}},
+            {11: {"exam_name": None, "student": None}, 12: {"exam_name": None, "student": None}},
+            {13: {"exam_name": None, "student": None}, 14: {"exam_name": None, "student": None}},
         ],
     ]
-    }
     """
 
     rowCounts = oturma_duzeni.split(",")
@@ -299,23 +297,23 @@ def create_arrangement(kacli: str, ogretmen_yonu: str, oturma_duzeni: str):
     if ogretmen_yonu == "Solda":
         for colIndex in range(len(matrix)):
             for rowIndex in range(len(matrix[colIndex])):
-                matrix[colIndex][rowIndex].update({deskNo: None})
+                matrix[colIndex][rowIndex].update({deskNo: {"exam_name": None, "student": None}})
                 deskNo += 1
                 if kacli == "2'li":
-                    matrix[colIndex][rowIndex].update({deskNo: None})
+                    matrix[colIndex][rowIndex].update({deskNo: {"exam_name": None, "student": None}})
                     deskNo += 1
                               
     else:
         for colIndex in range(len(matrix) - 1 , -1, -1):
             for rowIndex in range(len(matrix[colIndex])):
                 if kacli == "1'li":
-                    matrix[colIndex][rowIndex].update({deskNo: None})
+                    matrix[colIndex][rowIndex].update({deskNo: {"exam_name": None, "student": None}})
                     deskNo += 1
                 else:
                     deskNo += 1
-                    matrix[colIndex][rowIndex].update({deskNo: None})
+                    matrix[colIndex][rowIndex].update({deskNo: {"exam_name": None, "student": None}})
                     deskNo -= 1
-                    matrix[colIndex][rowIndex].update({deskNo: None})
+                    matrix[colIndex][rowIndex].update({deskNo: {"exam_name": None, "student": None}})
                     deskNo += 2
                     
     return matrix
@@ -327,22 +325,22 @@ def get_name_given_classrooms(names: list) -> dict:
 
     classrooms = dict()
     for name in names:
-        QUERY = f"SELECT * FROM salonlar WHERE derslik_adi = ?"
-        result = cur.execute(QUERY, (name,)).fetchall()
-        if len(result) >= 1:
-            classroom = result[0]
+        QUERY = "SELECT * FROM salonlar WHERE derslik_adi = ?"
+        result = cur.execute(QUERY, (name,)).fetchone()
+        if result:
+            classroom = result
 
-        elif not result:
+        else:
             return classrooms
         
         derslik_adi, ogretmen_yonu, kacli, oturma_duzeni = [classroom[indx] for indx in range(len(classroom))]
         duzen = create_arrangement(kacli, ogretmen_yonu, oturma_duzeni)
         
-        classroom = dict({"derslik_adi": derslik_adi,
+        classroom = {"derslik_adi": derslik_adi,
                   "ogretmen_yonu": ogretmen_yonu,
                   "kacli": kacli,
                   "oturma_duzeni": duzen,
-                  "ogretmen_masasi": None})
+                  "ogretmen_masasi": None}
         
         classrooms.update({derslik_adi: classroom})
 
@@ -378,7 +376,7 @@ def get_all_infos() -> list:
     try:
         bilgiler = cur.execute(QUERY).fetchall()[0]
     except Exception as e:
-        logger.error(str(e))
+        logger.error(f"{e} | Okul bilgileri veritabanından çekilemedi")
         bilgiler = ("", "", "")
         
     return bilgiler

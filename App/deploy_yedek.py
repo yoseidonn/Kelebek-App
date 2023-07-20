@@ -1,8 +1,11 @@
-from App import database
-from App.logs import logger
+try:
+    from App import database
+    from App.logs import logger
+except:
+    import database
+    #from logs import logger
     
-import random, itertools, copy
-
+import random, itertools
 
 class Place:
     def __init__(self, column_index, row_index, place_number):
@@ -67,27 +70,20 @@ def get_iterator(exams: dict) -> OuterIterator:
 
     return OuterIterator(list(exams.keys()), grade_names_iterators)    
     
-def distribute_students(exams: dict, classroomsToUse: list, all_grades_backup: dict[str: list], rules: dict):
+def distribute_students(exams: dict, classroomsToUse: list, all_grades: dict[str: list], rules: dict):
     classrooms_backup = database.get_name_given_classrooms(classroomsToUse)
     iterator = get_iterator(exams)
 
-    class_counts = {grade: len(students) for grade, students in all_grades_backup.items()}
+    class_counts = {grade: len(students) for grade, students in all_grades.items()}
     placed_count = 0
     un_placed_count = 0
     
-    outer_attempts = 6
-    classrooms = {}
+    outer_attempts = 5
     while outer_attempts and is_there_any_student_left(class_counts):
-        print(f"Attempt: {7-outer_attempts}")
-        if ((7-outer_attempts) == 3) or (7-outer_attempts == 6):
-            classrooms = copy.deepcopy(classrooms_backup)
-            all_grades = copy.deepcopy(all_grades_backup)
-            class_counts = {grade: len(students) for grade, students in all_grades.items()}
-            placed_count = 0
-            un_placed_count = 0
-
+        classrooms = classrooms_backup.copy()
+        
         # Salonlar üzerinde gezinme
-        for classroom_name in classrooms:
+        for classroom_name in classrooms_backup:
             print(f"--------------------{classroom_name}--------------------")
             random_index = random.randint(0, len(exams) - 1)
             iterator.current_index = random_index
@@ -110,20 +106,18 @@ def distribute_students(exams: dict, classroomsToUse: list, all_grades_backup: d
                         
                         attempts = len(exams)
                         placed = False
-                        # Her sınavı dene ve uygun olan ilk öğrenciyi yerleştir
                         while attempts and not placed:
                             # Her denemede yeni bir sınav ve o sınava dahil sınıf seç
                             exam_name, grade_names_iterator = iterator.__next__()
+                            grade_name = grade_names_iterator.__next__()
                             
-                            # Seçilen sınavdan boş olmayan bir sınıf bul
                             for _ in range(len(exams.get(exam_name))):
-                                grade_name = grade_names_iterator.__next__()
                                 if all_grades.get(grade_name):
                                     break
-                                
+                                else:
+                                    grade_name = grade_names_iterator.__next__()
                             else:
-                                # Döngü hiç kırılmadan çıkıldı ise bu sınava girecek hiç öğrenci kalmamış 
-                                # Bu yeri geç
+                                # Bu sınava girecek hiç öğrenci kalmamış 
                                 attempts = 0
                                 continue
                             
@@ -134,7 +128,7 @@ def distribute_students(exams: dict, classroomsToUse: list, all_grades_backup: d
                             place_suitable = is_place_suitable(classroom=classroom, arrangement=arrangement, place=current_place, place_object=place_object, place_index=list(desk.keys()).index(place_number), current_exam_name=exam_name, student=student, current_gender=current_gender, rules=rules)
 
                             # Yer uygun ise öğrenciyi oraya yerleştir
-                            if place_suitable == True:
+                            if place_suitable:
                                 classrooms[classroom_name]["oturma_duzeni"][column_index][row_index][place_number] = {"exam_name": exam_name, "student": student}
                                 all_grades[grade_name].remove(student)
                                 random.shuffle(all_grades[grade_name])
@@ -158,10 +152,7 @@ def distribute_students(exams: dict, classroomsToUse: list, all_grades_backup: d
                                             placed = True
                                             placed_count += 1
                                             print(f"Placed: {desk}")
-                                        else:
-                                            print(f"Not placed: {desk}")
-                                        break # Break the for loop
-
+                                        
                             else:
                                 attempts -= 1
                                 print(f"Not placed: {desk}")
@@ -169,8 +160,18 @@ def distribute_students(exams: dict, classroomsToUse: list, all_grades_backup: d
         outer_attempts -= 1
                             
     if is_there_any_student_left(class_counts):
-        return {"Classrooms": classrooms, "Status": False, "Class-Counts": class_counts, "Placed-Count": placed_count, "Un-Placed-Count": un_placed_count   }
-    return {"Classrooms": classrooms, "Status": True, "Class-Counts": class_counts, "Placed-Count": placed_count, "Un-Placed-Count": un_placed_count}
+        return {"Classrooms": classrooms_backup, "Status": False, "Class-Counts": class_counts, "Placed-Count": placed_count, "Un-Placed-Count": un_placed_count   }
+    return {"Classrooms": classrooms_backup, "Status": True, "Class-Counts": class_counts, "Placed-Count": placed_count, "Un-Placed-Count": un_placed_count}
+
+
+def get_places(oturma_duzeni: list) -> list[Place]:
+    places = []
+    for column_index, column in enumerate(oturma_duzeni):
+        for desk_index, desk in enumerate(column):
+            for place_index, desk_no in enumerate(desk):
+                places.append(Place(column_index, desk_index, place_index))
+
+    return places
 
 def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, place_object: Place, place_index: int, current_exam_name: str, student: tuple, current_gender: str, rules: dict):
     """_summary_
@@ -220,7 +221,7 @@ def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, 
                 except IndexError:
                     return True
 
-                if (left_place.get("exam_name") == current_exam_name):
+                if (not isinstance(left_place, dict)) or (left_place.get("exam_name") == current_exam_name):
                     return False
                 
             try:
@@ -229,7 +230,7 @@ def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, 
             except IndexError:
                 return True
             
-            if (left_back_place.get("exam_name") == current_exam_name):
+            if (not isinstance(left_back_place, dict)) or (left_back_place.get("exam_name") == current_exam_name):
                     return False
 
         if kacli_salon == "2'li":
@@ -242,11 +243,11 @@ def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, 
                     except IndexError:
                         return True
                     
-                    if (left_fore_place.get("exam_name") == current_exam_name):
+                    if (not isinstance(left_fore_place, dict)) or (left_fore_place.get("exam_name") == current_exam_name):
                         return False
                 elif place_index:
                     left_fore_place = list(arrangement[column_index][row_index - 1].values())[0]
-                    if (left_fore_place.get("exam_name") == current_exam_name):
+                    if (not isinstance(left_fore_place, dict)) or (left_fore_place.get("exam_name") == current_exam_name):
                         return False
             
             try:
@@ -255,7 +256,7 @@ def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, 
             except IndexError:
                 return True
             
-            if (left_back_place.get("exam_name") == current_exam_name):
+            if (not isinstance(left_back_place, dict)) or (left_back_place.get("exam_name") == current_exam_name):
                 return False
                    
     if not rules.get("BackToBackSitting"):
@@ -268,8 +269,9 @@ def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, 
             elif place_index:
                 fore_student = list(arrangement[column_index][row_index - 1].values())[1]
 
-            if (left_back_place.get("exam_name") == current_exam_name):
+            if (not isinstance(left_back_place, dict)) or (left_back_place.get("exam_name") == current_exam_name):
                 return False
+    
     if not rules.get("SideBySideSitting"):
         if kacli_salon == "1'li":
             # En solda değilsen solunu kontrol et
@@ -281,7 +283,7 @@ def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, 
                 except IndexError:
                     return True
                 
-                if (left_place.get("exam_name") == current_exam_name):
+                if (not isinstance(left_place, dict)) or (left_place.get("exam_name") == current_exam_name):
                     return False
                 
         if kacli_salon == "2'li":
@@ -296,41 +298,21 @@ def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, 
                     except IndexError:
                         return True
                         
-                    if (left_place.get("exam_name") == current_exam_name):
+                    if (not isinstance(left_place, dict)) or (left_place.get("exam_name") == current_exam_name):
                         return False
-                    
+                        
                 # Check your left in the same desk if your place index is 1 in your current desk
                 elif place_index:
                     left_place = list(arrangement[column_index][row_index].values())[0]
-                    if (left_place.get("student") is not None):
-                        if (left_place.get("exam_name") == current_exam_name):
-                            return False
-                        
-                        # Cinsiyet kontrolü buraya koyuldu çünkü aynı yeri kontrol edecek
-                        # Gender check is here because both them will check same place        
-                        if (not rules.get("KizErkekYanYanaOturabilir")):
-                            # Klasik bir şekilde yukarıda tanımlanmış soldaki öğrenciyi kontrol et
-                            if (left_place.get("student")[3] != current_gender):
-                                print("Kız erkek yan yana oturamaz")
-                                return -1
-            
-            # Gender check is here      
-            if (not place_index) and (not rules.get("KizErkekYanYanaOturabilir")):
-                right_place = list(arrangement[column_index][row_index].values())[1]
-                right_place_student = right_place.get("student")
-                if right_place_student is not None:
-                    if (right_place_student[3] != current_gender):
-                        print("Kız erkek yan yana oturamaz")
-                        return -1
-            
-            elif (place_index) and (not rules.get("KizErkekYanYanaOturabilir")):
-                left_place = list(arrangement[column_index][row_index].values())[0]
-                left_place_student = left_place.get("student")
-                if left_place_student is not None:
-                    if (left_place_student[3] != current_gender):
-                        print("Kız erkek yan yana oturamaz")
-                        return -1
-                
+                    if (not isinstance(left_place, dict)) or (left_place.get("exam_name") == current_exam_name):
+                        return False
+                    
+        # Cinsiyet kontrolü buraya koyuldu çünkü aynı yeri kontrol edecek
+        # Gender check is here because both them will check same place        
+        if not rules.get("KizErkekYanYanaOturabilir"):
+            if (left_place.get("student")[3] == student[3]):
+                return -1    
+
     return True
 
 def is_there_any_student_left(classroomCounts: dict):
@@ -368,15 +350,16 @@ def distribute(exam):
 
 
 if __name__ == '__main__':
+    from Frames.create_exam_frame import Exam
     exams = {
         "Sınav1": {"gradeNames": ["9/A", "9/B", "9/C", "9/D"]},
         "Sınav2": {"gradeNames": ["10/A", "10/B", "10/C", "10/D"]},
         "Sınav3": {"gradeNames": ["11/A", "11/B", "11/C", "11/D"]},
         "Sınav4": {"gradeNames": ["12/A", "12/B", "12/C", "12/D"]},
     }
-        
+    
     classroomNames = ["9/A", "9/B", "9/C", "9/D", "10/A", "10/B", "10/C", "10/D", "11/A", "11/B", "11/C", "11/D", "12/A", "12/B", "12/C", "12/D"]
-        
+    
     rules = {
         "BackToBackSitting": 0,
         "SideBySideSitting": 0,
@@ -384,7 +367,7 @@ if __name__ == '__main__':
         "KizErkekYanYanaOturabilir": 0,
         "OgretmenMasasinaOgretmenOturabilir": 1
     }
-        
+    
     exam = Exam(exams, classroomNames, rules)
     result = distribute(exam)
     print_classrooms(result.get("Classrooms"))
