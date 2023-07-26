@@ -1,7 +1,7 @@
 from App import database
 from App.logs import logger
-    
 import random, itertools, copy
+#import database
 
 
 class Place:
@@ -220,7 +220,7 @@ def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, 
                 except IndexError:
                     return True
 
-                if (left_place.get("exam_name") == current_exam_name):
+                if (left_fore_place.get("exam_name") == current_exam_name):
                     return False
                 
             try:
@@ -263,13 +263,25 @@ def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, 
         if row_index != 0:
             # Burada da sadece oturma yönüne göre karşılaştırılacak öğrenciyi seçiyoruz
             if not place_index:
-                fore_student = list(arrangement[column_index][row_index - 1].values())[0]
+                fore_place = list(arrangement[column_index][row_index - 1].values())[0]
 
             elif place_index:
-                fore_student = list(arrangement[column_index][row_index - 1].values())[1]
+                fore_place = list(arrangement[column_index][row_index - 1].values())[1]
 
-            if (left_back_place.get("exam_name") == current_exam_name):
+            if (fore_place.get("exam_name") == current_exam_name):
                 return False
+
+        if row_index != (len(arrangement) - 1):
+            if not place_index:
+                back_place = list(arrangement[column_index][row_index + 1].values())[0]
+
+            elif place_index:
+                back_place = list(arrangement[column_index][row_index + 1].values())[1]
+
+            if (back_place.get("exam_name") == current_exam_name):
+                return False
+
+        
     if not rules.get("SideBySideSitting"):
         if kacli_salon == "1'li":
             # En solda değilsen solunu kontrol et
@@ -313,23 +325,24 @@ def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, 
                             if (left_place.get("student")[3] != current_gender):
                                 print("Kız erkek yan yana oturamaz")
                                 return -1
-            
-            # Gender check is here      
-            if (not place_index) and (not rules.get("KizErkekYanYanaOturabilir")):
+                                
+    if (not rules.get("KizErkekYanYanaOturabilir")):
+        if kacli_salon == "2'li":
+            if (not place_index):
                 right_place = list(arrangement[column_index][row_index].values())[1]
                 right_place_student = right_place.get("student")
                 if right_place_student is not None:
                     if (right_place_student[3] != current_gender):
                         print("Kız erkek yan yana oturamaz")
                         return -1
-            
-            elif (place_index) and (not rules.get("KizErkekYanYanaOturabilir")):
-                left_place = list(arrangement[column_index][row_index].values())[0]
-                left_place_student = left_place.get("student")
-                if left_place_student is not None:
-                    if (left_place_student[3] != current_gender):
-                        print("Kız erkek yan yana oturamaz")
-                        return -1
+                
+            elif (place_index):
+                    left_place = list(arrangement[column_index][row_index].values())[0]
+                    left_place_student = left_place.get("student")
+                    if left_place_student is not None:
+                        if (left_place_student[3] != current_gender):
+                            print("Kız erkek yan yana oturamaz")
+                            return -1
                 
     return True
 
@@ -368,20 +381,21 @@ def distribute(exam):
 
 
 if __name__ == '__main__':
+    from Frames.create_exam_frame import Exam
     exams = {
         "Sınav1": {"gradeNames": ["9/A", "9/B", "9/C", "9/D"]},
-        "Sınav2": {"gradeNames": ["10/A", "10/B", "10/C", "10/D"]},
-        "Sınav3": {"gradeNames": ["11/A", "11/B", "11/C", "11/D"]},
-        "Sınav4": {"gradeNames": ["12/A", "12/B", "12/C", "12/D"]},
+        #"Sınav2": {"gradeNames": ["10/A", "10/B", "10/C", "10/D"]},
+        #"Sınav3": {"gradeNames": ["11/A", "11/B", "11/C", "11/D"]},
+        #"Sınav4": {"gradeNames": ["12/A", "12/B", "12/C", "12/D"]},
     }
         
-    classroomNames = ["9/A", "9/B", "9/C", "9/D", "10/A", "10/B", "10/C", "10/D", "11/A", "11/B", "11/C", "11/D", "12/A", "12/B", "12/C", "12/D"]
+    classroomNames = ["9/A", "9/B", "9/C", "9/D", "10/A", "10/B",]# "10/C", "10/D", "11/A", "11/B", "11/C", "11/D", "12/A", "12/B", "12/C", "12/D"]
         
     rules = {
         "BackToBackSitting": 0,
         "SideBySideSitting": 0,
         "CrossByCrossSitting": 0,
-        "KizErkekYanYanaOturabilir": 0,
+        "KizErkekYanYanaOturabilir": 1,
         "OgretmenMasasinaOgretmenOturabilir": 1
     }
         

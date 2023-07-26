@@ -19,6 +19,11 @@ except Exception as e:
     logger.debug(e)
 
 try:
+    os.mkdir(os.path.join(BASE_DIR, 'Temp'))
+except Exception as e:
+    logger.debug(e)
+
+try:
     with open(os.path.join(BASE_DIR, "App", "Themes", "styles.css"), "r", encoding="utf-8") as f:
         styles = f.read()
 except Exception as e:

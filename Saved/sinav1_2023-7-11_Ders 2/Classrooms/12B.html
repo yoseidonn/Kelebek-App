@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <link href="styles.css" rel="stylesheet" type="text/css">
+        <style>
+      .wrapper {
+        height: 21cm;
+        width: 29.7cm;
+        max-height: 21cm;
+        max-width: 29.7cm;
+        page-break-inside: avoid;
+        page-break-after: always;
+      }
+      .header {
+        font-size: large;
+        text-align: center;
+        height: 2.5cm;
+        max-height: 2.5cm;
+    }
+        .headerText{
+            text-align: center;
+        }
+
+      .footer {
+        height: 4.5cm;
+      }
+      .row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+      }
+      .between {
+        justify-content: space-between;
+      }
+      .grid2x3 {
+        display: grid;
+        max-height: 2cm;
+        row-gap: 0.3cm;
+        column-gap: 0.1cm;
+        grid-template-rows: 1fr 0.1fr 1fr;
+        grid-template-columns: 1fr 1fr;
+        max-height: 2.2cm;
+      }
+      .grid-bottom {
+        display: grid;
+        max-height: 2cm;
+        row-gap: 0.1cm;
+        column-gap: 0.3cm;
+        grid-template-columns: 3fr 1fr 2fr 2fr 1fr 1fr;
+        grid-template-rows: 2fr 2fr 2fr;
+      }
+      .span2 {
+        grid-column: span 2;
+        display: flex;
+        justify-content: center;
+      }
+
+      .left {
+        display: flex;
+        justify-content: flex-start;
+      }
+
+      .right {
+        display: flex;
+        justify-content: flex-end;
+      }
+      .gap {
+        height: 1cm;
+      }
+      .line {
+        height: 1px;
+        border-bottom: 1px solid black;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-auto-rows: min-content;
+        background-color: green;
+        overflow: hidden;
+        height: 14cm;
+        max-height: 14cm;
+      }
+      .item {
+        background-color: white;
+        border: 2px solid rgba(0, 0, 0, 0.8);
+        padding: 1%;
+        margin: 1%;
+        font-size: x-small;
+        min-height: 60px;
+        max-height: 90px;
+      }
+      .blank {
+        background-color: transparent;
+        border: none;
+      }
+      @media print {
+        .wrapper {
+          size: A4;
+        }
+      }
+    </style>
+    </head>
+    <body>
+        
+<div class="wrapper">
+<div class="headerText"> 2022-2023  EĞİTİM-ÖĞRETİM YILI <strong>1. Dönem 1. Sınav</strong> (2023-7-11 - Ders 2)<br> <strong>12/B</strong> SALONUNUN ÖĞRENCİ YOKLAMA ÇİZELGESİ <br> <br> </div>
+<div class="container" style="grid-template-columns: 2fr 2fr 1fr 2fr 2fr 1fr 2fr 2fr ;">
+<div class="blank"></div>
+<div class="blank"></div>
+<div class="blank"></div>
+<div class="blank"></div>
+<div class="blank"></div>
+<div class="blank"></div>
+<div class="item" style="grid-column: span 2"> <center>Öğretmen Masası</center> </div>
+<div class="item"> <strong> <center> 22 </center> <center> 12 MAT </center> </strong> <br> 12/C - 98 (Kız) <br> FATMANUR BAKAN </div>
+<div class="item"> <strong> <center> 21 </center> <center> 9 MAT </center> </strong> <br> 9/B - 46 (Kız) <br> BERRA KILIÇ </div>
+<div class="blank"></div>
+<div class="item"> <strong> <center> 12 </center> <center> 10 MAT </center> </strong> <br> 10/D - 102 (Kız) <br> ZEYNEP SUDE SALIK </div>
+<div class="item"> <strong> <center> 11 </center> <center> 11 MAT </center> </strong> <br> 11/A - 2958 (Erkek) <br> ALPEREN USTA </div>
+<div class="blank"></div>
+<div class="item"> <strong> <center> 2 </center> <center> 12 MAT </center> </strong> <br> 12/D - 156 (Erkek) <br> FİKRET EFE VARNA </div>
+<div class="item"> <strong> <center> 1 </center> <center> 9 MAT </center> </strong> <br> 9/A - 179 (Erkek) <br> SÜLEYMAN GÜLBAĞ </div>
+<div class="item"> <strong> <center> 24 </center> <center> 10 MAT </center> </strong> <br> 10/C - 3233 (Kız) <br> AZRA VURAL </div>
+<div class="item"> <strong> <center> 23 </center> <center> 11 MAT </center> </strong> <br> 11/B - 299 (Erkek) <br> HASAN FIRAT SARTAN </div>
+<div class="blank"></div>
+<div class="item"> <strong> <center> 14 </center> <center> 12 MAT </center> </strong> <br> 12/A - 50 (Kız) <br> ÜMRAN BOZDAĞ </div>
+<div class="item"> <strong> <center> 13 </center> <center> 9 MAT </center> </strong> <br> 9/D - 114 (Erkek) <br> SÜLEYMAN EFE UYGUN </div>
+<div class="blank"></div>
+<div class="item"> <strong> <center> 4 </center> <center> 10 MAT </center> </strong> <br> 10/A - 3057 (Erkek) <br> ATAKAN YÜCEL </div>
+<div class="item"> <strong> <center> 3 </center> <center> 11 MAT </center> </strong> <br> 11/C - 3010 (Erkek) <br> HAMİT SONBEY ACER </div>
+<div class="item"> <strong> <center> 26 </center> <center> 12 MAT </center> </strong> <br> 12/B - 16 (Kız) <br> ŞÖHRET YILDIZ </div>
+<div class="item"> <strong> <center> 25 </center> <center> 9 MAT </center> </strong> <br> 9/A - 170 (Erkek) <br> BAYRAM KIBIK </div>
+<div class="blank"></div>
+<div class="item"> <strong> <center> 16 </center> <center> 10 MAT </center> </strong> <br> 10/B - 3157 (Kız) <br> RABİA KUZU </div>
+<div class="item"> <strong> <center> 15 </center> <center> 11 MAT </center> </strong> <br> 11/D - 3021 (Erkek) <br> FURKAN DAŞGIN </div>
+<div class="blank"></div>
+<div class="item"> <strong> <center> 6 </center> <center> 12 MAT </center> </strong> <br> 12/A - 147 (Kız) <br> AYŞENUR SARIER </div>
+<div class="item"> <strong> <center> 5 </center> <center> 9 MAT </center> </strong> <br> 9/C - 28 (Erkek) <br> YAKUB EMRE AYDIN </div>
+<div class="item"> <strong> <center> 28 </center> <center> 10 MAT </center> </strong> <br> 10/A - 3109 (Erkek) <br> BURAK ÖZTÜRK </div>
+<div class="item"> <strong> <center> 27 </center> <center> 11 MAT </center> </strong> <br> 11/C - 2996 (Erkek) <br> EGE YİĞİT KARAYEL </div>
+<div class="blank"></div>
+<div class="item"> <strong> <center> 18 </center> <center> 12 MAT </center> </strong> <br> 12/B - 55 (Erkek) <br> ABDULLAH KIVRAK </div>
+<div class="item"> <strong> <center> 17 </center> <center> 9 MAT </center> </strong> <br> 9/B - 68 (Kız) <br> BEYZA ONARAN </div>
+<div class="blank"></div>
+<div class="item"> <strong> <center> 8 </center> <center> 10 MAT </center> </strong> <br> 10/D - 3236 (Kız) <br> ELİF CEYLAN </div>
+<div class="item"> <strong> <center> 7 </center> <center> 11 MAT </center> </strong> <br> 11/A - 2936 (Erkek) <br> TUNA ÇELİK </div>
+<div class="item"> <strong> <center> 30 </center> <center> 12 MAT </center> </strong> <br> 12/D - 139 (Erkek) <br> ÖMER FARUK TORON </div>
+<div class="item"> <strong> <center> 29 </center> <center> 9 MAT </center> </strong> <br> 9/C - 103 (Kız) <br> BÜŞRA GÖVEN </div>
+<div class="blank"></div>
+<div class="item"> <strong> <center> 20 </center> <center> 10 MAT </center> </strong> <br> 10/C - 222 (Kız) <br> ELA ATILGAN </div>
+<div class="item"> <strong> <center> 19 </center> <center> 11 MAT </center> </strong> <br> 11/B - 2988 (Erkek) <br> YİĞİT ÇAKALOĞLU </div>
+<div class="blank"></div>
+<div class="item"> <strong> <center> 10 </center> <center> 12 MAT </center> </strong> <br> 12/B - 74 (Erkek) <br> KAYRA KUTBAY </div>
+<div class="item"> <strong> <center> 9 </center> <center> 9 MAT </center> </strong> <br> 9/D - 164 (Kız) <br> NEVA DEMİR </div>
+</div>
+<div class="footer"> Müdür adı: </div>
+</div>
+
+    </body>
+</html>

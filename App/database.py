@@ -1,5 +1,5 @@
 ### database.py
-#from .logs import logger
+from .logs import logger
 import sqlite3, re
 
 db = sqlite3.connect("database.db")

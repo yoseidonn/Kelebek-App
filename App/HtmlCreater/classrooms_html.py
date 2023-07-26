@@ -119,28 +119,37 @@ BASE = """<!DOCTYPE html>
 SEPERATOR = "{{}}"
 
 def create(examInfos, classrooms, exams):
-    headerInfos = examInfos[0:-1]
+    # egitimOgretimYili, donem, kacinciYazili, tarih, kacinciDers
+    headerInfos = [examInfos.get('Egitim-Ogretim-Yili'), 
+                   examInfos.get('Kacinci-Donem'),
+                   examInfos.get('Donemin-Kacinci-Sinavi'), 
+                   examInfos.get('Tarih'),
+                   examInfos.get('Kacinci-Ders')
+                   ]
+    
     student_exam = {}
-    for eName in exams:
-        for gradeName in exams[eName]:
+    for eName, gradeNames in exams.items():
+        for gradeName in gradeNames:
             result = database.get_all_students(grade = gradeName)
             for student in result:
-                student_exam.update({student: eName})
+                student_exam.update({student[0]: eName})
                 
     baseStart, baseEnd = BASE.split(SEPERATOR)
-    examName = "_".join([examInfos[-1], examInfos[3], examInfos[4]])
+    examName = "_".join([examInfos.get('Sinav-Adi'), examInfos.get('Tarih'), examInfos.get('Kacinci-Ders').strip()])
     classroom_htmls = get_htmls(classrooms, student_exam, headerInfos, baseStart, baseEnd)
     
     try:
         os.mkdir(os.path.join(BASE_DIR, 'Temp', examName))
+    except FileExistsError:
+        shutil.rmtree(os.path.join(BASE_DIR, 'Temp', examName))
+
+    try:
         os.mkdir(os.path.join(BASE_DIR, 'Temp', examName, "Classrooms"))
     except Exception as e:
-        logger.error(str(e))
+        logger.error(e)
+        shutil.rmtree(os.path.join(BASE_DIR, 'Temp', examName, "Classrooms"))
+        os.mkdir(os.path.join(BASE_DIR, 'Temp', examName, "Classrooms"))
             
-        shutil.rmtree(os.path.join(BASE_DIR, 'Temp', examName))
-        os.mkdir(os.path.join(BASE_DIR, 'Temp', examName))
-        os.mkdir(os.path.join(BASE_DIR, 'Temp', examName, "Clasrooms"))
-
     name_template = "{}.html"
     classroomPaths = {}
     for classroomName in classroom_htmls:
@@ -188,17 +197,15 @@ def get_htmls(classrooms, student_exam, headerInfos, baseStart, baseEnd):
     wrapperCloser, containerCloser = '</div>', '</div>'
     
     classroom_htmls = {}
-    x = 0
-    for cName in classrooms:
+    for classroom_name, classroom in classrooms.items():
         classroom_array = [baseStart]
-        classroom = classrooms[cName]
-        oturmaDuzeni = classrooms[cName]["oturma_duzeni"]
-        kacli = classrooms[cName]["kacli"]
-        yon = classrooms[cName]["ogretmen_yonu"]
-        ogretmenMasasiOgrenci = classrooms[cName]["ogretmen_masasi"]
+        oturmaDuzeni = classroom["oturma_duzeni"]
+        kacli = classroom["kacli"]
+        yon = classroom["ogretmen_yonu"]
+        ogretmenMasasiOgrenci = classroom["ogretmen_masasi"]
         
         classroom_array.append(wrapperOpener)
-        headerText = header.format(*headerInfos, cName)
+        headerText = header.format(*headerInfos, classroom_name)
         classroom_array.append(headerText)
         columnStyle, totalCount = get_column_style(classroom)
         rowStyle = get_row_style(classroom)
@@ -214,7 +221,7 @@ def get_htmls(classrooms, student_exam, headerInfos, baseStart, baseEnd):
         ogretmenMasasiItem = ogretmenMasasiBosItem
         ogretmenMasasiItemDouble = ogretmenMasasiBosDoubleItem
         if ogretmenMasasiOgrenci is not None:
-            print(f'OgretmenMasasiOgrenci: ')
+            #print(f'OgretmenMasasiOgrenci: {ogretmenMasasiOgrenci}')
             ogrenci = ogretmenMasasiOgrenci[1]
             sinavAdi = ogretmenMasasiOgrenci[0]
             sinif, no, cinsiyet, full_ad = ogrenci[4], ogrenci[0], ogrenci[3], ogrenci[1:3]
@@ -259,19 +266,19 @@ def get_htmls(classrooms, student_exam, headerInfos, baseStart, baseEnd):
                     continue
 
                 # Sıra varsa formatla ve yeni divi ekle
-                for deskNo in desk:
-                    chair = desk[deskNo]
+                for placeNumber in desk:
+                    chair = desk[placeNumber].get("student")
                     if chair is not None:
-                        sinavAdi = student_exam[chair]
+                        sinavAdi = student_exam[chair[0]]
                         fullAd = " ".join(chair[1:3])
                         cinsiyet = chair[3]
                         no = chair[0]
                         sinif = chair[4]
-                        student = item.format(deskNo, sinavAdi, sinif, no, cinsiyet, fullAd)
+                        student = item.format(placeNumber, sinavAdi, sinif, no, cinsiyet, fullAd)
                         classroom_array.append(student)
                     else:
                         # Sırada öğrenci yoksa boş koy
-                        siraBos = itemBos.format(deskNo)
+                        siraBos = itemBos.format(placeNumber)
                         classroom_array.append(siraBos)
 
                 # Son kolon değilse sıradan sonra araya boşluk koy
@@ -282,7 +289,7 @@ def get_htmls(classrooms, student_exam, headerInfos, baseStart, baseEnd):
         classroom_array.append(footer)            
         classroom_array.append(wrapperCloser)
         classroom_array.append(baseEnd)
-        classroom_htmls.update({cName: "\n".join(classroom_array)})
+        classroom_htmls.update({classroom_name: "\n".join(classroom_array)})
         
     return classroom_htmls
 
@@ -329,9 +336,9 @@ def get_row_style(classroom):
     longestRowLen = 0
     for colIndex in range(len(oturmaDuzeni)):
         currentLen = len(oturmaDuzeni[colIndex])
-        print(f"CurrentLen: {currentLen}")
-        print(f"LongestLen: {longestRowLen}")
-        print()
+        #print(f"CurrentLen: {currentLen}")
+        #print(f"LongestLen: {longestRowLen}")
+        #print()
         longestRowLen = currentLen if currentLen > longestRowLen else longestRowLen
     
     style = []

@@ -566,7 +566,7 @@
                      <string>Kız-Erkek yan yana oturabilir</string>
                     </property>
                     <property name="checked">
-                     <bool>false</bool>
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -609,7 +609,7 @@
                      <string>Öğretmen masalarına öğrenci oturabilir</string>
                     </property>
                     <property name="checked">
-                     <bool>false</bool>
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>

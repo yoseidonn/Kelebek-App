@@ -20,7 +20,6 @@ BASE_DIR = os.getenv("BASE_DIR")
 load_dotenv()
 
 
-
 class CreateExamBaseFrame(QFrame):
     MONTHS = {"Ocak": 1, "Şubat": 2, "Mart": 3, "Nisan": 4, "Mayıs": 5, "Haziran": 6,
         "Temmuz": 7, "Ağustos": 8, "Eylül": 9, "Ekim": 10, "Kasım": 11, "Aralık": 12}
@@ -99,7 +98,6 @@ class ExamFrame(QFrame):
         self.adjust_widget_settings()
 
     def set_start_variables(self):
-        self.examInfos = list()             # self.egitimOgretimYili, self.donem, self.kacinciYazili, self.tarih, self.kacinciDers, self.masterExamName
         self.gradeCheckBoxes = list()       # To hold the checkboxes for enabling all when i need
         self.classroomNames = list()        # To hold the selected classroom names
         self.exams = dict()                 # To hold the exam names with gradenames
@@ -126,21 +124,33 @@ class ExamFrame(QFrame):
     def check_conditions(self):
         flag = False
         sinavAdi = self.informationFrame.sinavAdi.text()
+
+        # Sınav adı girilmemiş ise uyarı mesajını göster
         if not sinavAdi:
             self.informationFrame.sinavAdiLabel.setVisible(True)
             self.informationFrame.sinavAdiLabel.setText("Lütfen bir sınav adı giriniz!")
             flag = True            
 
+        # Sınav yoksa uyarı mesajını göster
         if not self.exams:
             self.examNameInLabel.setVisible(True)
             self.examNameInLabel.setText("Lütfen en az bir sınav ekleyin!")
             flag = True            
 
+        # Sınav var ise:
         else:
             checked_grade_names = set([(checkbox if checkbox.isChecked() else None) for checkbox in self.gradeCheckBoxes])
-            if checked_grade_names:
-                checked_grade_names.remove(None)
+            #print(checked_grade_names)
 
+            # Henüz okula sınıf tanımlanmamış ise küme tamamen boş olurdu, o yüzden kontrol edip çıkartıyoruz
+            if None in checked_grade_names:
+                checked_grade_names.remove(None)
+            # Hiç kayıtlı değilse de özel uyarı mesajı göster
+            elif not checked_grade_names:
+                self.gradeNamesLabel.setVisible(True)
+                self.gradeNamesLabel.setText("Lütfen 'Öğrenciler' sekmesinden öğrenci kaydedin!")
+                flag = True
+            
             if len(checked_grade_names) < len(self.exams.keys()):
                 self.gradeNamesLabel.setVisible(True)
                 self.gradeNamesLabel.setText("Lütfen her sınava en az bir sınıf ekleyiniz!")
@@ -156,7 +166,6 @@ class ExamFrame(QFrame):
         
         self.deploying_step()
 
-        
     def add_exam(self):
         examName = self.examNameIn.text().strip().upper()
         if len(examName) and (examName not in self.exams.keys()):
@@ -181,7 +190,7 @@ class ExamFrame(QFrame):
         try:
             checkboxes = self.exams[self.selectedExamName]["checkBoxes"]
         except KeyError as e:
-            print(e)
+            #print(e)
             return
 
         for checkbox in checkboxes:
@@ -202,7 +211,7 @@ class ExamFrame(QFrame):
         try:
             checkboxes = self.exams[self.selectedExamName]["checkBoxes"]
         except KeyError as e:
-            print(e)
+            #print(e)
             return
         
         for checkbox in checkboxes:
@@ -227,7 +236,7 @@ class ExamFrame(QFrame):
         rowIndex = item.row()
 
         self.examTableWidget.selectRow(rowIndex)
-        print("Row selected.", rowIndex)
+        #print("Row selected.", rowIndex)
 
         # Seçili sınavın rengini palet rengine ata
         keys = list(self.exams.keys())
@@ -252,7 +261,7 @@ class ExamFrame(QFrame):
             checkbox.setEnabled(True)
             
         for checkbox in selectedBoxes:
-            print(checkbox.text())
+            #print(checkbox.text())
             checkbox.setEnabled(False)
 
     def grade_checkbox_clicked(self, checkbox: QCheckBox):
@@ -312,7 +321,7 @@ class ExamFrame(QFrame):
         if len(self.exams.keys()):
             lastRowIndex = len(self.exams) - 1
             self.examTableWidget.selectRow(lastRowIndex)
-            print("Lastrow index", lastRowIndex)
+            #print("Lastrow index", lastRowIndex)
             self.selectedExamName = list(self.exams.keys())[lastRowIndex]
 
         else:
@@ -386,33 +395,41 @@ class ExamFrame(QFrame):
         self.exam = Exam(exams = self.exams, classroomNames = self.classroomNames, rules = rules)
 
         sonuc = deploy.distribute(self.exam)
-        if not sonuc:
-            # Tekrar deneyiniz penceresi ekle
-            message = sonuc
-            retrieve = QMessageBox.question(QWidget(), "Yetersiz yer", message, QMessageBox.Yes | QMessageBox.No)
-            if retrieve == QMessageBox.Yes:
-                self.deploy_step()
-            else:
-                return
-            logger.info(message)
+        print(f"Status: {sonuc.get('Status')}")
+        print(f"Class-Counts: {sonuc.get('Class-Counts')}")
+        print(f"Placed-Count: {sonuc.get('Placed-Count')}")
+        print(f"Unplaced-Count: {sonuc.get('Un-Placed-Count')}")
+        if sonuc.get("Status"):
+            # Create files
+            exam_infos = {
+                # egitimOgretimYili, donem, kacinciYazili, tarih, kacinciDers, salonAdi
+                "Sinav-Adi": self.informationFrame.sinavAdi.text(),
+                "Egitim-Ogretim-Yili": self.informationFrame.egitimOgretimYili.currentText(),
+                "Kacinci-Donem": self.informationFrame.kacinciDonem.currentText(),
+                "Donemin-Kacinci-Sinavi": self.informationFrame.doneminKacinciSinavi.currentText(),
+                "Tarih": "-".join([str(i) for i in self.informationFrame.sinavTarihi.date().getDate()]),
+                "Kacinci-Ders": self.informationFrame.kacinciDers.currentText(),
+            }
+            print(exam_infos)
+            classroomPaths = classrooms_html.create(exam_infos, sonuc.get("Classrooms"), self.exam.exams)
+            gradePaths = grades_html.create(exam_infos, sonuc.get("Classrooms"), self.exam.exams)
+            
+            self.show_result_frame(classroomPaths, gradePaths, exam_infos)
 
         else:
-            # Create files
-            classroomPaths = classrooms_html.create(self.examInfos, sonuc, self.exam.exams)
-            gradePaths = grades_html.create(self.examInfos, sonuc, self.exam.exams)
-            logger.error(classroomPaths)
-            logger.error(gradePaths)
-            
-            self.show_result_frame(classroomPaths, gradePaths)
-            # -> TODO CHECK THIS IS NOT WORKING
-            self.sinavFrame.reset()
-            
-    def show_result_frame(self, classroomPaths: dict, gradePaths: dict):
+            # Tekrar deneyiniz penceresi
+            retrieve = QMessageBox.question(QWidget(), "Yetersiz yer", "Tekrar denemek için Evet'e basın.", QMessageBox.Yes | QMessageBox.No)
+            if retrieve == QMessageBox.Yes:
+                self.deploying_step()
+            else:
+                logger.info(f"Status: {sonuc.get('Status')} | Placed: {sonuc.get('Place-Count')} | Unplaced: {sonuc.get('Unplaced-Count')}")    
+
+    def show_result_frame(self, classroomPaths: dict, gradePaths: dict, exam_infos: dict):
         # Dialog sonucuna göre dosyayı ya kayıtlara taşı ya da sil
         dialogSonuc = SonucDialog(classroomPaths, gradePaths).isAccepted
 
         try:
-            examName = "_".join([self.examInfos[-1], self.examInfos[3], self.examInfos[4]])
+            examName = "_".join([exam_infos.get('Sinav-Adi'), exam_infos.get('Tarih'), exam_infos.get('Kacinci-Ders').strip()])
             if dialogSonuc:
                 os.mkdir(os.path.join(BASE_DIR, 'Saved', examName))
                 os.mkdir(os.path.join(BASE_DIR, 'Saved', examName, "Classrooms"))
@@ -429,9 +446,10 @@ class ExamFrame(QFrame):
                     Path(gPath).rename(os.path.join(BASE_DIR, 'Saved', examName, "Grades", name_template.format(gNameToPath)))
 
             shutil.rmtree(os.path.join(BASE_DIR, "Temp", examName))    
+            
         except Exception as e:
-            raise e
-            logger.error(str(e))
+            logger.error(f"{str(e)} | Sınav kaydedilirken bir sorun meydana geldi")
+            
     
     
 class Exam():
@@ -514,8 +532,8 @@ class SonucDialog(QDialog):
             self.classroomItems.append(item)
             self.classroomList.addItem(item)
         
-        logger.info(list(self.classroomPaths.items()))
-        logger.info(self.classroomItems)
+        #logger.info(list(self.classroomPaths.items()))
+        #logger.info(self.classroomItems)
         try:
             first_classroom_item = self.classroomItems[0]
             first_classroom_item.setSelected(True)
