@@ -273,9 +273,8 @@ def get_student_pools(exams: dict, all_grades: dict, classrooms: dict) -> dict:
         place_count = get_place_count(classroom['oturma_duzeni'])
         selected_count = 0
         student_pool = {}
-        for exam_name in exams:
+        for exam_name, grade_names in exams.items():
             student_pool.update({exam_name: {}})
-            grade_names = exams[exam_name]
             for grade_name in grade_names:
                 student_pool[exam_name].update({grade_name: []})
                 grade = all_grades.get(grade_name)
@@ -294,36 +293,47 @@ def get_student_pools(exams: dict, all_grades: dict, classrooms: dict) -> dict:
                 all_grades[grade_name] = grade
 
         student_pools.update({classroom_name: student_pool})
-        if not place_count-selected_count:
-            continue
-        
-        for exam_name in exams:
-            grade_names = exams[exam_name]
-            for grade_name in grade_names:
-                grade = all_grades.get(grade_name)
-                if (selected_count + 1) > place_count or not grade:
-                    continue
-                
-                selected_count += 1
-                # Öğrencileri havuza ekle
-                student = grade[0]
-                grade.pop(0)
-                student_pool[exam_name][grade_name].extend(students)
-                # Öğrencileri çıkar
-                all_grades[grade_name] = grade
-                
-        student_pools.update({classroom_name: student_pool})
         total_selected_count += selected_count
         counts[classroom_name] = selected_count
+
+    classrooms = shuffle_dict(classrooms)
+    for classroom_name, classroom in classrooms.items():
+        empty_place_count = get_place_count(classroom['oturma_duzeni'], empty = True)
+        selected_count = 0
+        for exam_name, grade_names in exams.items():
+            flag = False
+            if flag:
+                continue
+            for grade_name in grade_names:
+                grade = all_grades[grade_name]
+                if not grade:
+                    continue
+                selected_count += 1
+                student = grade[0]
+                grade.pop(0)
+                student_pools[classroom_name][exam_name][grade_name].extend([student])
+                all_grades[grade_name] = grade
+
+                if selected_count == empty_place_count:
+                    flag = True
+                    break
+
+        total_selected_count += selected_count
+        counts[classroom_name] += selected_count
 
     total_left_count = how_many_students_left(all_grades)
     return student_pools        
 
-def get_place_count(arrangement: list[list[dict]]) -> int:
+def get_place_count(arrangement: list[list[dict]], empty = False) -> int:
     total = 0
     for column in arrangement:
         for desk in column:
-            total += len(desk)
+            if empty:
+                for place_number, place in desk.items():
+                    if place['student'] is not None:
+                        total += 1
+            else:
+                total += len(desk)
     return total
 
 def how_many_students_left(grades: dict[list]) -> int:
