@@ -1,7 +1,7 @@
-#from App import database
-#from App.logs import logger
+from App import database
+from App.logs import logger
 import random, itertools, copy
-import database
+#import database
 
 
 class Place:
@@ -14,8 +14,8 @@ class Place:
         return [self.column_index, self.row_index, self.place_number]
 
 
-class GradeNamesIterator:
-    def __init__(self, grade_names: list[str]):
+class InnerIterator:
+    def __init__(self, grade_names: list):
         self.grade_names = grade_names
         self.current_index = 0
 
@@ -30,8 +30,8 @@ class GradeNamesIterator:
         return self.grade_names[self.current_index]
 
 
-class ExamNamesIterator:
-    def __init__(self, exam_names: list[str], grade_names_iterators: list[GradeNamesIterator]):
+class OuterIterator:
+    def __init__(self, exam_names: list, grade_names_iterators: list[InnerIterator]):
         self.exam_names = exam_names
         self.grade_names_iterators = grade_names_iterators
         self.current_index = 0
@@ -59,37 +59,118 @@ def get_key_with_max_value(dictionary):
         return None
     return max(dictionary, key=dictionary.get)
 
-def get_iterator(exams: dict) -> ExamNamesIterator:
+def get_iterator(exams: dict) -> OuterIterator:
     grade_names_iterators = []
     for exam_name, grade_names in exams.items():
         random.shuffle(grade_names)
-        grade_names_iterators.append(GradeNamesIterator(grade_names=grade_names))
+        grade_names_iterators.append(InnerIterator(grade_names=grade_names))
 
-    return ExamNamesIterator(list(exams.keys()), grade_names_iterators)    
+    return OuterIterator(list(exams.keys()), grade_names_iterators)    
     
-def distribute_students(exams: dict, classroomsNamesToUse: list, all_grades_backup: dict[str: list], rules: dict):
-    exam_names_iterator = get_iterator(exams)
-    classrooms_backup = database.get_name_given_classrooms(classroomsNamesToUse)
-    grade_counts_backup = {grade: len(students) for grade, students in all_grades_backup.items()}
-    total_student_count = sum([count for count in grade_counts_backup.values()])
-    classroom_count = len(classrooms_backup)
-    student_count_per_classroom = total_student_count // classroom_count
+def distribute_students(exams: dict, classroomsToUse: list, all_grades_backup: dict[str: list], rules: dict):
+    classrooms_backup = database.get_name_given_classrooms(classroomsToUse)
+    iterator = get_iterator(exams)
+
+    class_counts = {grade: len(students) for grade, students in all_grades_backup.items()}
+    placed_count = 0
+    un_placed_count = 0
     
-    grade_counts = copy.deepcopy(grade_counts_backup)
-    outer_attempts = 4
-    while outer_attempts and is_there_any_student_left(grade_counts): 
-        placed_count = 0
-        un_placed_count = 0
-        
-        all_grades = all_grades_backup
-        classrooms = classrooms_backup
-        student_pools = get_student_pools(exams, all_grades, classrooms)
-        
-        outer_attempts -= 1            
-                
-    if is_there_any_student_left(grade_counts):
-        return {"Classrooms": classrooms, "Status": False, "Class-Counts": grade_counts, "Placed-Count": placed_count, "Un-Placed-Count": un_placed_count}
-    return {"Classrooms": classrooms, "Status": True, "Class-Counts": grade_counts, "Placed-Count": placed_count, "Un-Placed-Count": un_placed_count}
+    outer_attempts = 6
+    classrooms = {}
+    while outer_attempts and is_there_any_student_left(class_counts):
+        print(f"Attempt: {7-outer_attempts}")
+        if ((7-outer_attempts) == 3) or (7-outer_attempts == 6):
+            classrooms = copy.deepcopy(classrooms_backup)
+            all_grades = copy.deepcopy(all_grades_backup)
+            class_counts = {grade: len(students) for grade, students in all_grades.items()}
+            placed_count = 0
+            un_placed_count = 0
+
+        # Salonlar üzerinde gezinme
+        for classroom_name in classrooms:
+            print(f"--------------------{classroom_name}--------------------")
+            random_index = random.randint(0, len(exams) - 1)
+            iterator.current_index = random_index
+            
+            classroom = classrooms.get(classroom_name)
+            arrangement = classroom.get("oturma_duzeni")
+
+            # Salonun öğretmen masasına yerleştirme
+            if (rules.get("OgretmenMasasinaOgretmenOturabilir")) and (classrooms.get(classroom_name).get("ogretmen_masasi") is None):
+                the_most_crowded_grade_name = get_key_with_max_value(class_counts)
+                if class_counts.get(the_most_crowded_grade_name):
+                    student = all_grades.get(the_most_crowded_grade_name)[0]
+                    classrooms[classroom_name]["ogretmen_masasi"] = student
+                    
+            # Salonun masalarına yerleştirme
+            for column_index, column in enumerate(arrangement):
+                for row_index, desk in enumerate(column):
+                    for place_number, current_place in desk.items():
+                        place_object = Place(column_index=column_index, row_index=row_index, place_number=place_number)
+                        
+                        attempts = len(exams)
+                        placed = False
+                        # Her sınavı dene ve uygun olan ilk öğrenciyi yerleştir
+                        while attempts and not placed:
+                            # Her denemede yeni bir sınav ve o sınava dahil sınıf seç
+                            exam_name, grade_names_iterator = iterator.__next__()
+                            
+                            # Seçilen sınavdan boş olmayan bir sınıf bul
+                            for _ in range(len(exams.get(exam_name))):
+                                grade_name = grade_names_iterator.__next__()
+                                if all_grades.get(grade_name):
+                                    break
+                                
+                            else:
+                                # Döngü hiç kırılmadan çıkıldı ise bu sınava girecek hiç öğrenci kalmamış 
+                                # Bu yeri geç
+                                attempts = 0
+                                continue
+                            
+                            # Seçilen sınava dahil sınıftan bir öğrenci seç
+                            student = all_grades.get(grade_name)[0]
+                            print(student)
+                            current_gender = student[3]
+                            place_suitable = is_place_suitable(classroom=classroom, arrangement=arrangement, place=current_place, place_object=place_object, place_index=list(desk.keys()).index(place_number), current_exam_name=exam_name, student=student, current_gender=current_gender, rules=rules)
+
+                            # Yer uygun ise öğrenciyi oraya yerleştir
+                            if place_suitable == True:
+                                classrooms[classroom_name]["oturma_duzeni"][column_index][row_index][place_number] = {"exam_name": exam_name, "student": student}
+                                all_grades[grade_name].remove(student)
+                                random.shuffle(all_grades[grade_name])
+                                class_counts[grade_name] -= 1
+                                placed = True
+                                placed_count += 1
+                                print(f"Placed: {desk}")
+                            
+                            # Eğer sorun cinsiyet ise farklı cinsiyetten bir öğrenci seç
+                            elif place_suitable == -1:
+                                for index, student in enumerate(all_grades.get(grade_name)):
+                                    if ((not index) and (current_gender != student[3])): 
+                                        student = all_grades.get(grade_name)[0]
+                                        print(student)
+                                        place_suitable = is_place_suitable(classroom=classroom, arrangement=arrangement, place=current_place, place_object=place_object, place_index=list(desk.keys()).index(place_number), current_exam_name=exam_name, student=student, current_gender=current_gender, rules=rules)
+                                        if place_suitable:
+                                            classrooms[classroom_name]["oturma_duzeni"][column_index][row_index][place_number] = {"exam_name": exam_name, "student": student}
+                                            all_grades[grade_name].remove(student)
+                                            random.shuffle(all_grades[grade_name])
+                                            class_counts[grade_name] -= 1
+                                            placed = True
+                                            placed_count += 1
+                                            print(f"Placed: {desk}")
+                                        else:
+                                            print(f"Not placed: {desk}")
+                                        break # Break the for loop
+
+                            else:
+                                attempts -= 1
+                                print(f"Not placed: {desk}")
+                            print()
+        outer_attempts -= 1
+                            
+    if is_there_any_student_left(class_counts):
+        return {"Classrooms": classrooms, "Status": False, "Class-Counts": class_counts, "Placed-Count": placed_count, "Un-Placed-Count": un_placed_count}
+    return {"Classrooms": classrooms, "Status": True, "Class-Counts": class_counts, "Placed-Count": placed_count, "Un-Placed-Count": un_placed_count}
 
 def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, place_object: Place, place_index: int, current_exam_name: str, student: tuple, current_gender: str, rules: dict):
     """_summary_
@@ -265,82 +346,6 @@ def is_place_suitable(classroom: dict, arrangement: list, place: None or tuple, 
                 
     return True
 
-def get_student_pools(exams: dict, all_grades: dict, classrooms: dict) -> dict:
-    student_pools = dict()
-    counts = {}
-    total_selected_count = 0
-    for classroom_name, classroom in classrooms.items():
-        place_count = get_place_count(classroom['oturma_duzeni'])
-        selected_count = 0
-        student_pool = {}
-        for exam_name in exams:
-            student_pool.update({exam_name: {}})
-            grade_names = exams[exam_name]
-            for grade_name in grade_names:
-                student_pool[exam_name].update({grade_name: []})
-                grade = all_grades.get(grade_name)
-                count = len(grade) // len(classrooms)
-                selected_count += count
-
-                # Öğrencileri havuza ekle
-                students = []
-                for _ in range(count):
-                    students = grade[:count]
-                for student in students:
-                    grade.remove(student)
-                    
-                student_pool[exam_name][grade_name].extend(students)
-                # Öğrencileri çıkar
-                all_grades[grade_name] = grade
-
-        student_pools.update({classroom_name: student_pool})
-        if not place_count-selected_count:
-            continue
-        
-        for exam_name in exams:
-            grade_names = exams[exam_name]
-            for grade_name in grade_names:
-                grade = all_grades.get(grade_name)
-                if (selected_count + 1) > place_count or not grade:
-                    continue
-                
-                selected_count += 1
-                # Öğrencileri havuza ekle
-                student = grade[0]
-                grade.pop(0)
-                student_pool[exam_name][grade_name].extend(students)
-                # Öğrencileri çıkar
-                all_grades[grade_name] = grade
-                
-        student_pools.update({classroom_name: student_pool})
-        total_selected_count += selected_count
-        counts[classroom_name] = selected_count
-
-    total_left_count = how_many_students_left(all_grades)
-    return student_pools        
-
-def get_place_count(arrangement: list[list[dict]]) -> int:
-    total = 0
-    for column in arrangement:
-        for desk in column:
-            total += len(desk)
-    return total
-
-def how_many_students_left(grades: dict[list]) -> int:
-    count = 0
-    for grade_name, grade in grades.items():
-        count += len(grade)
-
-    return count
-
-def shuffle_dict(dictionary: dict) -> dict:
-    backup = copy.deepcopy(dictionary)
-    keys = list(dictionary.keys())
-
-    shuffled_dict = dict()
-    for key in keys:
-        shuffled_dict.update({key: backup[key]})
-    return shuffled_dict
 def is_there_any_student_left(classroomCounts: dict):
     counts = [count for gradeName, count in classroomCounts.items()]
     if any(counts):
@@ -379,12 +384,12 @@ if __name__ == '__main__':
     from Frames.create_exam_frame import Exam
     exams = {
         "Sınav1": {"gradeNames": ["9/A", "9/B", "9/C", "9/D"]},
-        "Sınav2": {"gradeNames": ["10/A", "10/B", "10/C", "10/D"]},
-        "Sınav3": {"gradeNames": ["11/A", "11/B", "11/C", "11/D"]},
-        "Sınav4": {"gradeNames": ["12/A", "12/B", "12/C", "12/D"]},
+        #"Sınav2": {"gradeNames": ["10/A", "10/B", "10/C", "10/D"]},
+        #"Sınav3": {"gradeNames": ["11/A", "11/B", "11/C", "11/D"]},
+        #"Sınav4": {"gradeNames": ["12/A", "12/B", "12/C", "12/D"]},
     }
         
-    classroomNames = ["9/A", "9/B", "9/C", "9/D", "10/A", "10/B", "10/C", "10/D", "11/A", "11/B", "11/C", "11/D", "12/A", "12/B", "12/C", "12/D"]
+    classroomNames = ["9/A", "9/B", "9/C", "9/D", "10/A", "10/B",]# "10/C", "10/D", "11/A", "11/B", "11/C", "11/D", "12/A", "12/B", "12/C", "12/D"]
         
     rules = {
         "BackToBackSitting": 0,

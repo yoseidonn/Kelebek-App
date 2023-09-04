@@ -4,18 +4,18 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.uic import loadUi
 
-from App.HtmlCreater import classrooms_html, grades_html
-from App import database
-from App.colors import COLOR_PALETTE
-from App.logs import logger
-from App import deploy
+#from App.HtmlCreater import classrooms_html, grades_html
+#from App import database
+#from App.colors import COLOR_PALETTE
+#from App.logs import logger
+#from App import deploy
 
 from dotenv import load_dotenv
 from pathlib import Path
 import os, sys, datetime, shutil
 
 
-COLORS = list(COLOR_PALETTE.values())
+#COLORS = list(COLOR_PALETTE.values())
 BASE_DIR = os.getenv("BASE_DIR")
 load_dotenv()
 
