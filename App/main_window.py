@@ -1,9 +1,8 @@
-from PyQt5.QtWebEngineWidgets import *
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.uic import loadUi
-from dotenv import load_dotenv
 from pathlib import Path
 
 from Client import client
@@ -13,7 +12,6 @@ from .logs import logger
 
 import os, sys, datetime, logging, subprocess
 
-load_dotenv()
 BASE_DIR = os.getenv("BASE_DIR")
 
 
@@ -159,7 +157,44 @@ class MainWindow(QMainWindow):
         self.actionResetAllData.triggered.connect(lambda: print("Reset all data action has just triggered"))
         self.actionSettings.triggered.connect(self.settings_dialog)
         self.actionLicense.triggered.connect(lambda: print("License key action has just triggered"))
+        self.tabWidget.currentChanged.connect(lambda index: self.tab_changed(index))
 
+    def tab_changed(self, index: int):
+        if index == 1:
+            if self.schoolInfosVLayout.count():
+                child = self.schoolInfosVLayout.takeAt(0)
+                del child
+            self.schoolInformationsFrame = school_infos_frame.SchoolInformationsFrame()
+            self.schoolInfosVLayout.addWidget(self.schoolInformationsFrame)    
+
+        elif index == 2:
+            if self.studentsVLayout.count():
+                child = self.studentsVLayout.takeAt(0)
+                del child
+            self.studentsFrame = students_frame.StudentsFrame()
+            self.studentsVLayout.addWidget(self.studentsFrame)
+        
+        elif index == 3:
+            if self.classroomsVLayout.count():
+                child = self.classroomsVLayout.takeAt(0)
+                del child
+            self.classroomsFrame = classrooms_frame.ClassroomsFrame()
+            self.classroomsVLayout.addWidget(self.classroomsFrame)
+            
+        elif index == 4:
+            if self.createExamVLayout.count():
+                child = self.createExamVLayout.takeAt(0)
+                del child
+            self.createExamFrame = create_exam_frame.CreateExamBaseFrame()
+            self.createExamVLayout.addWidget(self.createExamFrame)
+            
+        elif index == 5:
+            if self.savedExamsVLayout.count():
+                child = self.savedExamsVLayout.takeAt(0)
+                del child
+            self.savedExamsFrame = saved_exams_frame.SavedExamsFrame()
+            self.savedExamsVLayout.addWidget(self.savedExamsFrame)
+            
     def set_ui(self):
         """
         This function, adds custom widgets and waits for signals comes from buttons.

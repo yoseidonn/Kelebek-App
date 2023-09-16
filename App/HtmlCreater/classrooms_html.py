@@ -1,5 +1,5 @@
+#import database
 from App import database
-from App import logs
 from App.logs import logger
 from App.database import num_sort, num_sort_dict, num_sort_tuple
 import os, shutil, datetime, re
@@ -208,7 +208,6 @@ def get_htmls(classrooms, student_exam, headerInfos, baseStart, baseEnd):
         headerText = header.format(*headerInfos, classroom_name)
         classroom_array.append(headerText)
         columnStyle, totalCount = get_column_style(classroom)
-        rowStyle = get_row_style(classroom)
         container = containerOpener.format(columnStyle)#, rowStyle)
         classroom_array.append(container)
         
@@ -318,11 +317,11 @@ def get_column_style(classroom):
     
     # blank count ile gezinip araya blankPercen textleri sıkıştır
     tempStyle = []
-    for index in range(len(style)):
+    for index, text in enumerate(style):
         tempStyle.append(style[index])
         if index == len(style) - 1:
             break
-        if index % kacli:
+        if (kacli == 1) or (index % kacli):
             tempStyle.append("1fr ")
             
     style = tempStyle
@@ -330,24 +329,27 @@ def get_column_style(classroom):
     styleText = "".join(style)
     totalCount = deskCount + blankCount
     return [styleText, totalCount]
-                    
-def get_row_style(classroom):
-    oturmaDuzeni = classroom["oturma_duzeni"]
-    longestRowLen = 0
-    for colIndex in range(len(oturmaDuzeni)):
-        currentLen = len(oturmaDuzeni[colIndex])
-        #print(f"CurrentLen: {currentLen}")
-        #print(f"LongestLen: {longestRowLen}")
-        #print()
-        longestRowLen = currentLen if currentLen > longestRowLen else longestRowLen
     
-    style = []
-    for _ in range(longestRowLen):
-        style.append("1fr ")
-    
-    styleText = "".join(style)
-    return styleText                  
-
  
 if __name__ == '__main__':
-    ...
+    classroom = {"kacli": "1'li",
+                 "oturma_duzeni":[
+        [ 
+            {1: {"exam_name": None, "student": None}},
+            {3: {"exam_name": None, "student": None}},
+            {5: {"exam_name": None, "student": None}},
+            {7: {"exam_name": None, "student": None}}
+        ],
+        [ 
+            {9: {"exam_name": None, "student": None}},
+            {11: {"exam_name": None, "student": None}},
+            {13: {"exam_name": None, "student": None}},
+        ],
+        [ 
+            {9: {"exam_name": None, "student": None}},
+            {11: {"exam_name": None, "student": None}},
+            {13: {"exam_name": None, "student": None}},
+        ],
+    ]
+                 }
+    print(get_column_style(classroom))

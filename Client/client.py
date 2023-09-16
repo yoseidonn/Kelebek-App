@@ -1,9 +1,8 @@
 import requests, json, datetime
-import os, sys, dotenv, platform, pyudev, subprocess
+import os, sys, platform, pyudev, subprocess
 from App import logs
 from App.logs import logger
 
-dotenv.load_dotenv()
 BASE_DIR = os.getenv("BASE_DIR")
 SERVER = os.getenv("SERVER_IP")
 #SERVER = "http://localhost:8000/rest_api/validate/"
