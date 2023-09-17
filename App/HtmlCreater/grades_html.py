@@ -49,13 +49,14 @@ def create(examInfos, classrooms, exams):
     baseStart, baseEnd = BASE.split(SEPERATOR)
     grades = classrooms_to_grades(classrooms)
     grade_htmls = create_html_tables(grades, baseStart, baseEnd)
-
-    examName = "_".join([examInfos[-1], examInfos[3], examInfos[4]])
+    # TODO GRADE_HTMLS Fonksiyonu çalışmıyor. Geriye boş dönüyor dolayısıyla sınıfların dosyaları oluşturulmuyor
+    examName = "_".join([examInfos.get('Sinav-Adi'), examInfos.get('Tarih'), examInfos.get('Kacinci-Ders').strip()])
     try:
         os.mkdir(os.path.join(BASE_DIR, 'Temp', examName, "Grades"))
     except Exception as e:
-        raise e
-        logger.error(str(e))
+        logger.error(e)
+        shutil.rmtree(os.path.join(BASE_DIR, 'Temp', examName, "Grades"))
+        os.mkdir(os.path.join(BASE_DIR, 'Temp', examName, "Grades"))
 
     name_template = "{}.html"
     gradePaths = {}
@@ -67,7 +68,6 @@ def create(examInfos, classrooms, exams):
                 newFile.write(grade_htmls[gradeName])
             gradePaths.update({gradeName: gradePath})
         except Exception as e:
-            raise e
             logger.error(str(e))
             
     sortedGradePaths = {}
@@ -79,95 +79,54 @@ def create(examInfos, classrooms, exams):
     return sortedGradePaths
 
 def create_html_tables(grades, baseStart, baseEnd):
+    print("creating html tables")
     grade_htmls = {}
     for grade_name, students in grades.items():
+        print(grade_name, len(students))
         grade_html = [baseStart]
         grade_html.append(f"<table><caption>{grade_name} Listesi</caption>")
         grade_html.append("<tr><th>Öğrenci</th><th>Sınav yeri</th></tr>")
         for student in students:
-            nameSurname, classroom, deskNo = student[1][1:3], student[2], student[3]
-            print(f"{classroom} - {deskNo}")
+            nameSurname, classroom, placeNumber = student[1][1:3], student[2], student[3]
             nameSurname = f"{nameSurname[0]} {nameSurname[1]}"
+            
             grade_html.append("<tr>")
             grade_html.append(f"<td>{nameSurname}</td>")
-            grade_html.append(f"<td>{classroom} - {deskNo}</td>")
+            grade_html.append(f"<td>{classroom} - {placeNumber}</td>")
             grade_html.append("</tr>")
         grade_html.append("</table>")
         grade_html.append(baseEnd)
         grade_htmls.update({grade_name: "\n".join(grade_html)})
+        print("grade added")
         
     return grade_htmls
 
-def classrooms_to_grades(classrooms):
+def classrooms_to_grades(classrooms: dict):
     counter = 0
     mixed = {}
-    for classroom in classrooms:
-        oturmaDuzeni = classrooms[classroom]["oturma_duzeni"]
-        ogretmenMasasi =  classrooms[classroom]["ogretmen_masasi"]
-        if ogretmenMasasi is not None:
-            student = ogretmenMasasi[1]
-            name = student[1] + " " + student[2]
-            no = student[0]
-            grade = student[4]
-            place = ogretmenMasasi
-            mixed.update({no: [grade, name, place]})
+    for classroomName, classroom in classrooms.items():
+        oturmaDuzeni = classroom["oturma_duzeni"]
+        ogretmenMasasiOgrenci =  classroom["ogretmen_masasi"]
+        if ogretmenMasasiOgrenci is not None:
+            student = ogretmenMasasiOgrenci[1]
+            placeNumber = ogretmenMasasiOgrenci
+            mixed.update({no: [grade, student, classroomName, placeNumber]})
 
         for colIndex in range(len(oturmaDuzeni)):
             for rowIndex in range(len(oturmaDuzeni[colIndex])):
                 desk = oturmaDuzeni[colIndex][rowIndex]
-                for deskNo in desk:
-                    student = desk[deskNo]
+                for placeNumber in desk:
+                    student = desk[placeNumber].get("student")
                     if student is not None:
                         counter += 1
                         no = student[0]
                         grade = student[4]
-                        info = [grade, student, classroom, deskNo]
+                        info = [grade, student, classroomName, placeNumber]
                         mixed.update({no: info})
-    
-    
+
     seperated = {}
     createds = []
-    for no in mixed:
-        info = mixed[no]
-        grade = info[0]
-        if grade not in createds:
-            createds.append(grade)
-            seperated.update({grade: []})
-
-        seperated[grade].append(info)
-        
-    return seperated
-
-def layer_function(classrooms):
-    counter = 0
-    mixed = {}
-    for classroom in classrooms:
-        oturmaDuzeni = classrooms[classroom]["oturma_duzeni"]
-        ogretmenMasasi =  classrooms[classroom]["ogretmen_masasi"]
-        if ogretmenMasasi is not None:
-            student = ogretmenMasasi[1]
-            name = student[1] + " " + student[2]
-            no = student[0]
-            grade = student[4]
-            place = "Öğretmen masası"
-            mixed.update({no: [grade, name, place]})
-
-        for colIndex in range(len(oturmaDuzeni)):
-            for rowIndex in range(len(oturmaDuzeni[colIndex])):
-                desk = oturmaDuzeni[colIndex][rowIndex]
-                for deskNo in desk:
-                    student = desk[deskNo]
-                    if student is not None:
-                        counter += 1
-                        no = student[0]
-                        grade = student[4]
-                        info = [grade, student, classroom, deskNo]
-                        mixed.update({no: info})
-    
-    seperated = {}
-    createds = []
-    for no in mixed:
-        info = mixed[no]
+    for no, info in mixed.items():
         grade = info[0]
         if grade not in createds:
             createds.append(grade)

@@ -1,5 +1,5 @@
 ### database.py
-#from .logs import logger
+from .logs import logger
 import sqlite3, re
 
 db = sqlite3.connect("database.db")
@@ -333,13 +333,14 @@ def get_name_given_classrooms(names: list) -> dict:
         else:
             return classrooms
         
-        derslik_adi, ogretmen_yonu, kacli, oturma_duzeni = [classroom[indx] for indx in range(len(classroom))]
-        duzen = create_arrangement(kacli, ogretmen_yonu, oturma_duzeni)
+        derslik_adi, ogretmen_yonu, kacli, oturma_duzeni_text = [classroom[indx] for indx in range(len(classroom))]
+        duzen = create_arrangement(kacli, ogretmen_yonu, oturma_duzeni_text)
         
         classroom = {"derslik_adi": derslik_adi,
                   "ogretmen_yonu": ogretmen_yonu,
                   "kacli": kacli,
                   "oturma_duzeni": duzen,
+                  "oturma_duzeni_text": oturma_duzeni_text,
                   "ogretmen_masasi": None}
         
         classrooms.update({derslik_adi: classroom})

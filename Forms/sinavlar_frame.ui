@@ -71,10 +71,10 @@
          <string>Dosyalar</string>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
+         <item alignment="Qt::AlignLeft">
           <widget class="QFrame" name="examsFrame">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -412,7 +412,7 @@
       <item>
        <widget class="QFrame" name="displayFrame">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>

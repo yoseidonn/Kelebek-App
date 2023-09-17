@@ -1,0 +1,43 @@
+2023-09-15 20:13:45,451 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-07
+2023-09-15 20:13:45,451 | INFO | Daha önce geçilmiş
+2023-09-15 20:13:45,452 | INFO | It's been two days after last validation skip.
+2023-09-15 20:13:45,459 | INFO | [Errno 2] Böyle bir dosya ya da dizin yok: '/home/yusuf/Belgeler/Projects/Software/Kelebek/BETA/Application/kelebek.conf' | kelebek.conf bulunamadı
+2023-09-15 20:13:47,729 | INFO | Validation refused. Exiting the application.
+2023-09-15 20:13:52,220 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: BLANK
+2023-09-15 20:13:52,220 | INFO | Hiç giriş yapılmamış
+2023-09-15 20:13:52,227 | INFO | [Errno 2] Böyle bir dosya ya da dizin yok: '/home/yusuf/Belgeler/Projects/Software/Kelebek/BETA/Application/kelebek.conf' | kelebek.conf bulunamadı
+2023-09-15 20:13:52,996 | INFO | Skipping licence validation. Starting the application.
+2023-09-15 20:14:05,102 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-15
+2023-09-15 20:14:05,102 | INFO | Daha önce geçilmiş
+2023-09-15 20:14:05,102 | INFO | It's not been too much after last validation skip.
+2023-09-15 20:14:20,034 | INFO | Kayıtlı anahtar: SDFSDFSDF	 Sonra eriş tarihi: SDFSDFSDFSD	 En son geçme tarihi: 2023-09-15
+2023-09-15 20:14:20,034 | INFO | Bozuk .env dosyası
+2023-09-15 20:14:20,041 | INFO | [Errno 2] Böyle bir dosya ya da dizin yok: '/home/yusuf/Belgeler/Projects/Software/Kelebek/BETA/Application/kelebek.conf' | kelebek.conf bulunamadı
+2023-09-15 20:14:22,812 | INFO | Skipping licence validation. Starting the application.
+2023-09-15 20:14:30,652 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-15
+2023-09-15 20:14:30,652 | INFO | Daha önce geçilmiş
+2023-09-15 20:14:30,652 | INFO | It's not been too much after last validation skip.
+2023-09-15 20:31:17,377 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-15
+2023-09-15 20:31:17,377 | INFO | Daha önce geçilmiş
+2023-09-15 20:31:17,377 | INFO | It's not been too much after last validation skip.
+2023-09-15 20:35:04,870 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-15
+2023-09-15 20:35:04,870 | INFO | Daha önce geçilmiş
+2023-09-15 20:35:04,870 | INFO | It's not been too much after last validation skip.
+2023-09-15 20:35:28,097 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-15
+2023-09-15 20:35:28,097 | INFO | Daha önce geçilmiş
+2023-09-15 20:35:28,097 | INFO | It's not been too much after last validation skip.
+2023-09-15 20:41:42,945 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-15
+2023-09-15 20:41:42,945 | INFO | Daha önce geçilmiş
+2023-09-15 20:41:42,945 | INFO | It's not been too much after last validation skip.
+2023-09-15 20:43:10,523 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-15
+2023-09-15 20:43:10,523 | INFO | Daha önce geçilmiş
+2023-09-15 20:43:10,523 | INFO | It's not been too much after last validation skip.
+2023-09-15 20:50:05,617 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-15
+2023-09-15 20:50:05,618 | INFO | Daha önce geçilmiş
+2023-09-15 20:50:05,618 | INFO | It's not been too much after last validation skip.
+2023-09-15 20:59:28,185 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-15
+2023-09-15 20:59:28,185 | INFO | Daha önce geçilmiş
+2023-09-15 20:59:28,186 | INFO | It's not been too much after last validation skip.
+2023-09-15 21:07:23,002 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-15
+2023-09-15 21:07:23,002 | INFO | Daha önce geçilmiş
+2023-09-15 21:07:23,002 | INFO | It's not been too much after last validation skip.

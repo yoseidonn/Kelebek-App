@@ -1,9 +1,8 @@
-from PyQt5.QtWebEngineWidgets import *
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.uic import loadUi
-from dotenv import load_dotenv
 
 from App import database
 from App.logs import logger
@@ -11,7 +10,6 @@ from App.logs import logger
 import os, functools
 
 
-load_dotenv()
 BASE_DIR = os.getenv("BASE_DIR")
 SOL = "Solda"
 SAG = "Sağda"
@@ -83,6 +81,11 @@ class ClassroomsFrame(QFrame):
         
     def save_button_clicked(self, add = False):
         # Salonu ekle
+        salonAdi = self.salonNameIn.text().strip().upper()
+        if not len(salonAdi):
+            self.label.setText("Salon adı boş olamaz!")
+            return
+        
         salonAdi = self.salonNameIn.text().strip().upper()
         ogretmenY = self.yonCombo.currentText()
         kacli = self.kacliCombo.currentText()

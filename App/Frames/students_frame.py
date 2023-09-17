@@ -5,11 +5,9 @@ from PyQt5.uic import loadUi
 
 from App import excel_reader, database
 from App.logs import logger
-from dotenv import load_dotenv
 import os
 
 BASE_DIR = os.getenv("BASE_DIR")
-load_dotenv()
 
 
 class StudentsFrame(QFrame):

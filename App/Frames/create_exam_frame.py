@@ -1,4 +1,4 @@
-from PyQt5.QtWebEngineWidgets import *
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -10,15 +10,12 @@ from App.colors import COLOR_PALETTE
 from App.logs import logger
 from App import deploy
 
-from dotenv import load_dotenv
 from pathlib import Path
-import os, sys, datetime, shutil
+import os, sys, datetime, shutil, copy
 
 
 COLORS = list(COLOR_PALETTE.values())
 BASE_DIR = os.getenv("BASE_DIR")
-load_dotenv()
-
 
 
 class CreateExamBaseFrame(QFrame):
@@ -84,24 +81,23 @@ class ExamFrame(QFrame):
 
         self.informationFrame = informationFrame
 
-        # DATAS FROM DATABASE
-        self.grades = database.get_all_students(withGrades=True)
-        self.gradeNames = database.get_all_grade_names()
-        self.classroomsNames = database.get_all_classrooms(onlyNames=True)
-
-        # VARIABLES
-        self.set_start_variables()
+        self.load_database_variables()
         
         # RENDER THE FRAME
         self.set_ui()
         self.set_signals()
         
+        self.set_start_variables()
         self.adjust_widget_settings()
 
+    def load_database_variables(self):
+        self.grades = database.get_all_students(withGrades=True)
+        self.classroom_names = database.get_all_classrooms(onlyNames=True)
+        self.grade_names = list(self.grades.keys())
+
     def set_start_variables(self):
-        self.examInfos = list()             # self.egitimOgretimYili, self.donem, self.kacinciYazili, self.tarih, self.kacinciDers, self.masterExamName
-        self.gradeCheckBoxes = list()       # To hold the checkboxes for enabling all when i need
-        self.classroomNames = list()        # To hold the selected classroom names
+        self.classroomNamesBackup = set()
+        self.classroomNames = set()         # To hold the selected classroom names
         self.exams = dict()                 # To hold the exam names with gradenames
         self.selectedExamName = str()
 
@@ -122,25 +118,38 @@ class ExamFrame(QFrame):
         self.examTableWidget.itemSelectionChanged.connect(self.on_cell_change)
 
         self.createButton.clicked.connect(self.check_conditions)
+        self.select_all_classrooms_checkbox.stateChanged.connect(self.select_all_classrooms)
         
     def check_conditions(self):
         flag = False
         sinavAdi = self.informationFrame.sinavAdi.text()
+
+        # Sınav adı girilmemiş ise uyarı mesajını göster
         if not sinavAdi:
             self.informationFrame.sinavAdiLabel.setVisible(True)
             self.informationFrame.sinavAdiLabel.setText("Lütfen bir sınav adı giriniz!")
             flag = True            
 
+        # Sınav yoksa uyarı mesajını göster
         if not self.exams:
             self.examNameInLabel.setVisible(True)
             self.examNameInLabel.setText("Lütfen en az bir sınav ekleyin!")
             flag = True            
 
+        # Sınav var ise:
         else:
-            checked_grade_names = set([(checkbox if checkbox.isChecked() else None) for checkbox in self.gradeCheckBoxes])
-            if checked_grade_names:
-                checked_grade_names.remove(None)
+            checked_grade_names = set([(checkbox if checkbox.isChecked() else None) for checkbox in self.grade_checkboxes])
+            #print(checked_grade_names)
 
+            # Henüz okula sınıf tanımlanmamış ise küme tamamen boş olurdu, o yüzden kontrol edip çıkartıyoruz
+            if None in checked_grade_names:
+                checked_grade_names.remove(None)
+            # Hiç kayıtlı değilse de özel uyarı mesajı göster
+            elif not checked_grade_names:
+                self.gradeNamesLabel.setVisible(True)
+                self.gradeNamesLabel.setText("Lütfen 'Öğrenciler' sekmesinden öğrenci kaydedin!")
+                flag = True
+            
             if len(checked_grade_names) < len(self.exams.keys()):
                 self.gradeNamesLabel.setVisible(True)
                 self.gradeNamesLabel.setText("Lütfen her sınava en az bir sınıf ekleyiniz!")
@@ -156,16 +165,15 @@ class ExamFrame(QFrame):
         
         self.deploying_step()
 
-        
     def add_exam(self):
         examName = self.examNameIn.text().strip().upper()
         if len(examName) and (examName not in self.exams.keys()):
             examIndex = len(self.exams)
             color = COLORS[examIndex]
             
-            self.exams.update({examName: {"gradeNames": [],
-                                          "checkBoxes": [],
-                                          "paletteColor": color
+            self.exams.update({examName: {"Grade-Names": [],
+                                          "Checkboxes": [],
+                                          "Palette-Color": color
                                           }})
 
             self.examNameIn.clear()
@@ -178,83 +186,48 @@ class ExamFrame(QFrame):
             self.set_red()       # Input place
 
     def remove_exam(self):
-        try:
-            checkboxes = self.exams[self.selectedExamName]["checkBoxes"]
-        except KeyError as e:
-            print(e)
-            return
-
+        checkboxes = self.exams[self.selectedExamName]["Checkboxes"]
         for checkbox in checkboxes:
+            checkbox.blockSignals(True)
             checkbox.setStyleSheet("")
             checkbox.setChecked(False)
-
+            checkbox.blockSignals(False)
+            #item = self.grade_checkboxes[checkbox]
+            #index = self.gradeListWidget.row(item)
+            
         self.exams.pop(self.selectedExamName)
-        for examName in self.exams:
-            for checkbox in self.exams[examName]["checkBoxes"]:
-                color = self.exams[examName]["paletteColor"]
-                r, g, b = color
-                checkbox.setChecked(True)
-                checkbox.setStyleSheet(f"background-color: rgba({r}, {g}, {b}, 100)") 
-        
+        self.selectedExamName = None
         self.draw_exam_table()
+        self.draw_grade_table()
 
     def remove_all_exams(self):
-        try:
-            checkboxes = self.exams[self.selectedExamName]["checkBoxes"]
-        except KeyError as e:
-            print(e)
-            return
-        
-        for checkbox in checkboxes:
-                checkbox.setStyleSheet("")
-                checkbox.setChecked(False)
-        
-        for examName in list(self.exams.keys()):
-            self.exams.pop(examName)
-            for eName in self.exams:
-                for checkbox in self.exams[eName]["checkBoxes"]:
-                    color = self.exams[eName]["paletteColor"]
-                    r, g, b = color
-                    checkbox.setChecked(True)
-                    checkbox.setStyleSheet(f"background-color: rgba({r}, {g}, {b}, 100)") 
-        
-        self.draw_exam_table()
+        self.adjust_widget_settings(reset=True)
 
     def on_cell_change(self):
         item = self.examTableWidget.currentItem()
         if item is None:
+            self.selectedExamName = None
             return
+        
         rowIndex = item.row()
 
         self.examTableWidget.selectRow(rowIndex)
-        print("Row selected.", rowIndex)
 
         # Seçili sınavın rengini palet rengine ata
         keys = list(self.exams.keys())
         if not keys:
             return
+        
         examName = keys[rowIndex]
         self.selectedExamName = examName                        # draw_exam_table da kullanılıyor
-        examColor = self.exams[examName]["paletteColor"]
+        examColor = self.exams[examName]["Palette-Color"]
         highLightColor = QColor(*examColor, 100)
 
         self.colorPalette.setColor(QPalette.Highlight, highLightColor)    
         self.examTableWidget.setPalette(self.colorPalette)
             
-        # Herhangi bir sınavın checkBoxes listesinde bulunmayan tüm checkbox nesnelerini aktif et
-        selectedBoxes = []
-        for examName in self.exams:
-            if examName != self.selectedExamName:
-                checkboxes = self.exams[examName]["checkBoxes"]
-                selectedBoxes.extend(checkboxes)
-
-        for checkbox in self.gradeCheckBoxes:
-            checkbox.setEnabled(True)
-            
-        for checkbox in selectedBoxes:
-            print(checkbox.text())
-            checkbox.setEnabled(False)
-
+        self.draw_grade_table()
+        
     def grade_checkbox_clicked(self, checkbox: QCheckBox):
         self.gradeNamesLabel.setVisible(False)
         self.gradeListWidget.setStyleSheet("")
@@ -268,42 +241,73 @@ class ExamFrame(QFrame):
         current = int(self.examTableWidget.item(examIndex, 1).text())
         
         #Değeri azalt ve itemi çıkart
-        if gradeName in self.exams[self.selectedExamName]["gradeNames"]:
-            self.exams[self.selectedExamName]["checkBoxes"].remove(checkbox)
-            self.exams[self.selectedExamName]["gradeNames"].remove(gradeName)
+        if gradeName in self.exams[self.selectedExamName]["Grade-Names"]:
+            self.exams[self.selectedExamName]["Checkboxes"].remove(checkbox)
+            self.exams[self.selectedExamName]["Grade-Names"].remove(gradeName)
             self.examTableWidget.item(examIndex, 1).setText(f"{current - toAdd}")
             # RENGI SIFIRLA
             checkbox.setStyleSheet("")
             
         #Değeri arttır ve itemi ekle
         else:
-            self.exams[self.selectedExamName]["checkBoxes"].append(checkbox)
-            self.exams[self.selectedExamName]["gradeNames"].append(gradeName)
+            self.exams[self.selectedExamName]["Checkboxes"].append(checkbox)
+            self.exams[self.selectedExamName]["Grade-Names"].append(gradeName)
             self.examTableWidget.item(examIndex, 1).setText(f"{current + toAdd}")
             #RENK EKLE
-            color = self.exams[self.selectedExamName]["paletteColor"]
+            color = self.exams[self.selectedExamName]["Palette-Color"]
             r, g, b = color
             checkbox.setStyleSheet(f"background-color: rgba({r}, {g}, {b}, 100)")
 
     def classroom_checkbox_clicked(self, checkbox: QCheckBox):
         self.classroomNamesLabel.setVisible(False)
-        self.classroomNames.append(checkbox.text())
+        self.classroomNames.add(checkbox.text())
         self.classroomListWidget.setStyleSheet("")
         
+    def select_all_classrooms(self):
+        self.classroomNamesLabel.setVisible(False)
+        self.classroomListWidget.blockSignals(True)
+        
+        state = self.select_all_classrooms_checkbox.isChecked()
+        if state:
+            # Eski secili olanlari yedekle ve tum salon adlarini listeye ekle
+            self.classroomNamesBackup = self.classroomNames.copy()
+            self.classroomNames = self.classroom_names.copy()
+            for checkbox in self.classroom_checkboxes:
+                checkbox.blockSignals(True)
+                
+                checkbox.setEnabled(False)
+                checkbox.setChecked(True)
+                
+                checkbox.blockSignals(False)
+        else:
+            # Yedegi geri getir
+            self.classroomNames = self.classroomNamesBackup.copy()
+            for checkbox in self.classroom_checkboxes:
+                checkbox.blockSignals(True)
+                
+                checkbox.setEnabled(True)
+                if checkbox.text() not in self.classroomNames:
+                    checkbox.setChecked(False)
+
+                checkbox.blockSignals(False)
+            self.classroomNamesBackup = set()
+            
+        self.classroomListWidget.blockSignals(False)
+
     def draw_exam_table(self):
         self.examTableWidget.setRowCount(len(self.exams))
         for rowIndex, examName in enumerate(self.exams.keys()):
             # Get the count of all the students which are in the gradeNames list in the spesific exam
             studentCount = 0
-            for gradeName in self.exams[examName]["gradeNames"]:
+            for gradeName in self.exams[examName]["Grade-Names"]:
                 studentCount += len(self.grades[gradeName])
 
-            item1 = QTableWidgetItem(examName)  
+            item1 = QTableWidgetItem(examName)
             item2 = QTableWidgetItem(str(studentCount))
             self.examTableWidget.setItem(rowIndex, 0, item1)
             self.examTableWidget.setItem(rowIndex, 1, item2)
             
-            color = self.exams[examName]["paletteColor"]
+            color = self.exams[examName]["Palette-Color"]
             r, g, b = color
             self.examTableWidget.item(rowIndex, 0).setBackground(QColor(r, g, b))
             self.examTableWidget.item(rowIndex, 1).setBackground(QColor(r, g, b))
@@ -312,41 +316,65 @@ class ExamFrame(QFrame):
         if len(self.exams.keys()):
             lastRowIndex = len(self.exams) - 1
             self.examTableWidget.selectRow(lastRowIndex)
-            print("Lastrow index", lastRowIndex)
+            #print("Lastrow index", lastRowIndex)
             self.selectedExamName = list(self.exams.keys())[lastRowIndex]
 
         else:
             self.selectedExamName = None
     
     def draw_grade_table(self):
-        for gradeName in self.gradeNames:
+        print("drawed grades")
+        for checkbox in self.grade_checkboxes:
+            checkbox.setEnabled(True if len(self.exams) else False)
+            checkbox.setStyleSheet("")
+
+        for exam_name, exam in self.exams.items():
+            #RENK EKLE
+            color = exam["Palette-Color"]
+            r, g, b = color
+
+            checkboxes = exam["Checkboxes"]
+            for checkbox in checkboxes:
+                if exam_name != self.selectedExamName:
+                    checkbox.setEnabled(False)
+                checkbox.setStyleSheet(f"background-color: rgba({r}, {g}, {b}, 100)")
+
+    def set_grade_table(self):
+        print("grades set")
+        for grade_name in self.grade_names:
             item = QListWidgetItem()
-            checkbox = QCheckBox(gradeName, self)
+            checkbox = QCheckBox(grade_name, self)
             checkbox.setEnabled(False)
             checkbox.stateChanged.connect(lambda state, c=checkbox: self.grade_checkbox_clicked(c))
-            
             self.gradeListWidget.addItem(item)
             self.gradeListWidget.setItemWidget(item, checkbox)
 
-            self.gradeCheckBoxes.append(checkbox)
+            self.grade_checkboxes.update({checkbox: item})
 
-    def draw_classroom_table(self):
-        for classroomName in self.classroomsNames:
+    def set_classroom_table(self):
+        print("classrooms set")
+        for classroom_name in self.classroom_names:
             item = QListWidgetItem()
-            checkbox = QCheckBox(classroomName, self)
+            checkbox = QCheckBox(classroom_name, self)
             checkbox.stateChanged.connect(lambda state, c=checkbox: self.classroom_checkbox_clicked(c))
             
             self.classroomListWidget.addItem(item)
             self.classroomListWidget.setItemWidget(item, checkbox)
+            self.classroom_checkboxes.update({checkbox: item})
     
     def adjust_widget_settings(self, reset = False):
         if reset:
+            print("reset")
+            self.exams = {}
             self.examTableWidget.clear()
-
             self.gradeListWidget.clear()
-            self.gradeCheckBoxes = []
-
             self.classroomListWidget.clear()
+            for checkbox, item in self.grade_checkboxes.items():
+                checkbox.deleteLater()
+                del item
+            for checkbox, item in self.classroom_checkboxes.items():
+                checkbox.deleteLater()
+                del item
 
             # Exams table
         # Tablo ayarlarını yap
@@ -365,9 +393,13 @@ class ExamFrame(QFrame):
         self.examTableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         self.examTableWidget.setSelectionBehavior(QTableWidget.SelectRows)
 
+        self.grade_checkboxes = dict()
+        self.classroom_checkboxes = dict()
+
         self.draw_exam_table()
+        self.set_grade_table()
         self.draw_grade_table()
-        self.draw_classroom_table()
+        self.set_classroom_table()
     
     def set_white(self):
         self.examNameInLabel.setVisible(False)
@@ -383,36 +415,44 @@ class ExamFrame(QFrame):
                  "KizErkekYanYanaOturabilir": self.kizErkek.isChecked(),
                  "OgretmenMasasinaOgrenciOturabilir": self.ogretmenMasasi.isChecked()
                 }
-        self.exam = Exam(exams = self.exams, classroomNames = self.classroomNames, rules = rules)
+        self.exam = Exam(exams = self.exams, classroomNames = list(self.classroomNames), rules = rules)
 
         sonuc = deploy.distribute(self.exam)
-        if not sonuc:
-            # Tekrar deneyiniz penceresi ekle
-            message = sonuc
-            retrieve = QMessageBox.question(QWidget(), "Yetersiz yer", message, QMessageBox.Yes | QMessageBox.No)
-            if retrieve == QMessageBox.Yes:
-                self.deploy_step()
-            else:
-                return
-            logger.info(message)
+        print(f"Status: {sonuc.get('Status')}")
+        print(f"Class-Counts: {sonuc.get('Class-Counts')}")
+        print(f"Placed-Count: {sonuc.get('Placed-Count')}")
+        print(f"Unplaced-Count: {sonuc.get('Un-Placed-Count')}")
+        if sonuc.get("Status"):
+            # Create files
+            exam_infos = {
+                # egitimOgretimYili, donem, kacinciYazili, tarih, kacinciDers, salonAdi
+                "Sinav-Adi": self.informationFrame.sinavAdi.text(),
+                "Egitim-Ogretim-Yili": self.informationFrame.egitimOgretimYili.currentText(),
+                "Kacinci-Donem": self.informationFrame.kacinciDonem.currentText(),
+                "Donemin-Kacinci-Sinavi": self.informationFrame.doneminKacinciSinavi.currentText(),
+                "Tarih": "-".join([str(i) for i in self.informationFrame.sinavTarihi.date().getDate()]),
+                "Kacinci-Ders": self.informationFrame.kacinciDers.currentText(),
+            }
+            print(exam_infos)
+            classroomPaths = classrooms_html.create(exam_infos, sonuc.get("Classrooms"), self.exam.exams)
+            gradePaths = grades_html.create(exam_infos, sonuc.get("Classrooms"), self.exam.exams)
+            
+            self.show_result_frame(classroomPaths, gradePaths, exam_infos)
 
         else:
-            # Create files
-            classroomPaths = classrooms_html.create(self.examInfos, sonuc, self.exam.exams)
-            gradePaths = grades_html.create(self.examInfos, sonuc, self.exam.exams)
-            logger.error(classroomPaths)
-            logger.error(gradePaths)
-            
-            self.show_result_frame(classroomPaths, gradePaths)
-            # -> TODO CHECK THIS IS NOT WORKING
-            self.sinavFrame.reset()
-            
-    def show_result_frame(self, classroomPaths: dict, gradePaths: dict):
+            # Tekrar deneyiniz penceresi
+            retrieve = QMessageBox.question(QWidget(), "Yetersiz yer", "Tekrar denemek için Evet'e basın.", QMessageBox.Yes | QMessageBox.No)
+            if retrieve == QMessageBox.Yes:
+                self.deploying_step()
+            else:
+                logger.info(f"Status: {sonuc.get('Status')} | Placed: {sonuc.get('Place-Count')} | Unplaced: {sonuc.get('Unplaced-Count')}")    
+
+    def show_result_frame(self, classroomPaths: dict, gradePaths: dict, exam_infos: dict):
         # Dialog sonucuna göre dosyayı ya kayıtlara taşı ya da sil
         dialogSonuc = SonucDialog(classroomPaths, gradePaths).isAccepted
 
         try:
-            examName = "_".join([self.examInfos[-1], self.examInfos[3], self.examInfos[4]])
+            examName = "_".join([exam_infos.get('Sinav-Adi'), exam_infos.get('Tarih'), exam_infos.get('Kacinci-Ders').strip()])
             if dialogSonuc:
                 os.mkdir(os.path.join(BASE_DIR, 'Saved', examName))
                 os.mkdir(os.path.join(BASE_DIR, 'Saved', examName, "Classrooms"))
@@ -429,9 +469,10 @@ class ExamFrame(QFrame):
                     Path(gPath).rename(os.path.join(BASE_DIR, 'Saved', examName, "Grades", name_template.format(gNameToPath)))
 
             shutil.rmtree(os.path.join(BASE_DIR, "Temp", examName))    
+            
         except Exception as e:
-            raise e
-            logger.error(str(e))
+            logger.error(f"{str(e)} | Sınav kaydedilirken bir sorun meydana geldi")
+            
     
     
 class Exam():
@@ -449,7 +490,7 @@ class Exam():
         """
         exams = dict()
         for examName in self.exams:
-            grades = self.exams[examName]["gradeNames"]
+            grades = self.exams[examName]["Grade-Names"]
             exams.update({examName: grades})
         self.exams = exams
                    
@@ -514,8 +555,8 @@ class SonucDialog(QDialog):
             self.classroomItems.append(item)
             self.classroomList.addItem(item)
         
-        logger.info(list(self.classroomPaths.items()))
-        logger.info(self.classroomItems)
+        #logger.info(list(self.classroomPaths.items()))
+        #logger.info(self.classroomItems)
         try:
             first_classroom_item = self.classroomItems[0]
             first_classroom_item.setSelected(True)

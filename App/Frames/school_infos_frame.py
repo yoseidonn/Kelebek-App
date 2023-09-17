@@ -1,19 +1,14 @@
-from PyQt5.QtWebEngineWidgets import *
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.uic import loadUi
-from dotenv import load_dotenv
 
 from App import database
 from App.logs import logger
 
 import os
-
-
-load_dotenv()
 BASE_DIR = os.getenv("BASE_DIR")
-
 
 class SchoolInformationsFrame(QFrame):
     def __init__(self):
