@@ -182,13 +182,14 @@ def get_grade_given_students(gradeNames: list or tuple or dict, returnType: str 
 
     return students
 
-def remove_one_student(number) -> None:
+def remove_students(numbers: list[int]) -> None:
     """
     Numarası verilen öğrenci kaydını siler.
     """
 
     QUERY = "DELETE FROM ogrenciler WHERE no = ?"
-    cur.execute(QUERY, (number,))
+    for number in numbers:
+        cur.execute(QUERY, (number,))
     db.commit()
 
 def remove_all_students():

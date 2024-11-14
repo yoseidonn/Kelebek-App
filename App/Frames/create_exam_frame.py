@@ -268,29 +268,12 @@ class ExamFrame(QFrame):
         self.classroomListWidget.blockSignals(True)
         
         state = self.select_all_classrooms_checkbox.isChecked()
-        if state:
-            # Eski secili olanlari yedekle ve tum salon adlarini listeye ekle
-            self.classroomNamesBackup = self.classroomNames.copy()
-            self.classroomNames = self.classroom_names.copy()
-            for checkbox in self.classroom_checkboxes:
-                checkbox.blockSignals(True)
+        for checkbox in self.classroom_checkboxes:
+            checkbox.blockSignals(True)
                 
-                checkbox.setEnabled(False)
-                checkbox.setChecked(True)
+            checkbox.setChecked(True) if state else checkbox.setChecked(False)
                 
-                checkbox.blockSignals(False)
-        else:
-            # Yedegi geri getir
-            self.classroomNames = self.classroomNamesBackup.copy()
-            for checkbox in self.classroom_checkboxes:
-                checkbox.blockSignals(True)
-                
-                checkbox.setEnabled(True)
-                if checkbox.text() not in self.classroomNames:
-                    checkbox.setChecked(False)
-
-                checkbox.blockSignals(False)
-            self.classroomNamesBackup = set()
+            checkbox.blockSignals(False)
             
         self.classroomListWidget.blockSignals(False)
 
@@ -323,7 +306,6 @@ class ExamFrame(QFrame):
             self.selectedExamName = None
     
     def draw_grade_table(self):
-        print("drawed grades")
         for checkbox in self.grade_checkboxes:
             checkbox.setEnabled(True if len(self.exams) else False)
             checkbox.setStyleSheet("")
@@ -340,7 +322,6 @@ class ExamFrame(QFrame):
                 checkbox.setStyleSheet(f"background-color: rgba({r}, {g}, {b}, 100)")
 
     def set_grade_table(self):
-        print("grades set")
         for grade_name in self.grade_names:
             item = QListWidgetItem()
             checkbox = QCheckBox(grade_name, self)
@@ -352,7 +333,6 @@ class ExamFrame(QFrame):
             self.grade_checkboxes.update({checkbox: item})
 
     def set_classroom_table(self):
-        print("classrooms set")
         for classroom_name in self.classroom_names:
             item = QListWidgetItem()
             checkbox = QCheckBox(classroom_name, self)
@@ -364,7 +344,6 @@ class ExamFrame(QFrame):
     
     def adjust_widget_settings(self, reset = False):
         if reset:
-            print("reset")
             self.exams = {}
             self.examTableWidget.clear()
             self.gradeListWidget.clear()

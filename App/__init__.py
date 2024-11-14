@@ -7,7 +7,6 @@ import os, sys
 
 BASE_DIR = os.getenv('BASE_DIR')
 
-
 try:
     os.mkdir(os.path.join(BASE_DIR, 'Archived'))
 except Exception as e:

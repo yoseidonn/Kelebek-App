@@ -258,7 +258,13 @@
                   </size>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">background-color: rgb(165, 29, 45);</string>
+                  <string notr="true">QPushButton {
+	background-color: rgba(255, 62, 62, 255);
+}
+
+QPushButton:disabled {
+	background-color: rgba(255, 62, 62, 50);
+}</string>
                  </property>
                  <property name="text">
                   <string>Hepsini sil</string>

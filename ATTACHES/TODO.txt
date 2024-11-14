@@ -1,0 +1,11 @@
+DONE
+App/licence_dialogs line 29 in confirm()
+    Girilen anahtari veritabanindan kontrol et eger gecerli ise onayla degil ise arkaplani kirmizi yap
+
+App/Structs/display_struct
+    Tüm yapıyı baştan oluştur.
+
+App/deploy line 92 in is_place_suitable()   
+    Verilen bilgiler dogrultusunda ogrencinin yerlestirilebilirligini kontrol et
+
+SQLITE Veritabanini sifrelemenin bir yolunu bul. Olmaz ise .env dosyasini sifreleyebilirsin

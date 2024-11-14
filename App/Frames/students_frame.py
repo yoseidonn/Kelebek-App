@@ -16,6 +16,7 @@ class StudentsFrame(QFrame):
         loadUi(os.path.join(BASE_DIR, "Forms", "ogrenciler_frame.ui"), self)
         
         self.ogrencilerList = database.get_all_students()
+        self.selectedStudents = list()
 
         self.set_signs() #SIGNALS
         self.set_ts() #TABLE SETTINGS
@@ -32,13 +33,82 @@ class StudentsFrame(QFrame):
         self.deleteButton.clicked.connect(lambda: self.remove_student(removeBy = True))
         self.deleteAllButton.clicked.connect(lambda: self.remove_student(all = True))
 
-        self.table.itemSelectionChanged.connect(self.select_row)
-        self.table.selectionModel().selectionChanged.connect(self.on_selection_changed) #KUTUCUK SECILINCE UYARI OLUSTURMA
+        # TODO - Her secim degistigi zaman sadece yeni eklenen yerdeki ogrencileri secililere ekliyor, 
+        # TODO - tum secili itemlerdeki ogrencileri selected listesine almanin bi yolunu bul.
+        
+        # Selection signals
+        self.table.itemSelectionChanged.connect(self.on_selection_changed)
+        self.table.itemClicked.connect(self.on_item_clicked)
 
+        # Sorting signals
         self.table.horizontalHeader().sectionClicked.connect(self.sort)
         self.resetOrderButton.clicked.connect(self.draw_table)
         
+    def change_button_statuses(self):
+        selected_student_count = len(self.selectedStudents)
+        student_count = len(self.ogrencilerList)
+        if not student_count:
+            self.deleteAllButton.setEnabled(False)
+            self.editButton.setEnabled(False)
+            self.deleteButton.setEnabled(False)
+
+        elif student_count:
+            self.deleteAllButton.setEnabled(True)
+            if self.selectedStudents:
+                if selected_student_count > 1:
+                    self.editButton.setEnabled(False)
+                else:
+                    self.editButton.setEnabled(True)
+
+                self.deleteButton.setEnabled(True)
+            else:
+                self.editButton.setEnabled(False)
+                self.deleteButton.setEnabled(False)
+            
+    def on_selection_changed(self):
+        selecteds = self.table.selectedItems()
+        # Bu fonksiyon öğrenciler tarafından tasarlanacak.
+        # Tasarlanacak idi fakat yine kendim yaptim :')
+        self.table.blockSignals(True)
+        
+        # Indexleri bul
+        row_indexes = list()
+        for item in selecteds:
+            row_indexes.append(item.row())
+        row_indexes = list(set(row_indexes))
+        
+        # Her indexin gosterdigi satiri sec
+        for row_ind in row_indexes:
+            for col_ind in range(5):
+                item: QTableWidgetItem = self.table.item(row_ind, col_ind)
+                item.setSelected(True)
+        
+        # Secili indexlerde olan ogrencilerden olusan bir listeyi comphrension kullanarak secili ogrenciler listesine ata
+        self.selectedStudents = [self.ogrencilerList[row_ind] for row_ind in row_indexes]
+        self.table.blockSignals(False)
+        self.change_button_statuses()
+        
+    def on_item_clicked(self, item: QTableWidgetItem):
+        row = item.row()
+        self.table.selectRow(row)
+        self.selectedStudents = [self.ogrencilerList[row]]
+        return
+        
+    def de_select_all_items(self):
+        self.table.blockSignals(True)
+        selecteds = self.table.selectedItems()
+
+        for item in selecteds:
+            row, col = item.row(), item.column()
+            item = self.table.item(row, col)
+            item.setSelected(False)
+
+        self.selectedStudents = []
+        self.table.blockSignals(False)
+        self.change_button_statuses()
+
     def sort(self, sectionIndex):
+        self.table.blockSignals(True)
         if sectionIndex == 0:
             self.draw_table(order=True, sectionIndex=sectionIndex)
 
@@ -54,7 +124,10 @@ class StudentsFrame(QFrame):
         elif sectionIndex == 4:
             self.draw_table(order=True, sectionIndex=sectionIndex)
             
+        self.table.blockSignals(False)
+        
     def draw_table(self, searchBy = False, order = False, sectionIndex = 0):
+        self.change_button_statuses()
         BY_NO = "Numaraya göre"
         BY_FULLNAME = "Tam ada göre"
         BY_CLASS = "Sınıfa göre"
@@ -90,15 +163,6 @@ class StudentsFrame(QFrame):
     def change_search_by(self):
         self.searchBy = self.searchByCombo.currentText()
 
-    def select_row(self):
-        items = self.table.selectedItems()
-        rowIndexes = set()
-        for item in items:
-            rowIndexes.add(item.row())
-
-        rowIndex = min(rowIndexes)
-        self.table.selectRow(rowIndex)        
-
     def import_dialog(self):
         dialog = QFileDialog(caption="Dosya seçiniz", filter="(*.xls)")
         if dialog.exec_() == dialog.Accepted:
@@ -111,6 +175,7 @@ class StudentsFrame(QFrame):
     
         self.ogrencilerList = database.get_all_students()
         self.draw_table()
+        self.change_button_statuses()
 
     def add_dialog(self):
         dialog = EkleDuzenleDialog()
@@ -136,16 +201,11 @@ class StudentsFrame(QFrame):
                 database.remove_all_students()
 
         elif removeBy:
-            rowIndexes = [item.row() for item in self.table.selectedItems()]
-            for rowIndex in rowIndexes:
-                lastIndex = rowIndex
-                if rowIndex != lastIndex:
-                    pass
-            # TÜM SEÇİLİ SATIRLARIN UZUNLUĞUNU KONTROL ET. EĞER 1 TANE SATIR SEÇİLİ İSE ONUN NUMARASINA BAK VE SİL
-            #print(self.table.itemAt(QPoint(0, self.table.selectedItems()[0].row())).text())
-            database.remove_one_student(number = self.table.itemAt(QPoint(0, self.table.selectedItems()[0].row())).text())
-
+            student_numbers = [student[0] for student in self.selectedStudents]
+            database.remove_students(numbers = student_numbers)
+            
         self.ogrencilerList = database.get_all_students()
+        self.de_select_all_items()
         self.draw_table()
 
     def add_student(self):
@@ -166,11 +226,7 @@ class StudentsFrame(QFrame):
         
         [input.clear() for input in [self.noIn, self.nameIn, self.surnameIn]] #CLEAR THE LINE_EDITS
         [combo.setCurrentIndex(0) for combo in [self.gradeCombo, self.classCombo]] #RESET THE COMBO_BOXES
-
-    def on_selection_changed(self, selected: QItemSelection, deselected: QItemSelection):
-        #Bu fonksiyon öğrenciler tarafından tasarlanacak.
-        pass
-    
+        
     def set_ts(self):
         """
         Set the 'table settings'.
@@ -181,6 +237,7 @@ class StudentsFrame(QFrame):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setSelectionMode(QAbstractItemView.ContiguousSelection)
         self.draw_table()    
    
 class EkleDuzenleDialog(QDialog):
