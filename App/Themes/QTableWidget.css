@@ -1,0 +1,48 @@
+/* QTableWidget styles */
+QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+}
+
+QTableWidget::item {
+    padding: 5px;
+}
+
+QTableWidget::item:focus {
+    background-color: #e5e5e5;
+    color: #ffffff;
+}
+
+QTableWidget::item:hover {
+    background-color: #e5e5e5;
+}
+
+QTableWidget::item:disabled {
+    color: #888888;
+}
+
+QTableWidget::header {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #cccccc;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+QTableWidget::header:last:selected {
+    background-color: #007acc;
+    color: #ffffff;
+}
+
+QTableWidget::header:last:focus {
+    background-color: #007acc;
+    color: #ffffff;
+}
+
+QTableWidget::header:last:hover {
+    background-color: #cccccc;
+}
+
+QTableWidget::header:last:pressed {
+    background-color: #007acc;
+    color: #ffffff;
+}

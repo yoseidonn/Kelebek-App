@@ -1,0 +1,13 @@
+2023-08-13 13:47:22,810 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-26
+2023-08-13 13:47:22,810 | INFO | Daha önce geçilmiş
+2023-08-13 13:47:22,810 | INFO | It's been two days after last validation skip.
+2023-08-13 13:47:22,817 | INFO | [Errno 2] Böyle bir dosya ya da dizin yok: '/home/yusuf/Belgeler/Projects/Software/Kelebek/BETA/Application/kelebek.conf' | kelebek.conf bulunamadı
+2023-08-13 13:47:25,658 | INFO | Skipping licence validation. Starting the application.
+2023-08-13 13:47:35,557 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-07-26
+2023-08-13 13:47:35,557 | INFO | Daha önce geçilmiş
+2023-08-13 13:47:35,557 | INFO | It's been two days after last validation skip.
+2023-08-13 13:47:35,562 | INFO | [Errno 2] Böyle bir dosya ya da dizin yok: '/home/yusuf/Belgeler/Projects/Software/Kelebek/BETA/Application/kelebek.conf' | kelebek.conf bulunamadı
+2023-08-13 13:47:36,888 | INFO | Skipping licence validation. Starting the application.
+2023-08-13 13:47:42,667 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-08-13
+2023-08-13 13:47:42,667 | INFO | Daha önce geçilmiş
+2023-08-13 13:47:42,668 | INFO | It's not been too much after last validation skip.

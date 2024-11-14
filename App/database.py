@@ -1,5 +1,6 @@
 ### database.py
-import sqlite3
+from .logs import logger
+import sqlite3, re
 
 db = sqlite3.connect("database.db")
 cur = db.cursor()
@@ -48,6 +49,14 @@ def createTables() -> None:
 	        "salonlar"	TEXT NOT NULL,
 	        PRIMARY KEY("id"))
         """)
+    
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS "ayarlar" (
+        	"id"	INTEGER,
+	        "ayar"	TEXT,
+	        "deger"	TEXT,
+        	PRIMARY KEY("id" AUTOINCREMENT))
+        """)
 
 createTables()   
 
@@ -62,9 +71,10 @@ def get_all_grade_names() -> list:
     QUERY = "SELECT sinif FROM ogrenciler"
     tumSiniflar = cur.execute(QUERY)
     siniflar = set()
-    [siniflar.add(sinif[0]) for sinif in tumSiniflar] 
+    [siniflar.add(sinif[0]) for sinif in tumSiniflar]
     siniflar = list(siniflar)
-    siniflar.sort()
+    
+    siniflar = sorted(sorted(siniflar), key=num_sort)
     return siniflar
 
 #ÖĞRENCİLER
@@ -88,9 +98,12 @@ def add_multiple_students(students: list) -> None:
         db.commit()
 
 def update_student(student):
-    removeNo = student[0]
-    # NUMARAYI BULUP O OGRENCIYI SIL VE YENISINI EKLE YAPABILIRSIN
-    # YA DA NUMARAYI BULUP DIGER DEGERLERINI DEGISTIREBILIRSIN
+    number, name, surname, gender, grade = student
+    QUERY = "UPDATE ogrenciler SET ad = ?, soyad = ?, cinsiyet = ?, sinif = ? WHERE no = ?"
+
+    cur.execute(QUERY, (name, surname, gender, grade, number))
+
+    db.commit()
 
 def get_student_counts_per_every_grade() -> list:
     """
@@ -149,25 +162,34 @@ def get_all_students(number = False, fullname = False, grade = False, withGrades
 
     return students
 
-def get_grade_given_students(grades: list or tuple) -> list:
+def get_grade_given_students(gradeNames: list or tuple or dict, returnType: str = "dict") -> dict:
     """
     Sınıf adı verilen tüm öğrencilerin bulunduğu bir öğrenci havuzu döndürür. -list-
     """
-    students = list()
+    students = dict()
     QUERY = "SELECT * FROM ogrenciler WHERE sinif = ?"
-    for gradeName in grades:
+    
+    # Eğer grades bir sözlük ise
+    if isinstance(gradeNames, dict):
+        grade_names = list()
+        for gradeNameList in gradeNames.values():
+            grade_names.extend(gradeNameList)
+        gradeNames = grade_names
+    
+    for gradeName in gradeNames:
         result = cur.execute(QUERY, (gradeName,)).fetchall()
-        students.extend(result)
+        students.update({gradeName: result})
 
     return students
 
-def remove_one_student(number) -> None:
+def remove_students(numbers: list[int]) -> None:
     """
     Numarası verilen öğrenci kaydını siler.
     """
 
     QUERY = "DELETE FROM ogrenciler WHERE no = ?"
-    cur.execute(QUERY, (number,))
+    for number in numbers:
+        cur.execute(QUERY, (number,))
     db.commit()
 
 def remove_all_students():
@@ -209,21 +231,22 @@ def get_all_classrooms(onlyNames = False) -> list or dict:
     QUERY = "SELECT derslik_adi FROM salonlar ORDER BY derslik_adi"
     QUERY_2 = "SELECT derslik_adi, ogretmen_yonu, kacli, oturma_duzeni FROM salonlar ORDER BY derslik_adi"
     
-    salonAdlari = []
-    salonAdlariTuple = cur.execute(QUERY).fetchall()
-    for salonAdi in salonAdlariTuple:
-        salonAdlari.append(salonAdi[0])
-
     if onlyNames: #SADECE ADLAR İSE
-        return salonAdlari
+        salonAdlari = []
+        salonAdlariTuple = cur.execute(QUERY).fetchall()
+        for salonAdi in salonAdlariTuple:
+            salonAdlari.append(salonAdi[0])
+            
+        return sorted(sorted(salonAdlari), key=num_sort)
         
     # SALON BİLGİLERİ
     salonlar = {}
     salonlarTuples = cur.execute(QUERY_2).fetchall()
     
-    for salonAdi, salon in zip(salonAdlari, salonlarTuples):
-        salonlar.update({salonAdi: list(salon)})
-    
+    for salon in salonlarTuples:
+        salonlar.update({salon[0]: list(salon)})
+
+    salonlar = num_sort_dict(salonlar)
     return salonlar
 
 def get_classrooms_counts_per_every_grade() -> list:
@@ -249,18 +272,17 @@ def create_arrangement(kacli: str, ogretmen_yonu: str, oturma_duzeni: str):
     Verilen derslik özelliklerine göre öğrenci dağıtmak için kullanılacak olan bir düzen oluşturur.
     [
         [ 
-            {1: None, 2: None},
-            {3: None, 4: None},
-            {5: None, 6: None},
-            {7: None, 8: None}
+            {1: {"exam_name": None, "student": None}, 2: {"exam_name": None, "student": None}},
+            {3: {"exam_name": None, "student": None}, 4: {"exam_name": None, "student": None}},
+            {5: {"exam_name": None, "student": None}, 6: {"exam_name": None, "student": None}},
+            {7: {"exam_name": None, "student": None}, 8: {"exam_name": None, "student": None}}
         ],
         [ 
-            {9: None, 10: None},
-            {11: None, 12: None},
-            {13: None, 14: None},
+            {9: {"exam_name": None, "student": None}, 10: {"exam_name": None, "student": None}},
+            {11: {"exam_name": None, "student": None}, 12: {"exam_name": None, "student": None}},
+            {13: {"exam_name": None, "student": None}, 14: {"exam_name": None, "student": None}},
         ],
     ]
-    }
     """
 
     rowCounts = oturma_duzeni.split(",")
@@ -276,23 +298,23 @@ def create_arrangement(kacli: str, ogretmen_yonu: str, oturma_duzeni: str):
     if ogretmen_yonu == "Solda":
         for colIndex in range(len(matrix)):
             for rowIndex in range(len(matrix[colIndex])):
-                matrix[colIndex][rowIndex].update({deskNo: None})
+                matrix[colIndex][rowIndex].update({deskNo: {"exam_name": None, "student": None}})
                 deskNo += 1
                 if kacli == "2'li":
-                    matrix[colIndex][rowIndex].update({deskNo: None})
+                    matrix[colIndex][rowIndex].update({deskNo: {"exam_name": None, "student": None}})
                     deskNo += 1
                               
     else:
         for colIndex in range(len(matrix) - 1 , -1, -1):
             for rowIndex in range(len(matrix[colIndex])):
                 if kacli == "1'li":
-                    matrix[colIndex][rowIndex].update({deskNo: None})
+                    matrix[colIndex][rowIndex].update({deskNo: {"exam_name": None, "student": None}})
                     deskNo += 1
                 else:
                     deskNo += 1
-                    matrix[colIndex][rowIndex].update({deskNo: None})
+                    matrix[colIndex][rowIndex].update({deskNo: {"exam_name": None, "student": None}})
                     deskNo -= 1
-                    matrix[colIndex][rowIndex].update({deskNo: None})
+                    matrix[colIndex][rowIndex].update({deskNo: {"exam_name": None, "student": None}})
                     deskNo += 2
                     
     return matrix
@@ -304,22 +326,23 @@ def get_name_given_classrooms(names: list) -> dict:
 
     classrooms = dict()
     for name in names:
-        QUERY = f"SELECT * FROM salonlar WHERE derslik_adi = ?"
-        result = cur.execute(QUERY, (name,)).fetchall()
-        if len(result) >= 1:
-            classroom = result[0]
+        QUERY = "SELECT * FROM salonlar WHERE derslik_adi = ?"
+        result = cur.execute(QUERY, (name,)).fetchone()
+        if result:
+            classroom = result
 
-        elif not result:
+        else:
             return classrooms
         
-        derslik_adi, ogretmen_yonu, kacli, oturma_duzeni = [classroom[indx] for indx in range(len(classroom))]
-        duzen = create_arrangement(kacli, ogretmen_yonu, oturma_duzeni)
+        derslik_adi, ogretmen_yonu, kacli, oturma_duzeni_text = [classroom[indx] for indx in range(len(classroom))]
+        duzen = create_arrangement(kacli, ogretmen_yonu, oturma_duzeni_text)
         
-        classroom = dict({"derslik_adi": derslik_adi,
+        classroom = {"derslik_adi": derslik_adi,
                   "ogretmen_yonu": ogretmen_yonu,
                   "kacli": kacli,
                   "oturma_duzeni": duzen,
-                  "ogretmen_masasi": None})
+                  "oturma_duzeni_text": oturma_duzeni_text,
+                  "ogretmen_masasi": None}
         
         classrooms.update({derslik_adi: classroom})
 
@@ -355,6 +378,7 @@ def get_all_infos() -> list:
     try:
         bilgiler = cur.execute(QUERY).fetchall()[0]
     except Exception as e:
+        logger.error(f"{e} | Okul bilgileri veritabanından çekilemedi")
         bilgiler = ("", "", "")
         
     return bilgiler
@@ -387,6 +411,53 @@ def get_table_infos() -> list:
     classroomCounts = ",".join(classroomCounts)
     
     return [gradeCounts, studentCounts, classroomCounts]
+
+################### SETTINGS ##############
+
+def get_theme():
+    QUERY = "SELECT COUNT(*) FROM ayarlar WHERE ayar = ?"
+    cur.execute(QUERY, ("theme",))
+    result = cur.fetchone()[0]
+
+    if result == 0:
+        # Satır yok, yeni satır oluştur
+        QUERY = "INSERT INTO ayarlar (ayar, deger) VALUES (?, ?)"
+        cur.execute(QUERY, ("theme", "auto"))
+    
+    QUERY = "SELECT deger FROM ayarlar WHERE ayar = ?"
+    theme = cur.execute(QUERY, ("theme",)).fetchone()[0]
+    return theme
+
+def set_theme(theme: str):
+    QUERY = "SELECT COUNT(*) FROM ayarlar WHERE ayar = ?"
+    cur.execute(QUERY, ("theme",))
+    result = cur.fetchone()[0]
+
+    if result == 0:
+        # Satır yok, yeni satır oluştur
+        QUERY = "INSERT INTO ayarlar (ayar, deger) VALUES (?, ?)"
+        cur.execute(QUERY, ("theme", theme))
+    else:
+        # Satır var, değeri güncelle
+        QUERY = "UPDATE ayarlar SET deger = ? WHERE ayar = ?"
+        cur.execute(QUERY, (theme, "theme"))
+
+    db.commit()
+
+################### EXTRA FUNCS ##############
+
+def num_sort(test_string):
+    return list(map(int, re.findall(r'\d+', test_string)))
+
+def num_sort_tuple(tuple_item):
+    test_string = tuple_item[0]
+    return int(re.findall(r'\d+', test_string)[0])
+
+def num_sort_dict(test_dict: dict):
+    order = sorted(sorted(list(test_dict.keys())), key=num_sort)
+    sorted_dict = dict(sorted(test_dict.items(), key=lambda item: order.index(item[0])))
+    return sorted_dict
+
 
 if __name__ == "__main__":
     #cur.execute("INSERT INTO ogrenciler VALUES (2949, 'Yusuf', 'Kiriş', 'Erkek', '10/A')")

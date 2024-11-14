@@ -26,26 +26,33 @@ border: none
    <item alignment="Qt::AlignLeft">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Salonlar</string>
+      <string>Kayıtlı salonlar</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <property name="spacing">
        <number>0</number>
       </property>
       <property name="leftMargin">
-       <number>0</number>
+       <number>7</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>7</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>7</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>7</number>
       </property>
       <item>
-       <widget class="QListWidget" name="classroomList"/>
+       <widget class="QListWidget" name="classroomList">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -139,7 +146,7 @@ border: none
               <property name="frameShadow">
                <enum>QFrame::Raised</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_12">
+              <layout class="QHBoxLayout" name="horizontalLayout_8">
                <property name="spacing">
                 <number>0</number>
                </property>
@@ -156,35 +163,25 @@ border: none
                 <number>0</number>
                </property>
                <item>
-                <widget class="QLabel" name="sutunText">
-                 <property name="text">
-                  <string>Sütun</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignLeft">
-                <widget class="QFrame" name="frame_5">
-                 <property name="frameShape">
-                  <enum>QFrame::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Raised</enum>
+                <widget class="QGroupBox" name="columnGroupBox">
+                 <property name="title">
+                  <string>Sütun sayısı</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_12">
                   <property name="spacing">
                    <number>0</number>
                   </property>
                   <property name="leftMargin">
-                   <number>0</number>
+                   <number>7</number>
                   </property>
                   <property name="topMargin">
-                   <number>0</number>
+                   <number>7</number>
                   </property>
                   <property name="rightMargin">
-                   <number>0</number>
+                   <number>7</number>
                   </property>
                   <property name="bottomMargin">
-                   <number>0</number>
+                   <number>7</number>
                   </property>
                   <item>
                    <widget class="QPushButton" name="addColumn">
@@ -219,37 +216,33 @@ border: none
              </widget>
             </item>
             <item>
-             <widget class="QFrame" name="rowFrame">
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
+             <widget class="QGroupBox" name="rowGroupBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
+              <property name="title">
+               <string>Satır sayısı</string>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_13">
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
                <property name="spacing">
                 <number>0</number>
                </property>
                <property name="leftMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
                <property name="topMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
                <property name="rightMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
                <item>
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>Satır</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignLeft">
                 <widget class="QFrame" name="frame_7">
                  <property name="frameShape">
                   <enum>QFrame::StyledPanel</enum>
@@ -306,38 +299,34 @@ border: none
              </widget>
             </item>
             <item>
-             <widget class="QFrame" name="frame_9">
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
+             <widget class="QGroupBox" name="groupBox_9">
+              <property name="title">
+               <string>Öğretmen masası</string>
               </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_14">
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
                <property name="spacing">
                 <number>5</number>
                </property>
                <property name="leftMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
                <property name="topMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
                <property name="rightMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
-               <item alignment="Qt::AlignLeft">
-                <widget class="QLabel" name="label_3">
-                 <property name="text">
-                  <string>Öğretmen</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignLeft">
+               <item>
                 <widget class="QComboBox" name="yonCombo">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <item>
                   <property name="text">
                    <string>Solda</string>
@@ -354,37 +343,27 @@ border: none
              </widget>
             </item>
             <item>
-             <widget class="QFrame" name="frame_10">
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
+             <widget class="QGroupBox" name="groupBox_10">
+              <property name="title">
+               <string>Sıralar</string>
               </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_15">
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
                <property name="spacing">
-                <number>5</number>
+                <number>0</number>
                </property>
                <property name="leftMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
                <property name="topMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
                <property name="rightMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>7</number>
                </property>
-               <item alignment="Qt::AlignLeft">
-                <widget class="QLabel" name="label_4">
-                 <property name="text">
-                  <string>Sıralar</string>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignLeft">
+               <item>
                 <widget class="QComboBox" name="kacliCombo">
                  <item>
                   <property name="text">
@@ -431,6 +410,16 @@ border: none
             <property name="bottomMargin">
              <number>0</number>
             </property>
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="styleSheet">
+               <string notr="true">color: rgb(246, 97, 81);</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
             <item>
              <widget class="QLineEdit" name="salonNameIn">
               <property name="text">
@@ -652,7 +641,7 @@ border: none
         </layout>
        </widget>
       </item>
-      <item>
+      <item alignment="Qt::AlignLeft">
        <widget class="QFrame" name="frame_2">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -678,6 +667,12 @@ border: none
          </property>
          <item>
           <widget class="QPushButton" name="addButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>Yeni ekle</string>
            </property>
@@ -685,6 +680,12 @@ border: none
          </item>
          <item>
           <widget class="QPushButton" name="saveButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="styleSheet">
             <string notr="true">background-color: rgb(87, 227, 137);</string>
            </property>
@@ -695,6 +696,12 @@ border: none
          </item>
          <item>
           <widget class="QPushButton" name="removeButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="styleSheet">
             <string notr="true">background-color: rgb(246, 97, 81);</string>
            </property>
@@ -703,8 +710,14 @@ border: none
            </property>
           </widget>
          </item>
-         <item alignment="Qt::AlignRight">
+         <item>
           <widget class="QPushButton" name="cancelButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="styleSheet">
             <string notr="true">background-color: rgb(119, 118, 123);</string>
            </property>
@@ -725,8 +738,29 @@ border: none
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QGroupBox" name="groupBox_3">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="title">
             <string>İstatistikler</string>
            </property>
@@ -735,16 +769,16 @@ border: none
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <property name="rightMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <property name="bottomMargin">
-             <number>0</number>
+             <number>9</number>
             </property>
             <item>
              <widget class="QListWidget" name="istatistiklerWIdget"/>

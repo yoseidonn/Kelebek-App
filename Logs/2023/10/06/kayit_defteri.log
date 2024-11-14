@@ -1,0 +1,27 @@
+2023-10-06 13:59:40,031 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-09-17
+2023-10-06 13:59:40,031 | INFO | Daha önce geçilmiş
+2023-10-06 13:59:40,031 | INFO | It's been two days after last validation skip.
+2023-10-06 13:59:40,042 | INFO | [Errno 2] Böyle bir dosya ya da dizin yok: '/home/yusuf/Belgeler/Projects/Software/Kelebek/BETA/Application/kelebek.conf' | kelebek.conf bulunamadı
+2023-10-06 13:59:42,718 | INFO | Skipping licence validation. Starting the application.
+2023-10-06 13:59:57,586 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-10-06
+2023-10-06 13:59:57,586 | INFO | Daha önce geçilmiş
+2023-10-06 13:59:57,586 | INFO | It's not been too much after last validation skip.
+2023-10-06 14:00:22,454 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: BLANK
+2023-10-06 14:00:22,455 | INFO | Hiç giriş yapılmamış
+2023-10-06 14:00:22,460 | INFO | [Errno 2] Böyle bir dosya ya da dizin yok: '/home/yusuf/Belgeler/Projects/Software/Kelebek/BETA/Application/kelebek.conf' | kelebek.conf bulunamadı
+2023-10-06 14:00:33,731 | INFO | Skipping licence validation. Starting the application.
+2023-10-06 15:38:25,797 | INFO | Kayıtlı anahtar: BLANK	 Sonra eriş tarihi: BLANK	 En son geçme tarihi: 2023-10-06
+2023-10-06 15:38:25,798 | INFO | Daha önce geçilmiş
+2023-10-06 15:38:25,798 | INFO | It's not been too much after last validation skip.
+2023-10-06 15:43:56,900 | INFO | Arşivleniyor
+2023-10-06 15:43:56,916 | INFO | Arşivleme tamamlandı
+2023-10-06 15:44:00,631 | INFO | Arşivleniyor
+2023-10-06 15:44:00,635 | INFO | Arşivleme tamamlandı
+2023-10-06 15:44:38,361 | INFO | Arşivden çıkartılıyor
+2023-10-06 15:44:38,364 | INFO | Arşivleme tamamlandı
+2023-10-06 15:44:42,515 | INFO | Arşivden çıkartılıyor
+2023-10-06 15:44:42,520 | INFO | Arşivleme tamamlandı
+2023-10-06 15:44:55,206 | INFO | Arşivleniyor
+2023-10-06 15:44:55,208 | INFO | Arşivleme tamamlandı
+2023-10-06 15:45:03,305 | INFO | Arşivden çıkartılıyor
+2023-10-06 15:45:03,308 | INFO | Arşivleme tamamlandı
