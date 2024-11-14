@@ -108,6 +108,8 @@ def classrooms_to_grades(classrooms: dict):
         oturmaDuzeni = classroom["oturma_duzeni"]
         ogretmenMasasiOgrenci =  classroom["ogretmen_masasi"]
         if ogretmenMasasiOgrenci is not None:
+            # TODO - Check the grade variable if it is necessary or correctly assisgned
+            grade = ogretmenMasasiOgrenci[4]
             student = ogretmenMasasiOgrenci[1]
             placeNumber = ogretmenMasasiOgrenci
             mixed.update({no: [grade, student, classroomName, placeNumber]})
