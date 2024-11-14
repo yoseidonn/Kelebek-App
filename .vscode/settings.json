@@ -1,8 +1,0 @@
-{
-    "python.analysis.typeCheckingMode": "off",
-    "files.watcherExclude": {
-        "**/.dart_tool": true,
-        ".flatpak/**": true,
-        "_build/**": true
-    }
-}

@@ -1,2 +1,0 @@
-kelebek.conf
-    CLEAR_DATE_CACHE=True
