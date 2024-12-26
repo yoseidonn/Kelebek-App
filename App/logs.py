@@ -11,33 +11,10 @@ stdout_handler.setFormatter(formatter)
 
 #####
 year, month, day = datetime.datetime.now().strftime("%Y-%m-%d").split("-")
-try:
-    os.mkdir(os.path.join(BASE_DIR, 'Logs'))
-except FileExistsError as e:
-    pass
-except Exception as e:
-    print("Logger hatası")
-
-try:
-    os.mkdir(os.path.join(BASE_DIR, "Logs", year))
-except FileExistsError as e:
-    pass
-except Exception as e:
-    print(f"{e} | log oluşturma hatası")
-
-try:
-    os.mkdir(os.path.join(BASE_DIR, "Logs", year, month))
-except FileExistsError as e:
-    pass
-except Exception as e:
-    print(f"{e} | log oluşturma hatası")
-    
-try:
-    os.mkdir(os.path.join(BASE_DIR, "Logs", year, month, day))
-except FileExistsError as e:
-    pass
-except Exception as e:
-    print(f"{e} | log oluşturma hatası")    
+os.makedirs(os.path.join(BASE_DIR, 'Logs'), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, "Logs", year), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, "Logs", year, month), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, "Logs", year, month, day), exist_ok=True)
 
 #-----------------
 try:    
