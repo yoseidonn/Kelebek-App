@@ -433,9 +433,8 @@ class ExamFrame(QFrame):
         try:
             examName = "_".join([exam_infos.get('Sinav-Adi'), exam_infos.get('Tarih'), exam_infos.get('Kacinci-Ders').strip()])
             if dialogSonuc:
-                os.mkdir(os.path.join(BASE_DIR, 'Saved', examName))
-                os.mkdir(os.path.join(BASE_DIR, 'Saved', examName, "Classrooms"))
-                os.mkdir(os.path.join(BASE_DIR, 'Saved', examName, "Grades"))
+                os.makedirs(os.path.join(BASE_DIR, 'Saved', examName, "Classrooms"), exist_ok=True)
+                os.makedirs(os.path.join(BASE_DIR, 'Saved', examName, "Grades"), exist_ok=True)
                 name_template = "{}.html"
                 for cName in classroomPaths:
                     cNameToPath = "".join(cName.split("/"))

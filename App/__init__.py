@@ -11,20 +11,11 @@ import os, sys
 
 BASE_DIR = os.getenv('BASE_DIR')
 
-try:
-    os.mkdir(os.path.join(BASE_DIR, 'Archived'))
-except Exception as e:
-    logger.debug(e)
+os.makedirs(os.path.join(BASE_DIR, 'Archived'), exist_ok=True)
 
-try:
-    os.mkdir(os.path.join(BASE_DIR, 'Saved'))
-except Exception as e:
-    logger.debug(e)
+os.makedirs(os.path.join(BASE_DIR, 'Saved'), exist_ok=True)
 
-try:
-    os.mkdir(os.path.join(BASE_DIR, 'Temp'))
-except Exception as e:
-    logger.debug(e)
+os.makedirs(os.path.join(BASE_DIR, 'Temp'), exist_ok=True)
 
 try:
     with open(os.path.join(BASE_DIR, "App", "Themes", "styles.css"), "r", encoding="utf-8") as f:
@@ -38,7 +29,7 @@ app = QApplication([sys.argv])
 app.setStyleSheet(styles)
 
 theme = get_theme()
-#qdarktheme.setup_theme(theme)
+qdarktheme.setup_theme(theme)
 
 window = MainWindow()
 sys.exit(app.exec_())

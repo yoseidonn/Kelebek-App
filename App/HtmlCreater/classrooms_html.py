@@ -148,7 +148,7 @@ def create(examInfos, classrooms, exams):
     except Exception as e:
         logger.error(e)
         shutil.rmtree(os.path.join(BASE_DIR, 'Temp', examName, "Classrooms"))
-        os.mkdir(os.path.join(BASE_DIR, 'Temp', examName, "Classrooms"))
+        os.makedirs(os.path.join(BASE_DIR, 'Temp', examName, "Classrooms"), exist_ok=True)
             
     name_template = "{}.html"
     classroomPaths = {}
