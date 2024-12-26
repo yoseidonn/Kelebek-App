@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "your_project_name"
+version = "0.1.0"
+dependencies = [
+    "certifi==2024.12.14",
+    "charset-normalizer==3.4.0",
+    "idna==3.10",
+    "PyQt5==5.15.7",
+    "PyQt5-Qt5==5.15.16",
+    "PyQt5_sip==12.11.0",
+    "pyqtdarktheme==0.1.7",
+    "PyQtWebEngine==5.15.6",
+    "PyQtWebEngine-Qt5==5.15.16",
+    "python-dotenv==1.0.0",
+    "pyudev==0.24.1",
+    "requests==2.31.0",
+    "urllib3==2.2.3",
+    "xlrd==2.0.1"
+]
+
+[external]
+dependencies = [
+    "libxcb-xinerama0",
+    "libxcb-cursor0"
+]

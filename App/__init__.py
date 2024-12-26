@@ -1,4 +1,8 @@
 from PyQt5.QtWidgets import QApplication, QMessageBox
+import qdarktheme.base
+import qdarktheme.dist
+import qdarktheme.qtpy
+import qdarktheme.util
 from .logs import logger
 from .main_window import MainWindow
 from .database import *
@@ -34,7 +38,7 @@ app = QApplication([sys.argv])
 app.setStyleSheet(styles)
 
 theme = get_theme()
-qdarktheme.setup_theme(theme)
+#qdarktheme.setup_theme(theme)
 
 window = MainWindow()
 sys.exit(app.exec_())
